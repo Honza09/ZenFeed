@@ -1,0 +1,11 @@
+{
+  "title": "ZenFeed: scénáře čtyřtýdenního pilotu",
+  "unit": "osoby",
+  "status": "Hypotetické kapacitní scénáře, nikoli naměřená adopce",
+  "source": "Vlastní model; VYZKUM-ZENFEED.md, část 5; 22. 10. 2026",
+  "scenarios": [
+    {"name": "Konzervativní", "contacted": 20, "trial_rate": 0.4, "return_rate": 0.5},
+    {"name": "Střední plánovací", "contacted": 40, "trial_rate": 0.5, "return_rate": 0.6},
+    {"name": "Optimistický", "contacted": 60, "trial_rate": 0.6, "return_rate": 0.7}
+  ]
+}
