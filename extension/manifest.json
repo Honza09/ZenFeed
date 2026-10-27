@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "ZenFeed",
+  "version": "0.1.0",
+  "description": "Personalized web content filtering and summarization.",
+  "action": {
+    "default_title": "ZenFeed",
+    "default_popup": "popup/popup.html"
+  },
+  "permissions": ["activeTab"],
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content/content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

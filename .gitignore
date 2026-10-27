@@ -1,44 +1,23 @@
-# macOS
-.DS_Store
-.AppleDouble
-.LSOverride
-._*
-
-# Windows
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-
-# Editors / IDEs
-.idea/
-*.swp
-*.swo
-*~
-
-# Node / Chrome extension
-node_modules/
-dist/
-build/
-out/
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# Env a tajnosti
-.env
-.env.*
-!.env.example
-*.pem
-
-# Python (skripty v zadani/assets)
+# Python
 __pycache__/
 *.py[cod]
 .venv/
 venv/
-.Python
+.pytest_cache/
+.coverage
+htmlcov/
 
-# Balíčky rozšíření
-*.crx
-*.zip
+# Secrets and environment
+.env
+.env.*
+!.env.example
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+dist/
+build/
