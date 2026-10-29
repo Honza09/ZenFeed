@@ -9,8 +9,9 @@ Issue: ZF-04 (milník M1, týden 1). Spotřebitelé: ZF-03 (extraktor), ZF-07 (v
 | Soubor | K čemu |
 |---|---|
 | [`stranky.md`](stranky.md) | Karta každé pilotní stránky: URL, snapshot, selektory, prvky, které **nemají** být bloky, poznámky k reprodukci |
-| [`anotace.csv`](anotace.csv) | Referenční anotace: 88 bloků, jeden řádek = jeden očekávaný blok (zdroj pravdy pro ZF-07) |
+| [`anotace.csv`](anotace.csv) | Referenční anotace: 90 bloků, jeden řádek = jeden očekávaný blok (zdroj pravdy pro ZF-07) |
 | [`sablona-mereni.csv`](sablona-mereni.csv), [`sablona-mereni.md`](sablona-mereni.md) | Šablona záznamu měření (předvyplněno 6 stránek × 3 nastavení, výsledky prázdné); stejná šablona pro 24 stránek v ZF-19 |
+| [`anotace-vyrazene.csv`](anotace-vyrazene.csv) | Historie: 9 bloků původní stránky P06 (BBC), vyřazené z podmínkových důvodů; neslouží jako referenční data |
 | [`navod-druhy-hodnotitel.md`](navod-druhy-hodnotitel.md) | Jak anotaci zopakuje druhý hodnotitel |
 | [`kandidati-pro-zf-19.md`](kandidati-pro-zf-19.md) | Kandidátní stránky a domény pro větší sadu (neanotováno) |
 | [`nastroje/profil-stranky.js`](nastroje/profil-stranky.js) | Skript pro konzoli prohlížeče, který jen čte strukturu stránky a vypíše JSON profil |
@@ -25,9 +26,13 @@ Issue: ZF-04 (milník M1, týden 1). Spotřebitelé: ZF-03 (extraktor), ZF-07 (v
 | P03 | https://www.irozhlas.cz/zpravy-domov | irozhlas.cz | CS | feed s opakovanými kartami | 28 |
 | P04 | https://ct24.ceskatelevize.cz/textovy-prenos/prave-se-deje-380 | ct24.ceskatelevize.cz | CS | dynamicky načítaný obsah (živý přenos, tlačítko „Zobrazit další příspěvky“) | 24 |
 | P05 | https://en.wikipedia.org/w/index.php?title=Talk:Russo-Ukrainian_war&oldid=1382272905 | en.wikipedia.org | EN | hluboce vnořené elementy (DOM hloubka až 43, `<dl>` až 17 úrovní) | 6 |
-| P06 | https://www.bbc.com/news/articles/cmqxnl312v34o | bbc.com | EN | stránka s reklamními kontejnery (6× `ad-slot`) | 9 |
+| P06 | https://www.lupa.cz/clanky/drahe-pameti-mame-i-kvuli-krvave-lazni-pri-niz-korejci-vyhladoveli-posledniho-vyrobce-ram-v-evrope/ | lupa.cz | CS | stránka s reklamními kontejnery (`ins.adsbygoogle`, `div.ad-detail` uvnitř těla článku) | 11 |
 
-Pokrytí: 6 různých domén, všech 6 případů z plánu (§2.2), 3× čeština a 3× angličtina.
+Pokrytí: 6 různých domén, všech 6 případů z plánu (§2.2), 4× čeština a 2× angličtina (původní BBC byla vyřazena, viz níže).
+
+## Vyřazená stránka: původní P06 (BBC)
+
+Původní P06 byla https://www.bbc.com/news/articles/cmqxnl312v34o (BBC News, 9 bloků, 6× `ad-slot`). **Vyřazena 29. 10. 2026**, protože BBC Global Terms of Use (v1.0, 15. 4. 2026) zakazují skripty a automatizovaný sběr (§7) a vyžadují povolení pro strojovou analýzu (§8); detaily a důsledky jsou ve [`stranky.md`](stranky.md). Řádky anotace jsou zachované v [`anotace-vyrazene.csv`](anotace-vyrazene.csv) s ID ve tvaru `P06-BBC-B001`. Nepoužívají se pro měření. Stránka by se mohla vrátit, pokud BBC povolení udělí.
 
 ## Provizorní kategorie (ZF-24 zatím nezmrazeno)
 
@@ -37,7 +42,7 @@ V `docs/` žádný zmrazený seznam kategorií není (`mvp.md` §9, bod 4 ho ved
 - **Tón** (samostatné pole, nezávislé na tématu): `vyhrocený / toxický` = `ano` nebo `ne`. Negativní událost není automaticky vyhrocený tón (proposal §4.2).
 - **Jistota** anotace: `J` jistá, `H` hraniční (o hraničních případech má rozhodnout druhý hodnotitel).
 
-Kategorie `katastrofické scénáře` může znamenat skutečné katastrofy, nebo hypotetické katastrofické scénáře. Proposal to nerozlišuje, rozhodnutí patří do ZF-24. V pilotu je pro stránku BBC a živý přenos ČT24 tahle nejasnost bez dopadu, protože nastavení S2 skrývá obě kategorie dohromady (`zprávy o úmrtí` i `katastrofické scénáře`).
+Kategorie `katastrofické scénáře` může znamenat skutečné katastrofy, nebo hypotetické katastrofické scénáře. Proposal to nerozlišuje, rozhodnutí patří do ZF-24. V pilotu je pro živý přenos ČT24 tahle nejasnost bez dopadu, protože nastavení S2 skrývá obě kategorie dohromady (`zprávy o úmrtí` i `katastrofické scénáře`).
 
 ## Příkladová nastavení preferencí
 
@@ -60,9 +65,9 @@ Očekávaný počet skrytých bloků (z celkového počtu bloků stránky):
 | P03 | 28 | 4 | 0 | 0 |
 | P04 | 24 | 8 | 3 | 0 |
 | P05 | 6 | 4 | 0 | 1 |
-| P06 | 9 | 0 | 6 | 0 |
+| P06 | 11 | 0 | 0 | 0 |
 
-U případů s nulou skrytých bloků nejsou precision a recall definované (dělení nulou); vyhodnocuje se jen počet neoprávněných skrytí. Případně doplníme další nastavení.
+P06 slouží k testu reklam a segmentace, ne k testu skrývání: žádný z jejích bloků není v příkladových nastaveních určen ke skrytí, takže měří hlavně falešná skrytí a správné oddělení reklamních kontejnerů. U případů s nulou skrytých bloků nejsou precision a recall definované (dělení nulou); vyhodnocuje se jen počet neoprávněných skrytí. Případně doplníme další nastavení.
 
 ## Pravidla anotace (pracovní, k potvrzení v ZF-27)
 
