@@ -14,5 +14,5 @@ Prompts are saved as Markdown files using collision-resistant filenames:
 
 | Prompt | Description |
 |---|---|
-| — | No prompts saved yet. |
+| [20261029-190400-docs-backlog-audit.md](20261029-190400-docs-backlog-audit.md) | Audit of the project proposal vs. docs/mvp.md v0.2 and docs/backlog; fixes inconsistencies (read-only on GitHub). |
 

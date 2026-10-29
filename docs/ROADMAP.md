@@ -1,5 +1,7 @@
 # ZenFeed Roadmap
 
+> **Note (Oct 2026):** This roadmap is outdated. It treats summarization, toxicity detection and text-to-speech as optional later phases and does not mention block hiding. In the MVP these are required features; the valid plan is the 4-week plan in [`mvp.md`](mvp.md) §6 and `zenfeed_implementacni_plan.md`.
+
 This roadmap describes the proposed development sequence. Update task statuses to reflect actual progress.
 
 ## Phase 1 — Project Foundation

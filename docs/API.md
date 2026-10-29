@@ -1,5 +1,7 @@
 # ZenFeed API Reference
 
+> **Note (Oct 2026):** This is the initial generic draft. The product scope and the current endpoint plan (`/health`, `/v1/analyze`, `/v1/summarize`, `/v1/tts`) are defined in [`mvp.md`](mvp.md) §5; the paths and schemas below (`/api/v1/summarize`, `/api/v1/classify`) are outdated and will be replaced by the contract from backlog issue ZF-02.
+
 ## Document Status
 
 This document describes a proposed API design. Endpoints remain proposals until they are implemented and verified in the backend code.

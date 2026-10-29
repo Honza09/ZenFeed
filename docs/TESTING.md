@@ -1,5 +1,7 @@
 # Testing Strategy
 
+> **Note (Oct 2026):** This is the generic testing strategy. The MVP evaluation (about 24 pages in Czech and English, two annotators, tuning vs. final split, thresholds 80 % / 20 % / 100 %, 5–8 interviews, 3–5 prototype testers) is defined in [`mvp.md`](mvp.md) §7 and will be added here under backlog issue ZF-27.
+
 ## Goals
 
 Testing should verify that ZenFeed:

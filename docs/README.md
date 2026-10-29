@@ -1,5 +1,7 @@
 # ZenFeed Documentation
 
+> The scope of the MVP is defined by [`mvp.md`](mvp.md) (v0.2), which follows `zadani/zenfeed-final-proposal.md`. The goals below are a generic overview; summarization, hiding of content blocks and synthetic-voice playback of the summary are required MVP features, not optional ones.
+
 ZenFeed is a project focused on personalized web content filtering and processing through a Google Chrome extension.
 
 ## Project Goals
@@ -50,3 +52,5 @@ Adapt this structure to match the actual repository as development progresses.
 - [API Reference](API.md)
 - [Testing](TESTING.md)
 - [Roadmap](ROADMAP.md)
+- [Product definition and MVP scope (v0.2)](mvp.md) — authoritative; the sections above are generic drafts
+- [Backlog](backlog/README.md)

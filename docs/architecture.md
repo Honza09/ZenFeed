@@ -1,5 +1,7 @@
 # ZenFeed Architecture
 
+> **Note (Oct 2026):** This is the initial generic draft. The target architecture (block segmentation in a content script, hiding with a reversible "Show" box, preference-aware summary, synthetic-voice playback, user-triggered processing only) is defined in [`mvp.md`](mvp.md) §3 and §5 and in `zadani/zenfeed-final-proposal.md` §4.4. It will be rewritten under backlog issue ZF-02.
+
 ## Overview
 
 ZenFeed consists of two primary components:

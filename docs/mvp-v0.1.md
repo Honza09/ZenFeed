@@ -1,5 +1,7 @@
 # ZenFeed — definice produktu a MVP
 
+> **ZASTARALÉ — nahrazeno verzí 0.2 (`mvp.md`).** Tento dokument byl v rozporu s proposalem (jen celé stránky, nativní TTS). Nepoužívat jako zdroj požadavků; uchováno pouze jako historie.
+
 - **Verze:** 0.1
 - **Stav:** Návrh k diskusi a schválení
 - **Datum:** 27. 10. 2026

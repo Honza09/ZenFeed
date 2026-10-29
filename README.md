@@ -1,7 +1,8 @@
 # ZenFeed
 
-Chrome extension for personalized web content filtering,
-summarization, and accessibility.
+Chrome extension that hides content blocks the user does not want to read,
+and produces a standalone summary that can be played in a synthetic voice.
+It never modifies the page text. See [`docs/mvp.md`](docs/mvp.md).
 
 ## Project structure
 
