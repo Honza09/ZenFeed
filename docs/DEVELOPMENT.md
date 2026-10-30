@@ -13,11 +13,9 @@
 If you do not have a local copy yet:
 
 ```bash
-git clone <REPOSITORY_URL>
-cd zenfeed
+git clone https://github.com/Honza09/ZenFeed.git
+cd ZenFeed
 ```
-
-Replace `<REPOSITORY_URL>` with the actual GitHub repository URL.
 
 ## Chrome Extension
 
@@ -49,13 +47,26 @@ Activate it on Windows PowerShell:
 .venv\Scripts\Activate.ps1
 ```
 
-If `backend/requirements.txt` exists, install dependencies:
+Install dependencies, including the lint and test tools (`requirements-dev.txt` includes `requirements.txt`):
 
 ```bash
-pip install -r backend/requirements.txt
+pip install -r backend/requirements-dev.txt
 ```
 
 The exact server startup command depends on the actual FastAPI application module. Add a verified command here once the entry point has been implemented.
+
+## Running the checks locally
+
+CI (`.github/workflows/ci.yml`) runs the same commands. Run them from the repository root before opening a pull request:
+
+```bash
+ruff check backend
+pytest backend
+python .github/scripts/check_extension.py extension/manifest.json
+find extension -name '*.js' -print0 | xargs -0 -r -n1 node --check
+```
+
+The last command needs Node.js, used only for the syntax check; the extension itself has no build step. The GitHub Actions workflow itself cannot be run locally; it runs when a pull request is opened.
 
 ## Configuration
 
@@ -71,4 +82,4 @@ The exact server startup command depends on the actual FastAPI application modul
 3. Implement a small, clearly scoped change.
 4. Run the relevant tests.
 5. Review `git diff`.
-6. Prepare a commit and pull request according to the team's workflow.
+6. Prepare a commit and pull request as described in [`CONTRIBUTING.md`](../CONTRIBUTING.md).

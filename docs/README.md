@@ -47,7 +47,7 @@ Adapt this structure to match the actual repository as development progresses.
 
 ## Documentation Index
 
-- [Architecture](ARCHITECTURE.md)
+- [Architecture](architecture.md)
 - [Development Setup](DEVELOPMENT.md)
 - [API Reference](API.md)
 - [Testing](TESTING.md)

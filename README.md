@@ -16,17 +16,34 @@ It never modifies the page text. See [`docs/mvp.md`](docs/mvp.md).
 - Python 3.11+
 - Git
 
-## Backend setup
+## Local setup
 
-Create a virtual environment:
+Clone the repository:
+
+    git clone https://github.com/Honza09/ZenFeed.git
+    cd ZenFeed
+
+Create a virtual environment, activate it and install the backend dependencies
+(including the lint and test tools):
 
     python -m venv .venv
+    source .venv/bin/activate        # Windows PowerShell: .venv\Scripts\Activate.ps1
+    pip install -r backend/requirements-dev.txt
 
-Activate it, then install dependencies:
+Run the checks that CI runs (from the repository root):
 
-    pip install -r backend/requirements.txt
+    ruff check backend
+    pytest backend
 
-## Development
+Load the extension in Chrome via `chrome://extensions` (Developer mode,
+**Load unpacked**, select `extension/`). Details are in
+[`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md).
 
-The project is currently in its initial setup phase.
-See the project issues for assigned tasks.
+There is no runnable backend server yet; the start command will be added with
+the first FastAPI endpoint.
+
+## Contributing
+
+The MVP scope is in [`docs/mvp.md`](docs/mvp.md) and the task list in
+[`docs/backlog/`](docs/backlog/README.md). Workflow, commit conventions and the
+Definition of Done are in [`CONTRIBUTING.md`](CONTRIBUTING.md).

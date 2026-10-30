@@ -21,3 +21,9 @@ Thumbs.db
 # Build artifacts
 dist/
 build/
+
+# Tooling caches and logs
+node_modules/
+.ruff_cache/
+.mypy_cache/
+*.log
