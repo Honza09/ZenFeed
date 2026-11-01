@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <title>ZenFeed segmentation fixture</title>
+  <style>.sr-hidden { display: none; }</style>
+</head>
+<body>
+  <header>
+    <a href="#">Logo</a>
+    <nav><a href="#">Domů</a> <a href="#">Zprávy</a> <a href="#">Sport</a></nav>
+  </header>
+
+  <div class="menu"><a href="#">O nás</a> <a href="#">Kontakt</a></div>
+
+  <form>
+    <label>Hledat <input type="search"></label>
+    <button>Najít článek o počasí a dopravě</button>
+  </form>
+
+  <main>
+    <h2>Výpis článků</h2>
+    <div class="list">
+      <div class="card"><a href="#">Vláda schválila nový rozpočet na příští rok</a><p>Krátký perex k rozpočtu a jeho dopadům na domácnosti.</p></div>
+      <div class="card"><a href="#">Hokejisté vyhráli třetí zápas v řadě</a><p>Trenér po zápase chválil obranu i brankáře.</p></div>
+      <div class="card"><a href="#">V Brně otevřeli novou knihovnu pro děti</a><p>Knihovna nabízí hernu, dílny a čtení pro nejmenší.</p></div>
+    </div>
+
+    <article id="long-article">
+      <h1>Dlouhý článek o klimatu</h1>
+      <p>První odstavec dlouhého článku popisuje, jak se v posledních letech mění průměrné teploty ve střední Evropě a co to znamená pro zemědělství, vodní zdroje a města. Autoři studie vycházejí z měření mnoha meteorologických stanic.</p>
+      <p>Druhý odstavec rozebírá, proč se častěji objevují přívalové deště a dlouhá období sucha. Vědci upozorňují, že extrémy přicházejí rychleji, než se ještě před deseti lety předpokládalo, a že adaptace stojí peníze.</p>
+      <h2>Dopady na města</h2>
+      <p>Města zkoušejí zelené střechy, stromořadí a zasakovací plochy. Tyto úpravy snižují teplotu ulic v létě o několik stupňů a pomáhají zadržet vodu při bouřkách, které kanalizace nestačí odvádět.</p>
+      <p>Úřady ale narážejí na nedostatek míst pro stromy, protože pod chodníky vedou kabely a potrubí. Proto se hledají nové typy výsadby a spolupráce se správci sítí, kteří musejí změny schvalovat.</p>
+      <h2>Dopady na zemědělství</h2>
+      <p>Zemědělci mění osevní postupy, pěstují odolnější odrůdy a investují do závlah. Některé plodiny se posouvají výš do kopců, jiné se v nížinách přestávají vyplácet úplně.</p>
+      <p>Pojišťovny reagují zdražením pojistek proti suchu a krupobití. Malé farmy proto častěji spolupracují v družstvech, aby rizika rozložily mezi více členů a mohly si dovolit techniku.</p>
+      <p class="sr-hidden">Tento skrytý text se nesmí objevit v žádném bloku.</p>
+      <p aria-hidden="true">Ani tento text označený aria-hidden se nesmí objevit.</p>
+    </article>
+
+    <section id="comments">
+      <h2>Komentáře</h2>
+      <div class="comment"><b>Petr:</b> Souhlasím, u nás na vesnici už třetí rok chybí voda ve studních.</div>
+      <div class="comment"><b>Jana:</b> Zelené střechy jsou drahé, ale vyplatí se, máme jednu na garáži.</div>
+      <div class="comment"><b>Karel:</b> Ok.</div>
+    </section>
+
+    <div id="no-title">
+      <p>Blok bez nadpisu: krátká zpráva o tom, že v pondělí bude uzavřena hlavní silnice kvůli opravě mostu.</p>
+    </div>
+
+    <div id="little-text"><p>Jen pár slov.</p></div>
+
+    <span class="wrapper"><div id="nested-in-inline">Odstavec vložený do inline elementu, který se nesmí započítat dvakrát do výsledku.</div></span>
+  </main>
+
+  <footer><p>© 2026 Testovací web. Všechna práva vyhrazena. Kontakt a podmínky použití.</p></footer>
+</body>
+</html>
