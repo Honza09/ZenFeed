@@ -1,78 +1,90 @@
-page_id,block_id,typ_bloku,locator,úryvek_pro_identifikaci,téma,tón_vyhrocený,jistota,S1_skrýt_válka+pol.konflikty,S2_skrýt_úmrtí+katastrofa,S3_skrýt_vyhrocený_tón,poznámka
-P01,P01-B001,section,"div.entry > * (děti 2–8 (od odstavce „This interview is part of a series…“ po „Civil society organizations…“, včetně bloku Read more))","Úvod: série o grantistech Digital Spark, Prison Agenda",jiné,ne,H,K,K,K,"věcný úvod o vězeňství v Turecku, zmínka o mučení; téma mimo provizorní kategorie, proto jiné; zda patří pod násilí, rozhodne ZF-24"
-P01,P01-B002,section,div.entry > * (děti 9–15 (od „Global Voices interviewed…“ po „We were particularly impressed…“)),Otázka 1: organizace a proč Digital Spark,jiné,ne,J,K,K,K,
-P01,P01-B003,section,div.entry > * (děti 16–19 (od „GV: What issue/challenge…“)),Otázka 2: jaký problém projekt řeší,jiné,ne,J,K,K,K,
-P01,P01-B004,section,div.entry > * (děti 20–23 (od „GV: What are the key changes…“)),Otázka 3: hlavní změny a aktivity,jiné,ne,J,K,K,K,
-P01,P01-B005,section,div.entry > * (děti 24–27 (od „AK: How did your participation…“)),Otázka 4: dopad na čtenáře a komunitu,jiné,ne,J,K,K,K,
-P01,P01-B006,section,div.entry > * (děti 28–31 (od „GV: How has your own knowledge…“)),Otázka 5: změna znalostí o digitální demokracii,jiné,ne,J,K,K,K,
-P01,P01-B007,section,div.entry > * (děti 32–36 (od „GV: What are the most valuable lessons…“)),Otázka 6: nejcennější poučení,jiné,ne,J,K,K,K,
-P01,P01-B008,section,div.entry > * (děti 37–41 (od „GV: What comes next?…“)),Otázka 7: co bude dál,jiné,ne,J,K,K,K,
-P02,P02-B001,comment,article#D4iCFgsHqfDeLPH9E,Cool!,jiné,ne,J,K,K,K,úroveň odpovědi 1
-P02,P02-B002,comment,article#HtSxuniKbmTtShnTS,Thanks for this suggestion! This is not currentl…,jiné,ne,J,K,K,K,úroveň odpovědi 2
-P02,P02-B003,comment,article#wSxXbwh4Lz8SkvNEJ,The main text from the CC BY 4.0 link above:,jiné,ne,J,K,K,K,úroveň odpovědi 1
-P02,P02-B004,comment,article#tY5ngyYJgpnConuGy,"(Ben_West, feel free to delete this comment if n…",jiné,ne,J,K,K,K,úroveň odpovědi 2
-P02,P02-B005,comment,article#WzqmHveqMMTqA5iCw,I just didn't want to make the post even longer.,jiné,ne,J,K,K,K,úroveň odpovědi 3
-P02,P02-B006,comment,article#BZYRnnqo4io3cFTjm,"Starting December 1, will it be obvious when wri…",jiné,ne,J,K,K,K,úroveň odpovědi 1
-P02,P02-B007,comment,article#G6zBuBJnrrap43DZr,"Going to ""New Post"" now, it looks like you have …",jiné,ne,J,K,K,K,úroveň odpovědi 2
-P02,P02-B008,comment,article#FXhpBCHFHddX5aEjF,"That said, this is not the case for comments cur…",jiné,ne,J,K,K,K,úroveň odpovědi 3
-P02,P02-B009,comment,article#iGmYMbKPyATtDPyYc,Do you have the link to the terms of use? I have…,jiné,ne,J,K,K,K,úroveň odpovědi 3
-P02,P02-B010,comment,article#3GLhvh3t77hkxgzeq,"I see that most of EVF orgs' own content (CEA, G…",jiné,ne,J,K,K,K,úroveň odpovědi 1
-P02,P02-B011,comment,article#2Ky3Sj2osuxaLpL6h,"Yeah, good flag. I think most of what CEA writes…",jiné,ne,J,K,K,K,úroveň odpovědi 2
-P02,P02-B012,comment,article#vXscH7g8GqCoLq3me,I noticed the checkbox for confirming awareness …,jiné,ne,J,K,K,K,úroveň odpovědi 1
-P02,P02-B013,comment,article#Bao25ThWuG5LeTyvm,"[Answering from memory, without any knowledge of…",jiné,ne,J,K,K,K,úroveň odpovědi 2
-P02,P02-B014,comment,article#fwosy98tLPttjvkuu,Thanks JP — that's right that we originally show…,jiné,ne,J,K,K,K,úroveň odpovědi 3
-P02,P02-B015,comment,article#SiDPf6C5XmryQgzzp,"If I post a quote here, the quoted text won't be…",jiné,ne,J,K,K,K,úroveň odpovědi 1
-P02,P02-B016,comment,article#5K2ontwdxW3qM6vCS,The CC license only covers Licensed Rights that …,jiné,ne,J,K,K,K,úroveň odpovědi 2
-P02,P02-B017,comment,article#Kyw55nML5nHbst3aK,I just wrote some comments today without being i…,jiné,ne,J,K,K,K,úroveň odpovědi 1
-P02,P02-B018,comment,article#k9peASDxE3TxzSNxz,"Oh, yeah, the tick-box also disappeared for me w…",jiné,ne,J,K,K,K,úroveň odpovědi 2
-P02,P02-B019,comment,article#CMfYqp3Sw75QKKXGz,Thanks for reporting this! I believe the issue i…,jiné,ne,J,K,K,K,úroveň odpovědi 3
-P02,P02-B020,comment,article#RW5GBLFFXuSCY559b,(odkaz na termsOfUse fóra),jiné,ne,J,K,K,K,úroveň odpovědi 1
-P02,P02-B021,comment,article#p8uP7GpvvLzeLBJDy,"Hi Elliot, your quote cuts off the ""Subject to s…",jiné,ne,J,K,K,K,úroveň odpovědi 2
-P02,P02-B022,comment,article#xmYSsxcn3pWukj35f,You want me to talk to a lawyer to know how quot…,jiné,ne,H,K,K,K,"úroveň odpovědi 3; lehce podrážděný tón, ale ne vyhrocený"
-P02,P02-B023,comment,article#WbivFym9KRCCFZbwN,"Does the EA forum have a terms of use document, …",jiné,ne,J,K,K,K,úroveň odpovědi 1
-P02,P02-B024,comment,article#9JepyLQdwN6rnSoqq,(odkaz na terms-and-conditions CEA),jiné,ne,J,K,K,K,úroveň odpovědi 2
-P03,P03-B001,listing article,".hds-content-item:has(a[href^=""/blogs/spacestation/2026/11/02/week-starts-with-spacewalk-preps-and-li""])",Week Starts with Spacewalk Preps and Life Science,jiné,ne,J,K,K,K,
-P03,P03-B002,listing article,".hds-content-item:has(a[href^=""/image-article/nasas-chapea-crew-returns-to-earth/""])",NASA’s CHAPEA Crew “Returns” to Earth,jiné,ne,J,K,K,K,"simulovaná mise na Marsu, uvozovky v titulku"
-P03,P03-B003,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/solar-system/skywatching/whats-up-november-20""])",What’s Up: November 2026 Skywatching Tips from NASA,jiné,ne,J,K,K,K,
-P03,P03-B004,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/blogs/swift/2026/11/02/nasas-swift-observator""])",NASA’s Swift Observatory to Re-Enter Atmosphere,jiné,ne,H,K,K,K,"zánik družice; zda jde o „katastrofické scénáře“, rozhodne ZF-24 (zde ne)"
-P03,P03-B005,listing article,".hds-content-item:has(a[href^=""/news-release/nasa-invites-media-to-northrop-grumman-crs-25-station-re""])",NASA Invites Media to Northrop Grumman CRS-25 Station Resupply Launch,jiné,ne,J,K,K,K,
-P03,P03-B006,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/blogs/tsis-2/2026/11/02/nasas-mission-to-stud""])","NASA’s Mission to Study Sunlight Completes Vacuum, Vibration Testing",jiné,ne,J,K,K,K,
-P03,P03-B007,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/missions/hubble/nasas-hubble-uncovers-case-of""])",NASA’s Hubble Uncovers Case of Missing Oxygen in Nearby Dwarf Galaxies,jiné,ne,J,K,K,K,
-P03,P03-B008,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/image-article/apod-2026-november-2-a-long-clo""])",APOD: 2026 November 2 – A Long Cloud on Mars,jiné,ne,J,K,K,K,
-P03,P03-B009,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/earth/earth-observatory/pennsylvanias-grand-c""])",Pennsylvania’s Grand Canyon,jiné,ne,J,K,K,K,
-P03,P03-B010,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/image-article/apod-2026-november-1-colors-of-""])",APOD: 2026 November 1 – Colors of the Moon,jiné,ne,J,K,K,K,
-P03,P03-B011,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/image-article/apod-2026-october-31-night-on-a""])",APOD: 2026 October 31 – Night on a Spooky Planet,jiné,ne,J,K,K,K,"halloweenské slovo „Spooky“, tón neutrální"
-P03,P03-B012,listing article,".hds-content-item:has(a[href^=""/news-release/nasa-releases-max-power-key-events-for-media-participant""])","NASA Releases MAX POWER Key Events for Media, Participants",jiné,ne,J,K,K,K,
-P03,P03-B013,listing article,".hds-content-item:has(a[href^=""/blogs/spacestation/2026/10/30/space-crops-and-advanced-tech-wrap-up-w""])",Space Crops and Advanced Tech Wrap Up Week Following Spacewalk,jiné,ne,J,K,K,K,
-P03,P03-B014,listing article,".hds-content-item:has(a[href^=""/image-article/nasas-james-webb-space-telescope-captures-eerie-cats-he""])",NASA’s James Webb Space Telescope Captures Eerie Cat’s Head,jiné,ne,J,K,K,K,"„eerie“ je popis snímku, ne vyhrocený tón"
-P03,P03-B015,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/missions/hubble/nasa-explores-potential-comme""])",NASA Explores Potential Commercial Servicing for Hubble Telescope,jiné,ne,J,K,K,K,
-P03,P03-B016,listing article,".hds-content-item:has(a[href^=""/podcasts/houston-we-have-a-podcast/artemis-iii-paving-the-way-to-luna""])",Artemis III: Paving the Way to Lunar Landings,jiné,ne,J,K,K,K,"podcast (55 min), na kartě jen popis"
-P03,P03-B017,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/solar-system/skywatching/night-sky-network/no""])",November’s Night Sky Notes: Light-Day Away,jiné,ne,J,K,K,K,
-P03,P03-B018,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/image-article/apod-2026-october-30-haunting-t""])",APOD: 2026 October 30 – Haunting the Cepheus Flare,jiné,ne,J,K,K,K,"halloweenské slovo „Haunting“, tón neutrální"
-P03,P03-B019,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/earth/earth-observatory/vega-island-frozen-in""])",Vega Island Frozen in Fright,jiné,ne,H,K,K,K,titulek hraje s Halloweenem („Fright“); obsah je věcný popis ostrova
-P03,P03-B020,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/photojournal/map-showing-potential-origins-of""])",Map Showing Potential Origins of Martian Meteorite Teghaza 001,jiné,ne,J,K,K,K,
-P03,P03-B021,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/photojournal/slice-of-martian-meteorite-tegha""])",Slice of Martian Meteorite Teghaza 001,jiné,ne,J,K,K,K,
-P03,P03-B022,listing article,".hds-content-item:has(a[href^=""/centers-and-facilities/johnson/halloween-aboard-the-international-spa""])",Halloween Aboard the International Space Station,jiné,ne,J,K,K,K,
-P03,P03-B023,listing article,".hds-content-item:has(a[href^=""/blogs/spacestation/2026/10/29/spacewalkers-install-roll-out-solar-arr""])",Spacewalkers Install Roll-Out Solar Array for Power Generation,jiné,ne,J,K,K,K,
-P03,P03-B024,listing article,".hds-content-item:has(a[href^=""/solar-system/planets/mars/nasa-funded-study-details-one-of-oldest-mar""])",NASA-funded Study Details One of Oldest Mars Meteorites Ever Found,jiné,ne,J,K,K,K,
-P03,P03-B025,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/blogs/tracers/2026/10/29/nasas-tracers-first-""])",NASA’s TRACERS First Results Offers Peek into Violent Magnetic Process,jiné,ne,H,K,K,K,"slovo „Violent“ je vědecký popis magnetického děje, ne vyhrocený tón"
-P04,P04-B001,section,div#introduction,Úvod: od roku 1800 zemřelo v bojích přes 37 milionů lidí,válka,ne,J,H,K,K,"statistický text o obětech válek; hlavní téma = válka, ne zpráva o úmrtí"
-P04,P04-B002,section,div.article-block__key-insights (h1#key-insights),Key Insights on War and Peace,válka,ne,J,H,K,K,"obsahuje i grafy (figure.chart), které se dokreslí až po rolování"
-P04,P04-B003,section,section.article-block__research-and-writing (h1#research-writing),Research & Writing (3 články + More on Measuring Conflict),válka,ne,H,H,K,K,seznam odkazů na články o konfliktech
-P04,P04-B004,section,div.article-block__gray-section (h1#explore-data-on-armed-conflict-and-war),Explore Data: Data Explorer a mapa úmrtí v konfliktech,válka,ne,J,H,K,K,figure.explorer a graf se kreslí dynamicky (svg se objeví až po načtení)
-P04,P04-B005,section,section.article-block__all-charts (h1#all-charts),Key Charts on War & Peace: Deaths in wars,válka,ne,J,H,K,K,graf se kreslí dynamicky
-P04,P04-B006,section,section.article-block__featured-metrics,Featured Data on War & Peace (8 odkazů),válka,ne,H,H,K,K,mix: úmrtí v konfliktech i uprchlíci
-P04,P04-B007,section,kontejner s h3#article-endnotes,Endnotes: poznámky a literatura,jiné,ne,H,K,K,K,"bibliografický aparát k tématu války; hlavní téma = citace, ne obsah"
-P05,P05-B001,section,"#mw-content-text .mw-parser-output > section[data-mw-section-id=""0""]",(lead) upozornění na „contentious topic“ a šablony,jiné,ne,J,K,K,K,"administrativní upozornění, ne diskuze; ověřit, zda jde o obsahový blok"
-P05,P05-B002,section,"#mw-content-text .mw-parser-output > section[data-mw-section-id=""1""]","""Clockwise from top left"" – popisky fotografií",jiné,ne,H,K,K,K,o popiscích obrázků; téma válka jen nepřímo
-P05,P05-B003,section,"#mw-content-text .mw-parser-output > section[data-mw-section-id=""2""]","Last sentence of lede – příměří, neochota stran",válka,ne,J,H,K,K,"nejhlubší vnoření: DOM hloubka až 43, <dl> až 17 úrovní; 25 příspěvků"
-P05,P05-B004,section,"#mw-content-text .mw-parser-output > section[data-mw-section-id=""3""]",Still no Response regarding belligerents list,válka,ano,H,H,K,H,"odmítavý tón, hraniční"
-P05,P05-B005,section,"#mw-content-text .mw-parser-output > section[data-mw-section-id=""4""]",Edit request – formulace o Krymu,válka,ne,J,H,K,K,
-P05,P05-B006,section,"#mw-content-text .mw-parser-output > section[data-mw-section-id=""5""]",Pro west propaganda? – název článku,válka,ne,H,H,K,K,"nadpis obviňující, odpovědi věcné"
-P06,P06-B001,section,div.wysiwyg_content.perex_content > p,Perex: kultivované maso a čokoláda jsou témata…,jiné,ne,J,K,K,K,perex je v samostatném div.perex_content před hlavním div#asset_213980
-P06,P06-B002,section,h2 „Rybí prsty z laboratoře“ a sourozenci do dalšího h2 (v div#asset_213980.wysiwyg_content),Rybí prsty z laboratoře,jiné,ne,J,K,K,K,
-P06,P06-B003,section,h2 „Náhrada mléčných výrobků“ a sourozenci do dalšího h2,Náhrada mléčných výrobků,jiné,ne,J,K,K,K,
-P06,P06-B004,section,h2 „Vaječná bílkovina ze zkumavky“ a sourozenci do dalšího h2,Vaječná bílkovina ze zkumavky,jiné,ne,J,K,K,K,
-P06,P06-B005,section,"h2 „Investice? Ano, ale zprostředkovaně…“ a sourozenci do dalšího h2","Investice? Ano, ale zprostředkovaně…",jiné,ne,J,K,K,K,
-P06,P06-B006,section,h2 „Nadějná studie z Finska“ a sourozenci do dalšího h2,Nadějná studie z Finska,jiné,ne,J,K,K,K,
-P06,P06-B007,section,h2 „Velký otazník: Přijme veřejnost potraviny…“ a sourozenci do konce div#asset_213980,Velký otazník: Přijme veřejnost potraviny…,jiné,ne,J,K,K,K,
+page_id,block_id,typ_bloku,locator,úryvek_pro_identifikaci,téma,tón_vyhrocený,jistota,S1_skrýt_válka+pol.konflikty,S2_skrýt_úmrtí+katastrofa,S3_skrýt_vyhrocený_tón,S4_skrýt_násilí,poznámka
+P01,P01-B001,section,div#introduction,Úvod: od roku 1800 zemřelo v bojích přes 37 milionů lidí,válka,ne,J,H,K,K,K,statistický text o obětech válek; hlavní téma = válka (válka má přednost před úmrtím)
+P01,P01-B002,section,div.article-block__key-insights (h1#key-insights),Key Insights on War and Peace,válka,ne,J,H,K,K,K,čtyři dílčí poznatky (h4); grafy jsou v DOM hned po načtení
+P01,P01-B003,section,section.article-block__research-and-writing (h1#research-writing),Research & Writing (3 články + More on Measuring Conflict),válka,ne,H,H,K,K,K,seznam odkazů na články o konfliktech
+P01,P01-B004,section,div.article-block__gray-section (h1#explore-data-on-armed-conflict-and-war),Explore Data: Data Explorer a mapa úmrtí v konfliktech,válka,ne,J,H,K,K,K,Data Explorer a mapa úmrtí v konfliktech; grafy v DOM hned po načtení
+P01,P01-B005,section,section.article-block__all-charts (h1#all-charts),Key Charts on War & Peace: Deaths in wars,válka,ne,J,H,K,K,K,graf Deaths in wars
+P01,P01-B006,section,kontejner s h3#article-endnotes,Endnotes: poznámky a literatura,jiné,ne,H,K,K,K,K,"bibliografický aparát k tématu války; hlavní téma = citace, ne obsah"
+P02,P02-B001,comment,article#D4iCFgsHqfDeLPH9E,Cool!,jiné,ne,J,K,K,K,K,úroveň odpovědi 1
+P02,P02-B002,comment,article#HtSxuniKbmTtShnTS,Thanks for this suggestion! This is not currentl…,jiné,ne,J,K,K,K,K,úroveň odpovědi 2
+P02,P02-B003,comment,article#wSxXbwh4Lz8SkvNEJ,The main text from the CC BY 4.0 link above:,jiné,ne,J,K,K,K,K,úroveň odpovědi 1
+P02,P02-B004,comment,article#tY5ngyYJgpnConuGy,"(Ben_West, feel free to delete this comment if n…",jiné,ne,J,K,K,K,K,úroveň odpovědi 2
+P02,P02-B005,comment,article#WzqmHveqMMTqA5iCw,I just didn't want to make the post even longer.,jiné,ne,J,K,K,K,K,úroveň odpovědi 3
+P02,P02-B006,comment,article#BZYRnnqo4io3cFTjm,"Starting December 1, will it be obvious when wri…",jiné,ne,J,K,K,K,K,úroveň odpovědi 1
+P02,P02-B007,comment,article#G6zBuBJnrrap43DZr,"Going to ""New Post"" now, it looks like you have …",jiné,ne,J,K,K,K,K,úroveň odpovědi 2
+P02,P02-B008,comment,article#FXhpBCHFHddX5aEjF,"That said, this is not the case for comments cur…",jiné,ne,J,K,K,K,K,úroveň odpovědi 3
+P02,P02-B009,comment,article#iGmYMbKPyATtDPyYc,Do you have the link to the terms of use? I have…,jiné,ne,J,K,K,K,K,úroveň odpovědi 3
+P02,P02-B010,comment,article#3GLhvh3t77hkxgzeq,"I see that most of EVF orgs' own content (CEA, G…",jiné,ne,J,K,K,K,K,úroveň odpovědi 1
+P02,P02-B011,comment,article#2Ky3Sj2osuxaLpL6h,"Yeah, good flag. I think most of what CEA writes…",jiné,ne,J,K,K,K,K,úroveň odpovědi 2
+P02,P02-B012,comment,article#vXscH7g8GqCoLq3me,I noticed the checkbox for confirming awareness …,jiné,ne,J,K,K,K,K,úroveň odpovědi 1
+P02,P02-B013,comment,article#Bao25ThWuG5LeTyvm,"[Answering from memory, without any knowledge of…",jiné,ne,J,K,K,K,K,úroveň odpovědi 2
+P02,P02-B014,comment,article#fwosy98tLPttjvkuu,Thanks JP — that's right that we originally show…,jiné,ne,J,K,K,K,K,úroveň odpovědi 3
+P02,P02-B015,comment,article#SiDPf6C5XmryQgzzp,"If I post a quote here, the quoted text won't be…",jiné,ne,J,K,K,K,K,úroveň odpovědi 1
+P02,P02-B016,comment,article#5K2ontwdxW3qM6vCS,The CC license only covers Licensed Rights that …,jiné,ne,J,K,K,K,K,úroveň odpovědi 2
+P02,P02-B017,comment,article#Kyw55nML5nHbst3aK,I just wrote some comments today without being i…,jiné,ne,J,K,K,K,K,úroveň odpovědi 1
+P02,P02-B018,comment,article#k9peASDxE3TxzSNxz,"Oh, yeah, the tick-box also disappeared for me w…",jiné,ne,J,K,K,K,K,úroveň odpovědi 2
+P02,P02-B019,comment,article#CMfYqp3Sw75QKKXGz,Thanks for reporting this! I believe the issue i…,jiné,ne,J,K,K,K,K,úroveň odpovědi 3
+P02,P02-B020,comment,article#RW5GBLFFXuSCY559b,(odkaz na termsOfUse fóra),jiné,ne,J,K,K,K,K,úroveň odpovědi 1
+P02,P02-B021,comment,article#p8uP7GpvvLzeLBJDy,"Hi Elliot, your quote cuts off the ""Subject to s…",jiné,ne,J,K,K,K,K,úroveň odpovědi 2
+P02,P02-B022,comment,article#xmYSsxcn3pWukj35f,You want me to talk to a lawyer to know how quot…,jiné,ne,H,K,K,K,K,"úroveň odpovědi 3; lehce podrážděný tón, ale ne vyhrocený"
+P02,P02-B023,comment,article#WbivFym9KRCCFZbwN,"Does the EA forum have a terms of use document, …",jiné,ne,J,K,K,K,K,úroveň odpovědi 1
+P02,P02-B024,comment,article#9JepyLQdwN6rnSoqq,(odkaz na terms-and-conditions CEA),jiné,ne,J,K,K,K,K,úroveň odpovědi 2
+P02,P02-B025,section,"div.content-base (tělo příspěvku pod h1#top; 23 potomků, 5 nadpisů h2: „What does this mean…“, „How will this affect previously…“, „What if I want to use a different…“, „What if I have another concern…“, „Thank you!“)",Tělo příspěvku: New Forum License: Creative Commons,jiné,ne,J,K,K,K,K,"příspěvek anotován jako jeden blok (rozhodnutí Libuše 2. 11. 2026); licence fóra, věcný text"
+P03,P03-B001,listing article,".hds-content-item:has(a[href^=""/blogs/spacestation/2026/11/02/week-starts-with-spacewalk-preps-and-li""])",Week Starts with Spacewalk Preps and Life Science,jiné,ne,J,K,K,K,K,
+P03,P03-B002,listing article,".hds-content-item:has(a[href^=""/image-article/nasas-chapea-crew-returns-to-earth/""])",NASA’s CHAPEA Crew “Returns” to Earth,jiné,ne,J,K,K,K,K,"simulovaná mise na Marsu, uvozovky v titulku"
+P03,P03-B003,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/solar-system/skywatching/whats-up-november-20""])",What’s Up: November 2026 Skywatching Tips from NASA,jiné,ne,J,K,K,K,K,
+P03,P03-B004,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/blogs/swift/2026/11/02/nasas-swift-observator""])",NASA’s Swift Observatory to Re-Enter Atmosphere,jiné,ne,H,K,K,K,K,"zánik družice; zda jde o „katastrofické scénáře“, rozhodne ZF-24 (zde ne)"
+P03,P03-B005,listing article,".hds-content-item:has(a[href^=""/news-release/nasa-invites-media-to-northrop-grumman-crs-25-station-re""])",NASA Invites Media to Northrop Grumman CRS-25 Station Resupply Launch,jiné,ne,J,K,K,K,K,
+P03,P03-B006,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/blogs/tsis-2/2026/11/02/nasas-mission-to-stud""])","NASA’s Mission to Study Sunlight Completes Vacuum, Vibration Testing",jiné,ne,J,K,K,K,K,
+P03,P03-B007,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/missions/hubble/nasas-hubble-uncovers-case-of""])",NASA’s Hubble Uncovers Case of Missing Oxygen in Nearby Dwarf Galaxies,jiné,ne,J,K,K,K,K,
+P03,P03-B008,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/image-article/apod-2026-november-2-a-long-clo""])",APOD: 2026 November 2 – A Long Cloud on Mars,jiné,ne,J,K,K,K,K,
+P03,P03-B009,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/earth/earth-observatory/pennsylvanias-grand-c""])",Pennsylvania’s Grand Canyon,jiné,ne,J,K,K,K,K,
+P03,P03-B010,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/image-article/apod-2026-november-1-colors-of-""])",APOD: 2026 November 1 – Colors of the Moon,jiné,ne,J,K,K,K,K,
+P03,P03-B011,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/image-article/apod-2026-october-31-night-on-a""])",APOD: 2026 October 31 – Night on a Spooky Planet,jiné,ne,J,K,K,K,K,"halloweenské slovo „Spooky“, tón neutrální"
+P03,P03-B012,listing article,".hds-content-item:has(a[href^=""/news-release/nasa-releases-max-power-key-events-for-media-participant""])","NASA Releases MAX POWER Key Events for Media, Participants",jiné,ne,J,K,K,K,K,
+P03,P03-B013,listing article,".hds-content-item:has(a[href^=""/blogs/spacestation/2026/10/30/space-crops-and-advanced-tech-wrap-up-w""])",Space Crops and Advanced Tech Wrap Up Week Following Spacewalk,jiné,ne,J,K,K,K,K,
+P03,P03-B014,listing article,".hds-content-item:has(a[href^=""/image-article/nasas-james-webb-space-telescope-captures-eerie-cats-he""])",NASA’s James Webb Space Telescope Captures Eerie Cat’s Head,jiné,ne,J,K,K,K,K,"„eerie“ je popis snímku, ne vyhrocený tón"
+P03,P03-B015,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/missions/hubble/nasa-explores-potential-comme""])",NASA Explores Potential Commercial Servicing for Hubble Telescope,jiné,ne,J,K,K,K,K,
+P03,P03-B016,listing article,".hds-content-item:has(a[href^=""/podcasts/houston-we-have-a-podcast/artemis-iii-paving-the-way-to-luna""])",Artemis III: Paving the Way to Lunar Landings,jiné,ne,J,K,K,K,K,"podcast (55 min), na kartě jen popis"
+P03,P03-B017,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/solar-system/skywatching/night-sky-network/no""])",November’s Night Sky Notes: Light-Day Away,jiné,ne,J,K,K,K,K,
+P03,P03-B018,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/image-article/apod-2026-october-30-haunting-t""])",APOD: 2026 October 30 – Haunting the Cepheus Flare,jiné,ne,J,K,K,K,K,"halloweenské slovo „Haunting“, tón neutrální"
+P03,P03-B019,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/earth/earth-observatory/vega-island-frozen-in""])",Vega Island Frozen in Fright,jiné,ne,H,K,K,K,K,titulek hraje s Halloweenem („Fright“); obsah je věcný popis ostrova
+P03,P03-B020,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/photojournal/map-showing-potential-origins-of""])",Map Showing Potential Origins of Martian Meteorite Teghaza 001,jiné,ne,J,K,K,K,K,
+P03,P03-B021,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/photojournal/slice-of-martian-meteorite-tegha""])",Slice of Martian Meteorite Teghaza 001,jiné,ne,J,K,K,K,K,
+P03,P03-B022,listing article,".hds-content-item:has(a[href^=""/centers-and-facilities/johnson/halloween-aboard-the-international-spa""])",Halloween Aboard the International Space Station,jiné,ne,J,K,K,K,K,
+P03,P03-B023,listing article,".hds-content-item:has(a[href^=""/blogs/spacestation/2026/10/29/spacewalkers-install-roll-out-solar-arr""])",Spacewalkers Install Roll-Out Solar Array for Power Generation,jiné,ne,J,K,K,K,K,
+P03,P03-B024,listing article,".hds-content-item:has(a[href^=""/solar-system/planets/mars/nasa-funded-study-details-one-of-oldest-mar""])",NASA-funded Study Details One of Oldest Mars Meteorites Ever Found,jiné,ne,J,K,K,K,K,
+P03,P03-B025,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/blogs/tracers/2026/10/29/nasas-tracers-first-""])",NASA’s TRACERS First Results Offers Peek into Violent Magnetic Process,jiné,ne,H,K,K,K,K,"slovo „Violent“ je vědecký popis magnetického děje, ne vyhrocený tón"
+P04,P04-B001,listing article,main#latest-page-root > article#one-in-ten-people-in-the-world-is-over-65-how-does-this-compare-in-the-youngest-and-oldest-countries,One in ten people in the world is over 65 — how does this compare in the yo,jiné,ne,J,K,K,K,K,
+P04,P04-B002,listing article,main#latest-page-root > article#how-is-life-at-different-levels-of-gdp-per-capita,How is life at different levels of GDP per capita?,jiné,ne,J,K,K,K,K,
+P04,P04-B003,listing article,main#latest-page-root > article#in-china-more-than-one-in-five-workers-is-still-employed-in-agriculture,"In China, more than one in five workers is still employed in agriculture",jiné,ne,J,K,K,K,K,
+P04,P04-B004,listing article,main#latest-page-root > article#the-world-is-getting-more-of-its-electricity-from-renewables-but-less-from-nuclear-power,The world is getting more of its electricity from renewables but less from ,jiné,ne,J,K,K,K,K,
+P04,P04-B005,listing article,main#latest-page-root > article#no-matter-what-poverty-line-you-choose-the-share-below-it-has-declined-globally,"No matter what poverty line you choose, the share of the global population ",jiné,ne,J,K,K,K,K,
+P04,P04-B006,listing article,main#latest-page-root > article#at-the-peak-of-the-hiv-epidemic-aids-caused-more-than-half-of-all-deaths-in-some-countries,"At the peak of the HIV epidemic, AIDS caused more than half of all deaths i",zprávy o úmrtí,ne,H,K,H,K,K,"statistika o podílu úmrtí na HIV/AIDS; věcný text, téma = úmrtí; hraniční, protože jde o zdravotní statistiku"
+P04,P04-B007,listing article,main#latest-page-root > article#how-many-people-in-the-world-identify-with-a-particular-religion,How many people in the world identify with a particular religion?,jiné,ne,J,K,K,K,K,
+P04,P04-B008,listing article,main#latest-page-root > article#a-long-term-perspective-on-humanitys-battle-against-malaria,A long-term perspective on humanity’s battle against malaria,jiné,ne,H,K,K,K,K,"historie boje s malárií (nemoc); zda jde o úmrtí, ověřit"
+P04,P04-B009,listing article,main#latest-page-root > article#china-reduced-extreme-poverty-fast-but-indonesia-hasnt-been-far-behind,"China reduced extreme poverty fast, but Indonesia hasn’t been far behind",jiné,ne,J,K,K,K,K,
+P04,P04-B010,listing article,main#latest-page-root > article#what-share-of-plastic-waste-ends-up-in-the-ocean,What share of plastic waste ends up in the ocean?,jiné,ne,J,K,K,K,K,
+P04,P04-B011,listing article,main#latest-page-root > article#the-living-planet-index-reports-a-73-average-decline-in-studied-wildlife-populations,The new Living Planet Index reports a 73% average decline in studied wildli,jiné,ne,H,K,K,K,K,"pokles populací volně žijících zvířat o 73 %; zda jde o „katastrofické scénáře“, rozhodne ZF-24"
+P04,P04-B012,listing article,main#latest-page-root > article#child-mortality-has-declined-in-all-world-regions,Child mortality has declined in all world regions,zprávy o úmrtí,ne,H,K,H,K,K,"statistika dětské úmrtnosti (klesá); téma = úmrtí, ale pozitivní zpráva; hraniční"
+P04,P04-B013,listing article,main#latest-page-root > article#electricity-generation-per-person-in-the-united-kingdom-has-fallen-by-a-third-from-its-early-2000s-peak,Electricity generation per person in the United Kingdom has fallen by a thi,jiné,ne,J,K,K,K,K,
+P04,P04-B014,listing article,main#latest-page-root > article#europe-is-older-but-latin-america-is-aging-faster,"Europe is older, but Latin America is aging faster",jiné,ne,J,K,K,K,K,
+P04,P04-B015,listing article,main#latest-page-root > article#the-united-states-is-the-worlds-largest-oil-producer,The United States is the world’s largest oil producer,jiné,ne,J,K,K,K,K,
+P04,P04-B016,listing article,main#latest-page-root > article#foreign-aid-contributions-fell-in-2025-amongst-almost-all-of-the-top-10-donors,Foreign aid contributions fell in 2025 amongst almost all of the top 10 don,jiné,ne,J,K,K,K,K,
+P04,P04-B017,listing article,main#latest-page-root > article#electric-car-sales-are-growing-rapidly-in-turkey,Electric car sales are growing rapidly in Turkey,jiné,ne,J,K,K,K,K,
+P04,P04-B018,listing article,main#latest-page-root > article#after-a-decade-of-growth-indonesia-has-become-the-worlds-largest-producer-of-processed-nickel,"After a decade of growth, Indonesia has become the world's largest producer",jiné,ne,J,K,K,K,K,
+P04,P04-B019,listing article,main#latest-page-root > article#beef-production-has-been-the-largest-driver-of-deforestation-this-century,Beef production has been the largest driver of deforestation this century,jiné,ne,J,K,K,K,K,
+P04,P04-B020,listing article,main#latest-page-root > article#haiti-and-the-dominican-republic-share-the-last-caribbean-island-with-endemic-malaria,Haiti and the Dominican Republic share the last Caribbean island with endem,jiné,ne,J,K,K,K,K,
+P05,P05-B001,section,"#mw-content-text .mw-parser-output > section[data-mw-section-id=""0""]",(lead) upozornění na „contentious topic“ a šablony,jiné,ne,J,K,K,K,K,"administrativní upozornění, ne diskuze; ověřit, zda jde o obsahový blok"
+P05,P05-B002,section,"#mw-content-text .mw-parser-output > section[data-mw-section-id=""1""]","""Clockwise from top left"" – popisky fotografií",jiné,ne,H,K,K,K,K,o popiscích obrázků; téma válka jen nepřímo
+P05,P05-B003,section,"#mw-content-text .mw-parser-output > section[data-mw-section-id=""2""]","Last sentence of lede – příměří, neochota stran",válka,ne,J,H,K,K,K,"nejhlubší vnoření: DOM hloubka až 43, <dl> až 17 úrovní; 25 příspěvků"
+P05,P05-B004,section,"#mw-content-text .mw-parser-output > section[data-mw-section-id=""3""]",Still no Response regarding belligerents list,válka,ano,H,H,K,H,K,"odmítavý tón, hraniční"
+P05,P05-B005,section,"#mw-content-text .mw-parser-output > section[data-mw-section-id=""4""]",Edit request – formulace o Krymu,válka,ne,J,H,K,K,K,
+P05,P05-B006,section,"#mw-content-text .mw-parser-output > section[data-mw-section-id=""5""]",Pro west propaganda? – název článku,válka,ne,H,H,K,K,K,"nadpis obviňující, odpovědi věcné"
+P06,P06-B001,section,div.wysiwyg_content.perex_content > p,Perex: kultivované maso a čokoláda jsou témata…,jiné,ne,J,K,K,K,K,perex je v samostatném div.perex_content před hlavním div#asset_213980
+P06,P06-B002,section,h2 „Rybí prsty z laboratoře“ a sourozenci do dalšího h2 (v div#asset_213980.wysiwyg_content),Rybí prsty z laboratoře,jiné,ne,J,K,K,K,K,
+P06,P06-B003,section,h2 „Náhrada mléčných výrobků“ a sourozenci do dalšího h2,Náhrada mléčných výrobků,jiné,ne,J,K,K,K,K,
+P06,P06-B004,section,h2 „Vaječná bílkovina ze zkumavky“ a sourozenci do dalšího h2,Vaječná bílkovina ze zkumavky,jiné,ne,J,K,K,K,K,
+P06,P06-B005,section,"h2 „Investice? Ano, ale zprostředkovaně…“ a sourozenci do dalšího h2","Investice? Ano, ale zprostředkovaně…",jiné,ne,J,K,K,K,K,
+P06,P06-B006,section,h2 „Nadějná studie z Finska“ a sourozenci do dalšího h2,Nadějná studie z Finska,jiné,ne,J,K,K,K,K,
+P06,P06-B007,section,h2 „Velký otazník: Přijme veřejnost potraviny…“ a sourozenci do konce div#asset_213980,Velký otazník: Přijme veřejnost potraviny…,jiné,ne,J,K,K,K,K,

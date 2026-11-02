@@ -1,6 +1,6 @@
 # Kandidáti pro větší sadu (ZF-19) a jak ji rozšířit
 
-Zadání ZF-04 a milník M1 vyžadují přesně 6 pilotních stránek (ZF-03: „≥ 5 ze 6“). Větší sada je ZF-19 (24 stránek, 6 typů × 4, dva hodnotitelé). Tady je zásobník kandidátů. **Nic z toho není anotováno** a u většiny jsem neotevřela obsah stránky. **Podmínky použití nejsou u kandidátů ověřené.** Do finální sady zařazuj jen stránky, u kterých je podmínka ověřena podle postupu ve [`stranky.md`](stranky.md); zdroje z původního pilotu, u kterých se to nepodařilo, jsou tam v sekci „Vyřazené stránky“ (root.cz, Hacker News, iROZHLAS, ČT24, lupa.cz, BBC).
+Zadání ZF-04 a milník M1 vyžadují přesně 6 pilotních stránek (ZF-03: „≥ 5 ze 6“). Větší sada je ZF-19 (24 stránek, 6 typů × 4). Tady je zásobník kandidátů. **Nic z toho není anotováno** a u většiny jsem neotevřela obsah stránky. **Podmínky použití nejsou u kandidátů ověřené.** Do finální sady zařazuj jen stránky, u kterých je podmínka ověřena podle postupu ve [`stranky.md`](stranky.md); zdroje z původního pilotu, u kterých se to nepodařilo, jsou tam v sekci „Vyřazené stránky“ (root.cz, Hacker News, iROZHLAS, ČT24, lupa.cz, BBC).
 
 ## A. Viděno v této session (z výpisů, ne z obsahu)
 
@@ -33,7 +33,7 @@ Rozšiř sadu hlavně o zdroje, kde je licence jasná (stejný postup jako ve [`
 
 | Zdroj | Licence | Poznámka |
 |---|---|---|
-| Global Voices, jiné články (například o konfliktech) | CC BY 3.0 | hodně obsahu o válkách a krizích; anglicky, existují i jiné jazykové verze |
+| Global Voices (ověřený článek o tureckých věznicích je anotován v `anotace-nahrazene.csv`, včetně bloku `násilí`), jiné články (například o konfliktech) | CC BY 3.0 | hodně obsahu o válkách a krizích; anglicky, existují i jiné jazykové verze |
 | Wikipedie, další diskuzní stránky a články (včetně `cs.wikipedia.org`) | CC BY-SA | česká verze doplní češtinu |
 | Our World in Data, jiná témata a „Data insights“ | CC BY | výpisy mohou mít „načíst další“, tedy dynamický případ s přibývajícími bloky |
 | Horydoly.cz, další články | CC BY 3.0 CZ | čeština, reklamní kontejnery |
@@ -43,6 +43,6 @@ Rozšiř sadu hlavně o zdroje, kde je licence jasná (stejný postup jako ve [`
 ## C. Jak sehnat stovky stránek rozumně
 
 1. **Strukturální profil je levný.** Skript [`nastroje/profil-stranky.js`](nastroje/profil-stranky.js) vypíše na otevřené stránce jeden řádek JSON (počty prvků, hloubka, podezřelé reklamní prvky). Pomůže vybrat, které stránky jsou zajímavé pro konkrétní typ rozložení. Neprohlíží web automaticky: otevřít stránku musí člověk (nebo Claude v prohlížeči po jedné).
-2. **Anotace je drahá.** Pilot má 77 bloků na 6 stránkách; 24 stránek bude zhruba 300 bloků, dvakrát (dva hodnotitelé). Kapacita Libuše v `docs/CAPACITY.md` je 25–45 hodin za celý projekt. Stovky plně anotovaných stránek proto nejsou reálné.
-3. **Realistický postup:** (a) 24 stránek anotovat plně dvěma hodnotiteli (ZF-19); (b) pro větší počet stránek (desítky až stovky) měřit **jen to, co jde automaticky**: zda extraktor neselhal, počet nalezených bloků, čas, reverzibilitu skrytí. Bez ručního „očekávaného“ počtu nelze počítat precision a recall, ale lze hlídat selhání a rozptyl; (c) u vzorku z velké sady udělat kontrolní anotaci.
+2. **Anotace je drahá.** Pilot má 90 bloků na 6 stránkách; 24 stránek bude zhruba 360 bloků. Kapacita Libuše v `docs/CAPACITY.md` je 25–45 hodin za celý projekt. Stovky plně anotovaných stránek proto nejsou reálné.
+3. **Realistický postup:** (a) 24 stránek anotovat plně (ZF-19); (b) pro větší počet stránek (desítky až stovky) měřit **jen to, co jde automaticky**: zda extraktor neselhal, počet nalezených bloků, čas, reverzibilitu skrytí. Bez ručního „očekávaného“ počtu nelze počítat precision a recall, ale lze hlídat selhání a rozptyl; (c) u vzorku z velké sady udělat kontrolní anotaci.
 4. Sledujte, zda se výpisy a živé přenosy mezi běhy nezměnily (plán §5.1 to žádá).

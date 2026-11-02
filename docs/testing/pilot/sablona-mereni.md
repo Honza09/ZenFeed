@@ -12,7 +12,7 @@ Jedna šablona pro pilot (6 stránek, ZF-07) i pro 24stránkovou sadu (ZF-19) a 
 | `rozlozeni` | typ rozložení (statický článek, komentáře, feed, dynamický obsah, hluboké vnoření, reklamy) | plán §5.1 |
 | `jazyk` | CS / EN | proposal §1, §5 |
 | `cast_sady` | `pilot`, `ladeni`, `finale` | proposal §5 (ladění × finále), ZF-27 |
-| `nastaveni` | S1 / S2 / S3 (viz README), u finální sady případně další | proposal §5 (stránka × nastavení) |
+| `nastaveni` | S1 / S2 / S3 / S4 (viz README), u finální sady případně další | proposal §5 (stránka × nastavení) |
 | `datum_mereni`, `verze_rozsireni` | datum a verze (commit nebo `manifest.json`) | plán §5.1 |
 | `beh` | pořadí opakování (1, 2, 3) | plán §5.2 bod 7 |
 | `ocekavane_bloky` | počet bloků v anotaci | plán §5.1 |
