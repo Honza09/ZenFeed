@@ -39,8 +39,15 @@ Load the extension in Chrome via `chrome://extensions` (Developer mode,
 **Load unpacked**, select `extension/`). Details are in
 [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md).
 
-There is no runnable backend server yet; the start command will be added with
-the first FastAPI endpoint.
+Start the backend (virtual environment active, from the repository root):
+
+    uvicorn app.main:app --app-dir backend --reload
+
+`GET http://127.0.0.1:8000/health` returns `{"status":"ok"}`.
+`POST /v1/analyze` checks the blocks and returns one result per block.
+Classification is not implemented yet, so every block comes back as
+`recommended_action: "review"` and nothing is hidden. Optional settings are
+listed in `.env.example`.
 
 ## Contributing
 

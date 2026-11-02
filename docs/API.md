@@ -1,62 +1,82 @@
 # ZenFeed API Reference
 
-> **Note (Oct 2026):** This is the initial generic draft. The product scope and the current endpoint plan (`/health`, `/v1/analyze`, `/v1/summarize`, `/v1/tts`) are defined in [`mvp.md`](mvp.md) §5; the paths and schemas below (`/api/v1/summarize`, `/api/v1/classify`) are outdated and will be replaced by the contract from backlog issue ZF-02.
+Endpoints implemented for ZF-05. `/v1/summarize` and `/v1/tts` are later issues (ZF-15, ZF-16) and are not part of this server.
 
-## Document Status
-
-This document describes a proposed API design. Endpoints remain proposals until they are implemented and verified in the backend code.
+The extension sends blocks produced by the content script (`id`, `kind`, `title`, `text`). `title` is accepted and ignored. Classification is not implemented: `/v1/analyze` validates the body and returns `recommended_action: "review"` for every block, so nothing is hidden.
 
 ## Principles
 
 - REST API implemented with FastAPI.
 - JSON request and response bodies.
-- Pydantic request validation.
-- Appropriate HTTP status codes.
-- Consistent error responses.
-- No secret keys in extension source code.
+- Pydantic request and response validation.
+- Page text and API keys are not written to logs.
+- No secret keys in extension source code. The optional `ZENFEED_AI_API_KEY` is read from the environment and is unused until classification exists.
 
-## Proposed Endpoints
+## Endpoints
 
 | Method | Path | Purpose | Status |
 |---|---|---|---|
-| GET | `/health` | Check backend availability | Planned |
-| POST | `/api/v1/summarize` | Summarize text | Planned |
-| POST | `/api/v1/classify` | Classify content | Planned |
+| GET | `/health` | Check backend availability | Implemented |
+| POST | `/v1/analyze` | Validate blocks and return one unclassified result per block | Implemented, no classifier yet |
 
-Confirm endpoint names and data contracts with the team before implementation.
+## GET /health
 
-## Example Summarization Request
+Response `200`:
+
+```json
+{"status": "ok"}
+```
+
+## POST /v1/analyze
+
+Request:
 
 ```json
 {
-  "text": "The text to summarize.",
-  "max_length": 150
+  "blocks": [
+    {
+      "id": "zf-0",
+      "text": "Normalized visible text.",
+      "kind": "article",
+      "title": "Optional heading"
+    }
+  ],
+  "preferences": {"war": true}
 }
 ```
 
-## Example Response
+- `blocks`: 1 to 100 items. `id` matches `[A-Za-z0-9_-]+` and is unique in the request. `text` is 1 to 8000 characters after trimming; blank text is rejected. `kind` is `article`, `section`, `comment`, `post`, or `other`.
+- `preferences`: up to 32 keys, each 1 to 64 characters. Values are JSON booleans (`true` / `false` only). Categories are not frozen yet (ZF-24), so the keys are not a fixed list.
+- The whole body must be at most 1 MiB.
+
+Response `200`:
 
 ```json
 {
-  "summary": "The generated summary."
+  "results": [
+    {
+      "id": "zf-0",
+      "category": "unclassified",
+      "toxicity_score": 0.0,
+      "confidence": 0.0,
+      "recommended_action": "review"
+    }
+  ],
+  "model_version": "none"
 }
 ```
 
-These examples are illustrative and do not represent a confirmed, existing API contract.
+`model_version: "none"` means no model ran. `toxicity_score` and `confidence` are 0 to 1. `recommended_action` is `show`, `hide`, or `review`. This placeholder never returns `hide`.
 
-## Validation and Errors
+## Errors
 
-The API should:
-- Reject missing or invalid required fields.
-- Enforce reasonable input text length limits.
-- Return appropriate HTTP status codes on failure.
-- Avoid exposing internal stack traces or secret values.
+| Status | Body | When |
+|---|---|---|
+| 422 | `{"error":"validation_error","details":[{"loc":[],"msg":""}]}` | Missing or invalid fields. `details` contains only `loc` and `msg`, not the submitted text. |
+| 413 | `{"error":"request_too_large"}` | Body larger than 1 MiB. |
+| 504 | `{"error":"timeout"}` | Analysis exceeds `ZENFEED_ANALYZE_TIMEOUT_SECONDS` (default 10, maximum 120). |
+| 500 | `{"error":"internal_error"}` | Unexpected failure or a response that does not match the output schema. No stack trace. |
 
-## Keeping This Document Updated
+## Keeping this document updated
 
-After each API change, update:
-- Endpoint paths and HTTP methods.
-- Request and response schemas.
-- Possible errors.
-- Endpoint tests.
-- Implementation status.
+After each API change, update the paths, schemas, errors, and tests.

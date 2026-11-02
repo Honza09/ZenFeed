@@ -53,7 +53,13 @@ Install dependencies, including the lint and test tools (`requirements-dev.txt` 
 pip install -r backend/requirements-dev.txt
 ```
 
-The exact server startup command depends on the actual FastAPI application module. Add a verified command here once the entry point has been implemented.
+Start the API from the repository root:
+
+```bash
+uvicorn app.main:app --app-dir backend --reload
+```
+
+`GET http://127.0.0.1:8000/health` returns `{"status":"ok"}`. Generated docs are at `http://127.0.0.1:8000/docs`. Copy `.env.example` to `.env` only when you need to override the timeout, log level, or the future AI key. The server starts without a key.
 
 ## Running the checks locally
 
