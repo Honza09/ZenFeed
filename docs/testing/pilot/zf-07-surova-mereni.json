@@ -1,0 +1,21 @@
+{
+ "verze_rozsireni": "9be0e8b1cf1815bc2f54b26462c58c26dc99fd2b",
+ "segmenter_js_sha256": "223e65b5ae260931855d45207b9908f9636741aacaf77817d2971ad279e46e0d",
+ "datum": "2026-11-02",
+ "pages": {
+  "P01": {"layout":"statický článek","jazyk":"EN","url":"https://ourworldindata.org/war-and-peace","snapshot_utc":"2026-11-02T20:42:17Z","expected":6,"measurable":6,"found":74,"extras":4,"times_ms":[18,9,7],
+   "refs":{"B001":["merged",1.0,0],"B002":["merged",0.74,0],"B003":["correct",1.0,0],"B004":["split",1.0,0],"B005":["split",0.93,0],"B006":["split",0.99,0]}},
+  "P02": {"layout":"komentáře","jazyk":"EN","url":"https://forum.effectivealtruism.org/posts/KK6AE8HzPkR2KnqSg/new-forum-license-creative-commons","snapshot_utc":"2026-11-02T20:41:30Z","expected":25,"measurable":25,"found":50,"extras":20,"times_ms":[16,10,8],
+   "refs":{"B001":["correct",0.91,0],"B002":["correct",0.90,0],"B003":["correct",0.97,0],"B004":["correct",0.92,0],"B005":["correct",0.77,0],"B006":["correct",0.82,0],"B007":["correct",0.89,0],"B008":["correct",0.65,0],"B009":["correct",0.82,0],"B010":["correct",0.92,0],"B011":["correct",0.96,0],"B012":["correct",0.88,0],"B013":["correct",0.89,0],"B014":["correct",0.90,0],"B015":["correct",0.93,0],"B016":["correct",0.96,0],"B017":["correct",0.96,0],"B018":["correct",0.88,0],"B019":["correct",0.92,0],"B020":["correct",0.91,0],"B021":["correct",0.93,0],"B022":["correct",0.94,0],"B023":["correct",0.89,0],"B024":["correct",0.89,0],"B025":["split",0.99,0]}},
+  "P03": {"layout":"feed / výpis","jazyk":"EN","url":"https://www.nasa.gov/news/recently-published/","snapshot_utc":"2026-11-02T20:43:04Z","expected":25,"measurable":24,"found":26,"extras":2,"times_ms":[22,14,13],
+   "cov_note":"pokrytí uloženo jen jako dolní mez 0,97 (z meziběhu; finální běh vypsal jen stavy)",
+   "refs":{"B001":["correct",0.97,0],"B002":["correct",0.97,0],"B003":["correct",0.97,0],"B004":["correct",0.97,0],"B005":["correct",0.97,0],"B006":["unresolved",null,0],"B007":["correct",0.97,0],"B008":["correct",0.97,0],"B009":["correct",0.97,0],"B010":["correct",0.97,0],"B011":["correct",0.97,0],"B012":["correct",0.97,0],"B013":["correct",0.97,0],"B014":["correct",0.97,0],"B015":["correct",0.97,0],"B016":["correct",0.97,0],"B017":["correct",0.97,0],"B018":["correct",0.97,0],"B019":["correct",0.97,0],"B020":["correct",0.97,0],"B021":["correct",0.97,0],"B022":["correct",0.97,0],"B023":["correct",0.97,0],"B024":["correct",0.97,0],"B025":["correct",0.97,0]}},
+  "P04": {"layout":"dynamický obsah","jazyk":"EN","url":"https://ourworldindata.org/latest?type=data-insight","snapshot_utc":"2026-11-02T20:42:38Z","expected":20,"measurable":20,"found":23,"extras":2,"times_ms":[44,25,31],
+   "refs":{"B001":["correct",0.88,0],"B002":["correct",0.97,0],"B003":["correct",0.87,0],"B004":["correct",0.93,0],"B005":["correct",0.97,0],"B006":["correct",0.97,0],"B007":["correct",0.97,0],"B008":["correct",0.97,0],"B009":["correct",0.91,0],"B010":["split",0.93,0],"B011":["correct",0.97,0],"B012":["correct",0.86,0],"B013":["correct",0.93,0],"B014":["correct",0.96,0],"B015":["correct",0.86,0],"B016":["correct",0.96,0],"B017":["correct",0.96,0],"B018":["correct",0.96,0],"B019":["correct",0.97,0],"B020":["correct",0.96,0]},
+   "po_show_more":{"snapshot_utc":"2026-11-02T20:38:49Z","clanku_na_strance":40,"nalezene_bloky":44,"duration_ms":107,"poznamka":"jeden běh, anotace pokrývá jen prvních 20 článků"}},
+  "P05": {"layout":"komentáře / diskuse","jazyk":"EN","url":"https://en.wikipedia.org/w/index.php?title=Talk:Russo-Ukrainian_war&oldid=1382272905","snapshot_utc":"2026-11-02T20:42:49Z","expected":6,"measurable":6,"found":49,"extras":24,"times_ms":[16,8,8],
+   "refs":{"B001":["split",0.77,0],"B002":["correct",1.0,0],"B003":["split",0.25,0],"B004":["correct",0.49,0],"B005":["correct",0.93,0],"B006":["split",0.70,0]}},
+  "P06": {"layout":"reklamy / článek","jazyk":"CS","url":"https://www.horydoly.cz/jidlo-a-piti/vejce-losos-i-mleko-kultivovane-potraviny-si-razi-cestu-na-pulty-obchodu.html","snapshot_utc":"2026-11-02T20:41:52Z","expected":8,"measurable":8,"found":54,"extras":46,"times_ms":[20,12,11],
+   "refs":{"B001":["foreign",1.0,0.242],"B002":["correct",1.0,0],"B003":["correct",1.0,0],"B004":["correct",1.0,0],"B005":["correct",1.0,0],"B006":["correct",1.0,0],"B007":["correct",1.0,0],"B008":["foreign",1.0,0.0099]}}
+ }
+}
