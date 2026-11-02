@@ -6,7 +6,7 @@ Proposal (§5) požaduje u finální sady dva nezávislé hodnotitele. V pilotu 
 
 1. Zkopíruj [`anotace.csv`](anotace.csv) do `anotace-A2.csv` (nebo do tabulky) a **smaž hodnoty** ve sloupcích `téma`, `tón_vyhrocený`, `jistota`, `S1…S3` a `poznámka`. Ponech `page_id`, `block_id`, `typ_bloku`, `locator`, `úryvek`.
 2. Přečti si kategorie a nastavení v [`README.md`](README.md). Seznam kategorií je provizorní, dokud ZF-24 nezmrazí definice.
-3. Otevři stránku podle [`stranky.md`](stranky.md): trvalý odkaz (P01, P02, P05, P06), u P03 a P04 podle čísla článku nebo id zprávy. Cookie lištu nepotvrzuj, pokud to karta nepopisuje jinak.
+3. Otevři stránku podle [`stranky.md`](stranky.md): trvalý odkaz (P01, P02, P05, P06). P03 je živý výpis (karty hledej podle prefixu odkazu) a u P04 počkej na dokreslení grafů, tedy stránku jednou přerolovat až dolů před anotací. Cookie lištu nepotvrzuj, pokud to karta nepopisuje jinak.
 
 ## Krok 1: ověř seznam bloků
 

@@ -40,7 +40,7 @@ Pole jsou prázdná; **nic není naměřeno**.
 
 1. **„Správně oddělený blok“**: nalezený blok pokrývá právě jeden očekávaný blok, nepřidává cizí obsah (reklamu, navigaci) a očekávaný blok nerozděluje. Plán říká jen „podíl správně oddělených bloků“, přesnou definici nedává.
 2. **Bloky navíc** (extraktor vrátí něco, co v anotaci není): v šabloně jde do `nalezene_bloky`, ne do `spravne_oddelene_bloky`. Jejich vliv na skrytí řeší ZF-07.
-3. **Vzorek** (P02): `ocekavane_bloky` je 15, extraktor jich vrátí víc. Porovnává se jen na anotovaném vzorku, pokud ZF-07 nerozhodne jinak.
+3. **Neanotované bloky** (například související karty u P01 nebo doplněný obsah u P04): `ocekavane_bloky` zahrnuje jen anotované bloky. Porovnává se jen na anotovaném výběru, pokud ZF-07 nerozhodne jinak.
 
 ## Co šablona nepokrývá (patří do ZF-20)
 

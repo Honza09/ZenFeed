@@ -1,91 +1,78 @@
 page_id,block_id,typ_bloku,locator,úryvek_pro_identifikaci,téma,tón_vyhrocený,jistota,S1_skrýt_válka+pol.konflikty,S2_skrýt_úmrtí+katastrofa,S3_skrýt_vyhrocený_tón,poznámka
-P01,P01-B001,section,h2#h20 a jeho sourozenecké prvky do dalšího h2 (kontejner div.element-margin-top-half),Ransomware skupiny Qilin a INC obchází MFA,jiné,ne,J,K,K,K,kyberbezpečnost
-P01,P01-B002,section,h2#h21 a jeho sourozenecké prvky do dalšího h2 (kontejner div.element-margin-top-half),Šíření malwaru skrz kompromitovaný LiteLLM,jiné,ne,J,K,K,K,kyberbezpečnost
-P01,P01-B003,section,h2#h22 a jeho sourozenecké prvky do dalšího h2 (kontejner div.element-margin-top-half),Výpadek napájení Google Cloudu vyřadil řadu služeb,jiné,ne,H,K,K,K,"výpadek služeb; zda jde o „katastrofické scénáře“, rozhodne ZF-24 (zde ne)"
-P01,P01-B004,section,h2#h23 a jeho sourozenecké prvky do dalšího h2 (kontejner div.element-margin-top-half),Německé AfD unikly stovky tisíc e-mailů,politické konflikty,ne,H,H,K,K,politický skandál/únik dat; hraničně politické konflikty
-P01,P01-B005,section,h2#h24 a jeho sourozenecké prvky do dalšího h2 (kontejner div.element-margin-top-half),Ve zkratce,jiné,ne,J,K,K,K,souhrn krátkých zpráv
-P01,P01-B006,section,h2#h25 a jeho sourozenecké prvky do dalšího h2 (kontejner div.element-margin-top-half),Pro pobavení,jiné,ne,J,K,K,K,humorná rubrika
-P02,P02-B001,comment,tr.athing.comtr#50160084 (úroveň odsazení 0),They've been doing drone evacuations for years.,válka,ne,J,H,K,K,
-P02,P02-B002,comment,tr.athing.comtr#50161169 (úroveň odsazení 1),I wonder what is the risk analysis here?,válka,ne,J,H,K,K,
-P02,P02-B003,comment,tr.athing.comtr#50161260 (úroveň odsazení 2),It's not. Ukraine roads are filled with armoured,válka,ne,J,H,K,K,
-P02,P02-B004,comment,tr.athing.comtr#50162792 (úroveň odsazení 3),Apparently a big concern is mines.,válka,ne,J,H,K,K,
-P02,P02-B005,comment,tr.athing.comtr#50163087 (úroveň odsazení 4),And Mud,válka,ne,H,H,K,K,2slovný komentář; téma plyne jen z vlákna
-P02,P02-B006,comment,tr.athing.comtr#50163706 (úroveň odsazení 5),And I imagine time. A significant issue,válka,ne,J,H,K,K,
-P02,P02-B007,comment,tr.athing.comtr#50161240 (úroveň odsazení 2),it's in the article's subtitle,válka,ne,J,H,K,K,
-P02,P02-B008,comment,tr.athing.comtr#50163271 (úroveň odsazení 2),> I wonder what is the risk analysis here? Simple.,válka,ne,J,H,K,K,"věcný, stručný tón"
-P02,P02-B009,comment,tr.athing.comtr#50163396 (úroveň odsazení 3),Now add 100s or 1000s wounded at the same time,válka,ne,J,H,K,K,
-P02,P02-B010,comment,tr.athing.comtr#50163487 (úroveň odsazení 4),"Risk calculations aside, don't forget to take",válka,ne,J,H,K,K,
-P02,P02-B011,comment,tr.athing.comtr#50165272 (úroveň odsazení 5),... particularly if you know the other side treats,válka,ano,H,H,K,H,"polemický tón, hraniční"
-P02,P02-B012,comment,tr.athing.comtr#50165857 (úroveň odsazení 6),""".. particularly if you know the other side treats",válka,ne,H,H,K,K,"nesouhlas, věcně; hraniční"
-P02,P02-B013,comment,tr.athing.comtr#50166273 (úroveň odsazení 7),> Putin had to openly declare repeatedly,válka,ano,J,H,K,H,sebejisté tvrzení o lži oficiálů
-P02,P02-B014,comment,tr.athing.comtr#50166454 (úroveň odsazení 8),The fact remains russia does not send in forced,válka,ne,J,H,K,K,
-P02,P02-B015,comment,tr.athing.comtr#50166672 (úroveň odsazení 9),You consceeding that they dont except when,válka,ano,H,H,K,H,"hraniční, překlepy; „Their words are worthless“"
-P03,P03-B001,listing article,article.c-articles__item s odkazem obsahujícím „_2610291858_“,"Říkáme tomu ‚velký pátek‘, řekl Klempíř k hlasování o poplatcích",politické konflikty,ne,H,H,K,K,spor opozice × koalice; tón podle titulku nejistý
-P03,P03-B002,listing article,article.c-articles__item s odkazem obsahujícím „_2610291505_“,Ve stopách historické stezky vzniká na Tachovsku křížová cesta,jiné,ne,J,K,K,K,
-P03,P03-B003,listing article,article.c-articles__item s odkazem obsahujícím „_2610291705_“,‚Můžeme vytvořit propojenou Evropu.‘ Magyar a Babiš podepsali memorandum,jiné,ne,J,K,K,K,"politika, ale spolupráce, ne konflikt"
-P03,P03-B004,listing article,article.c-articles__item s odkazem obsahujícím „_2610291635_“,Nejvíc ‚věčných chemikálií‘ loni do vody vypustila čistírna v Rybitví,jiné,ne,J,K,K,K,
-P03,P03-B005,listing article,article.c-articles__item s odkazem obsahujícím „_2610291545_“,Korejská společnost KHNP jednala o dostavbě Dukovan,jiné,ne,J,K,K,K,
-P03,P03-B006,listing article,article.c-articles__item s odkazem obsahujícím „_2610291528_“,Druhé čtení zákona o poplatcích by mohlo být v lednu,jiné,ne,H,K,K,K,procedurální zpráva; souvisí s č. 1
-P03,P03-B007,listing article,article.c-articles__item s odkazem obsahujícím „_2610291509_“,Čtyři firmy čelí obžalobě kvůli nelegálnímu dovozu odpadu,jiné,ne,J,K,K,K,
-P03,P03-B008,listing article,article.c-articles__item s odkazem obsahujícím „_2610291349_“,Zatloukal: Čeští ředitelé škol mají extrémně vysokou autonomii,jiné,ne,J,K,K,K,
-P03,P03-B009,listing article,article.c-articles__item s odkazem obsahujícím „_2610291110_“,‚Snažíme se je vyčerpat psychicky i fyzicky.‘ Zájemci o místo v zásahové,jiné,ne,J,K,K,K,
-P03,P03-B010,listing article,article.c-articles__item s odkazem obsahujícím „_2610291303_“,Žena z Písecka opustila pracoviště a se všemi se rozloučila,jiné,ne,H,K,K,K,pohřešovaná osoba; zda spadá pod „úmrtí“ rozhodne ZF-24
-P03,P03-B011,listing article,article.c-articles__item s odkazem obsahujícím „_2610291255_“,Poskytnutí rozsudku k Čapímu hnízdu novinářům nebylo trestné,jiné,ne,J,K,K,K,
-P03,P03-B012,listing article,article.c-articles__item s odkazem obsahujícím „_2610291241_“,"Policie hledá člověka, který dal v Jihlavě na koleje kámen",jiné,ne,J,K,K,K,
-P03,P03-B013,listing article,article.c-articles__item s odkazem obsahujícím „_2610291120_“,Kriminalisté obvinili tři muže z pokusu ovlivnit volby na Lounsku,jiné,ne,H,K,K,K,kriminalita vs. politika
-P03,P03-B014,listing article,article.c-articles__item s odkazem obsahujícím „_2610291112_“,Zastupitelé Turnova končí v ANO. Nechtějí být zatíženi,politické konflikty,ne,H,H,K,K,politický spor v malém měřítku
-P03,P03-B015,listing article,article.c-articles__item s odkazem obsahujícím „_2610291108_“,Tuny posypových materiálů i nové stroje za desítky milionů,jiné,ne,J,K,K,K,
-P03,P03-B016,listing article,article.c-articles__item s odkazem obsahujícím „_2610291039_“,Kostel v Kravařích dostane nový oltář z kararského mramoru,jiné,ne,J,K,K,K,
-P03,P03-B017,listing article,article.c-articles__item s odkazem obsahujícím „_2610291026_“,Muž pod vlivem drog ujížděl na Chomutovsku při silniční kontrole,jiné,ne,J,K,K,K,
-P03,P03-B018,listing article,article.c-articles__item s odkazem obsahujícím „_2610290954_“,Až osm let vězení hrozí dvěma lidem za nehodu vlaku,jiné,ne,H,K,K,K,"o následném řízení, ne o nehodě; hraničně katastrofa"
-P03,P03-B019,listing article,article.c-articles__item s odkazem obsahujícím „_2610290916_“,Na namrzlé silnici na Chebsku havaroval autobus,jiné,ne,H,K,K,K,nehoda s lehkými zraněními; hraničně katastrofa
-P03,P03-B020,listing article,article.c-articles__item s odkazem obsahujícím „_2610290912_“,"‚Chtěli jsme ukázat, že to není tragédie.‘ Spolek Albína",jiné,ne,J,K,K,K,
-P03,P03-B021,listing article,article.c-articles__item s odkazem obsahujícím „_2610290803_“,Příčná ulice v Nemošicích bude mít své vsakovací jezírko,jiné,ne,J,K,K,K,
-P03,P03-B022,listing article,article.c-articles__item s odkazem obsahujícím „_2610290752_“,"OBRAZEM: Janžurová, Forman i Čáslavská. Prezident Pavel udělil vyznamenání",jiné,ne,J,K,K,K,zmínka zemřelých osobností není zpráva o úmrtí
-P03,P03-B023,listing article,article.c-articles__item s odkazem obsahujícím „_2610290700_“,Novela umožní v Ostravě-Porubě stavbu tramvajové trati bez EIA,jiné,ne,J,K,K,K,
-P03,P03-B024,listing article,article.c-articles__item s odkazem obsahujícím „_2610290647_“,Peticí protestují místní proti hluku u Malého jezu,jiné,ne,J,K,K,K,
-P03,P03-B025,listing article,article.c-articles__item s odkazem obsahujícím „_2610290643_“,‚Zasloužený dlouhý potlesk.‘ Zástupci opozice ocenili Pavlův projev,jiné,ne,J,K,K,K,
-P03,P03-B026,listing article,article.c-articles__item s odkazem obsahujícím „_2610290618_“,O víkendu se ochladí až na šest stupňů Celsia,jiné,ne,J,K,K,K,
-P03,P03-B027,listing article,article.c-articles__item s odkazem obsahujícím „_2610290500_“,"Neplníme 70 procent požadavků NATO, armáda na velký konflikt nemá sílu",válka,ne,H,H,K,K,"hypotetický konflikt, bezpečnostní politika"
-P03,P03-B028,listing article,article.c-articles__item s odkazem obsahujícím „_2610290010_“,Petr Šabata: Česko-slovenské vztahy byly nahoře pochroumané,politické konflikty,ne,H,H,K,K,"geopolitika, rozhovor"
-P04,P04-B001,listing article,li.text-stream__message-wrap#zprava-245555 (čas 19:27),Rusko podporuje kroky k obnovení vztahů s Evropou…,válka,ne,H,H,K,K,"válka/politika, zmínka o připravenosti na válku"
-P04,P04-B002,listing article,li.text-stream__message-wrap#zprava-245554 (čas 19:19),Tanker plující Hormuzským průlivem zasáhl neznámý projektil,válka,ne,H,H,K,K,konflikt na Blízkém východě
-P04,P04-B003,listing article,li.text-stream__message-wrap#zprava-245553 (čas 19:09),Generální ředitel ČT Hynek Chudárek přišel na jednání s premiérem,politické konflikty,ne,H,H,K,K,spor o financování ČT
-P04,P04-B004,listing article,li.text-stream__message-wrap#zprava-245551 (čas 18:58),Na severu Bosny a Hercegoviny havaroval vrtulník EUFOR,zprávy o úmrtí,ne,J,K,H,K,tři mrtví; též katastrofa – v S2 skryto v obou případech
-P04,P04-B005,listing article,li.text-stream__message-wrap#zprava-245550 (čas 18:53),Státy EU uvolní v příštích měsících 42 milionů barelů ropy,jiné,ne,J,K,K,K,
-P04,P04-B006,listing article,li.text-stream__message-wrap#zprava-245549 (čas 18:45),(bez textu – pravděpodobně vložený objekt),jiné,ne,H,K,K,K,"prázdný blok: nelze klasifikovat, nesmí se skrýt"
-P04,P04-B007,listing article,li.text-stream__message-wrap#zprava-245548 (čas 18:40),"Pokud rozpočet ČT klesne, nebude moci fungovat tak, jak má",politické konflikty,ne,H,H,K,K,spor o poplatky
-P04,P04-B008,listing article,li.text-stream__message-wrap#zprava-245547 (čas 18:36),Nově zvolený senátor Martin Půta (SLK) sice oznámil,jiné,ne,J,K,K,K,
-P04,P04-B009,listing article,li.text-stream__message-wrap#zprava-245546 (čas 18:24),Počet obětí středeční srážky vlaků… vzrostl na 74,zprávy o úmrtí,ne,J,K,H,K,též katastrofa – v S2 skryto v obou případech
-P04,P04-B010,listing article,li.text-stream__message-wrap#zprava-245545 (čas 18:18),Írán obdržel dopis od amerického viceprezidenta JD Vance,politické konflikty,ne,J,H,K,K,obsahuje odkaz „Válka proti Íránu…“; v S1 skryto v obou případech
-P04,P04-B011,listing article,li.text-stream__message-wrap#zprava-245544 (čas 18:02),Euro po rozhodnutí centrálních bank mírně posiluje,jiné,ne,J,K,K,K,
-P04,P04-B012,listing article,li.text-stream__message-wrap#zprava-245543 (čas 17:56),Evropští a kanadští vydavatelé vytvořili koalici,jiné,ne,J,K,K,K,
-P04,P04-B013,listing article,li.text-stream__message-wrap#zprava-245542 (čas 17:49),Na 252 milionech hektarů státy obnovují ekosystémy,jiné,ne,J,K,K,K,
-P04,P04-B014,listing article,li.text-stream__message-wrap#zprava-245541 (čas 17:43),Soud v polském městě Tarnów nepravomocně shledal biskupa vinným,jiné,ne,H,K,K,K,"soudní zpráva, citlivé téma mimo seznam kategorií"
-P04,P04-B015,listing article,li.text-stream__message-wrap#zprava-245540 (čas 17:37),Koruna dnes k euru zakončila téměř beze změny,jiné,ne,J,K,K,K,
-P04,P04-B016,listing article,li.text-stream__message-wrap#zprava-245538 (čas 17:32),Evropa musí mít při mírových jednáních o Ukrajině svého zástupce,válka,ne,H,H,K,K,"mírová jednání, válečný kontext"
-P04,P04-B017,listing article,li.text-stream__message-wrap#zprava-245537 (čas 17:22),Ceny ropy díky naději na obnovení mírových jednání klesají,jiné,ne,H,K,K,K,ekonomika s válečným kontextem
-P04,P04-B018,listing article,li.text-stream__message-wrap#zprava-245536 (čas 17:15),"Pražská burza dnes posílila, PX stoupl o 0,38 procenta",jiné,ne,J,K,K,K,
-P04,P04-B019,listing article,li.text-stream__message-wrap#zprava-245533 (čas 17:03),Rusko prodlouží zákaz vývozu nafty do konce roku,jiné,ne,H,K,K,K,ekonomika/sankce s válečným kontextem
-P04,P04-B020,listing article,li.text-stream__message-wrap#zprava-245532 (čas 16:55),Úřad vyšetřování zločinů komunismu zahájil… Postoloprty,zprávy o úmrtí,ne,H,K,H,K,"nález ostatků, historické zločiny"
-P04,P04-B021,listing article,li.text-stream__message-wrap#zprava-245531 (čas 16:54),Evropská komise schválila dalších 23 miliard korun pro Česko,jiné,ne,J,K,K,K,
-P04,P04-B022,listing article,li.text-stream__message-wrap#zprava-245530 (čas 16:51),Albánští opoziční poslanci zapálili dýmovnice,politické konflikty,ne,J,H,K,K,
-P04,P04-B023,listing article,li.text-stream__message-wrap#zprava-245529 (čas 16:43),Ministr kultury Ota Klempíř obvinil opozici,politické konflikty,ne,J,H,K,K,souvisí s P03-B001
-P04,P04-B024,listing article,li.text-stream__message-wrap#zprava-245528 (čas 16:40),(bez textu – pravděpodobně vložený objekt),jiné,ne,H,K,K,K,"prázdný blok: nelze klasifikovat, nesmí se skrýt"
+P01,P01-B001,section,"div.entry > * (děti 2–8 (od odstavce „This interview is part of a series…“ po „Civil society organizations…“, včetně bloku Read more))","Úvod: série o grantistech Digital Spark, Prison Agenda",jiné,ne,H,K,K,K,"věcný úvod o vězeňství v Turecku, zmínka o mučení; téma mimo provizorní kategorie, proto jiné; zda patří pod násilí, rozhodne ZF-24"
+P01,P01-B002,section,div.entry > * (děti 9–15 (od „Global Voices interviewed…“ po „We were particularly impressed…“)),Otázka 1: organizace a proč Digital Spark,jiné,ne,J,K,K,K,
+P01,P01-B003,section,div.entry > * (děti 16–19 (od „GV: What issue/challenge…“)),Otázka 2: jaký problém projekt řeší,jiné,ne,J,K,K,K,
+P01,P01-B004,section,div.entry > * (děti 20–23 (od „GV: What are the key changes…“)),Otázka 3: hlavní změny a aktivity,jiné,ne,J,K,K,K,
+P01,P01-B005,section,div.entry > * (děti 24–27 (od „AK: How did your participation…“)),Otázka 4: dopad na čtenáře a komunitu,jiné,ne,J,K,K,K,
+P01,P01-B006,section,div.entry > * (děti 28–31 (od „GV: How has your own knowledge…“)),Otázka 5: změna znalostí o digitální demokracii,jiné,ne,J,K,K,K,
+P01,P01-B007,section,div.entry > * (děti 32–36 (od „GV: What are the most valuable lessons…“)),Otázka 6: nejcennější poučení,jiné,ne,J,K,K,K,
+P01,P01-B008,section,div.entry > * (děti 37–41 (od „GV: What comes next?…“)),Otázka 7: co bude dál,jiné,ne,J,K,K,K,
+P02,P02-B001,comment,article#D4iCFgsHqfDeLPH9E,Cool!,jiné,ne,J,K,K,K,úroveň odpovědi 1
+P02,P02-B002,comment,article#HtSxuniKbmTtShnTS,Thanks for this suggestion! This is not currentl…,jiné,ne,J,K,K,K,úroveň odpovědi 2
+P02,P02-B003,comment,article#wSxXbwh4Lz8SkvNEJ,The main text from the CC BY 4.0 link above:,jiné,ne,J,K,K,K,úroveň odpovědi 1
+P02,P02-B004,comment,article#tY5ngyYJgpnConuGy,"(Ben_West, feel free to delete this comment if n…",jiné,ne,J,K,K,K,úroveň odpovědi 2
+P02,P02-B005,comment,article#WzqmHveqMMTqA5iCw,I just didn't want to make the post even longer.,jiné,ne,J,K,K,K,úroveň odpovědi 3
+P02,P02-B006,comment,article#BZYRnnqo4io3cFTjm,"Starting December 1, will it be obvious when wri…",jiné,ne,J,K,K,K,úroveň odpovědi 1
+P02,P02-B007,comment,article#G6zBuBJnrrap43DZr,"Going to ""New Post"" now, it looks like you have …",jiné,ne,J,K,K,K,úroveň odpovědi 2
+P02,P02-B008,comment,article#FXhpBCHFHddX5aEjF,"That said, this is not the case for comments cur…",jiné,ne,J,K,K,K,úroveň odpovědi 3
+P02,P02-B009,comment,article#iGmYMbKPyATtDPyYc,Do you have the link to the terms of use? I have…,jiné,ne,J,K,K,K,úroveň odpovědi 3
+P02,P02-B010,comment,article#3GLhvh3t77hkxgzeq,"I see that most of EVF orgs' own content (CEA, G…",jiné,ne,J,K,K,K,úroveň odpovědi 1
+P02,P02-B011,comment,article#2Ky3Sj2osuxaLpL6h,"Yeah, good flag. I think most of what CEA writes…",jiné,ne,J,K,K,K,úroveň odpovědi 2
+P02,P02-B012,comment,article#vXscH7g8GqCoLq3me,I noticed the checkbox for confirming awareness …,jiné,ne,J,K,K,K,úroveň odpovědi 1
+P02,P02-B013,comment,article#Bao25ThWuG5LeTyvm,"[Answering from memory, without any knowledge of…",jiné,ne,J,K,K,K,úroveň odpovědi 2
+P02,P02-B014,comment,article#fwosy98tLPttjvkuu,Thanks JP — that's right that we originally show…,jiné,ne,J,K,K,K,úroveň odpovědi 3
+P02,P02-B015,comment,article#SiDPf6C5XmryQgzzp,"If I post a quote here, the quoted text won't be…",jiné,ne,J,K,K,K,úroveň odpovědi 1
+P02,P02-B016,comment,article#5K2ontwdxW3qM6vCS,The CC license only covers Licensed Rights that …,jiné,ne,J,K,K,K,úroveň odpovědi 2
+P02,P02-B017,comment,article#Kyw55nML5nHbst3aK,I just wrote some comments today without being i…,jiné,ne,J,K,K,K,úroveň odpovědi 1
+P02,P02-B018,comment,article#k9peASDxE3TxzSNxz,"Oh, yeah, the tick-box also disappeared for me w…",jiné,ne,J,K,K,K,úroveň odpovědi 2
+P02,P02-B019,comment,article#CMfYqp3Sw75QKKXGz,Thanks for reporting this! I believe the issue i…,jiné,ne,J,K,K,K,úroveň odpovědi 3
+P02,P02-B020,comment,article#RW5GBLFFXuSCY559b,(odkaz na termsOfUse fóra),jiné,ne,J,K,K,K,úroveň odpovědi 1
+P02,P02-B021,comment,article#p8uP7GpvvLzeLBJDy,"Hi Elliot, your quote cuts off the ""Subject to s…",jiné,ne,J,K,K,K,úroveň odpovědi 2
+P02,P02-B022,comment,article#xmYSsxcn3pWukj35f,You want me to talk to a lawyer to know how quot…,jiné,ne,H,K,K,K,"úroveň odpovědi 3; lehce podrážděný tón, ale ne vyhrocený"
+P02,P02-B023,comment,article#WbivFym9KRCCFZbwN,"Does the EA forum have a terms of use document, …",jiné,ne,J,K,K,K,úroveň odpovědi 1
+P02,P02-B024,comment,article#9JepyLQdwN6rnSoqq,(odkaz na terms-and-conditions CEA),jiné,ne,J,K,K,K,úroveň odpovědi 2
+P03,P03-B001,listing article,".hds-content-item:has(a[href^=""/blogs/spacestation/2026/11/02/week-starts-with-spacewalk-preps-and-li""])",Week Starts with Spacewalk Preps and Life Science,jiné,ne,J,K,K,K,
+P03,P03-B002,listing article,".hds-content-item:has(a[href^=""/image-article/nasas-chapea-crew-returns-to-earth/""])",NASA’s CHAPEA Crew “Returns” to Earth,jiné,ne,J,K,K,K,"simulovaná mise na Marsu, uvozovky v titulku"
+P03,P03-B003,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/solar-system/skywatching/whats-up-november-20""])",What’s Up: November 2026 Skywatching Tips from NASA,jiné,ne,J,K,K,K,
+P03,P03-B004,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/blogs/swift/2026/11/02/nasas-swift-observator""])",NASA’s Swift Observatory to Re-Enter Atmosphere,jiné,ne,H,K,K,K,"zánik družice; zda jde o „katastrofické scénáře“, rozhodne ZF-24 (zde ne)"
+P03,P03-B005,listing article,".hds-content-item:has(a[href^=""/news-release/nasa-invites-media-to-northrop-grumman-crs-25-station-re""])",NASA Invites Media to Northrop Grumman CRS-25 Station Resupply Launch,jiné,ne,J,K,K,K,
+P03,P03-B006,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/blogs/tsis-2/2026/11/02/nasas-mission-to-stud""])","NASA’s Mission to Study Sunlight Completes Vacuum, Vibration Testing",jiné,ne,J,K,K,K,
+P03,P03-B007,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/missions/hubble/nasas-hubble-uncovers-case-of""])",NASA’s Hubble Uncovers Case of Missing Oxygen in Nearby Dwarf Galaxies,jiné,ne,J,K,K,K,
+P03,P03-B008,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/image-article/apod-2026-november-2-a-long-clo""])",APOD: 2026 November 2 – A Long Cloud on Mars,jiné,ne,J,K,K,K,
+P03,P03-B009,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/earth/earth-observatory/pennsylvanias-grand-c""])",Pennsylvania’s Grand Canyon,jiné,ne,J,K,K,K,
+P03,P03-B010,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/image-article/apod-2026-november-1-colors-of-""])",APOD: 2026 November 1 – Colors of the Moon,jiné,ne,J,K,K,K,
+P03,P03-B011,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/image-article/apod-2026-october-31-night-on-a""])",APOD: 2026 October 31 – Night on a Spooky Planet,jiné,ne,J,K,K,K,"halloweenské slovo „Spooky“, tón neutrální"
+P03,P03-B012,listing article,".hds-content-item:has(a[href^=""/news-release/nasa-releases-max-power-key-events-for-media-participant""])","NASA Releases MAX POWER Key Events for Media, Participants",jiné,ne,J,K,K,K,
+P03,P03-B013,listing article,".hds-content-item:has(a[href^=""/blogs/spacestation/2026/10/30/space-crops-and-advanced-tech-wrap-up-w""])",Space Crops and Advanced Tech Wrap Up Week Following Spacewalk,jiné,ne,J,K,K,K,
+P03,P03-B014,listing article,".hds-content-item:has(a[href^=""/image-article/nasas-james-webb-space-telescope-captures-eerie-cats-he""])",NASA’s James Webb Space Telescope Captures Eerie Cat’s Head,jiné,ne,J,K,K,K,"„eerie“ je popis snímku, ne vyhrocený tón"
+P03,P03-B015,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/missions/hubble/nasa-explores-potential-comme""])",NASA Explores Potential Commercial Servicing for Hubble Telescope,jiné,ne,J,K,K,K,
+P03,P03-B016,listing article,".hds-content-item:has(a[href^=""/podcasts/houston-we-have-a-podcast/artemis-iii-paving-the-way-to-luna""])",Artemis III: Paving the Way to Lunar Landings,jiné,ne,J,K,K,K,"podcast (55 min), na kartě jen popis"
+P03,P03-B017,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/solar-system/skywatching/night-sky-network/no""])",November’s Night Sky Notes: Light-Day Away,jiné,ne,J,K,K,K,
+P03,P03-B018,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/image-article/apod-2026-october-30-haunting-t""])",APOD: 2026 October 30 – Haunting the Cepheus Flare,jiné,ne,J,K,K,K,"halloweenské slovo „Haunting“, tón neutrální"
+P03,P03-B019,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/earth/earth-observatory/vega-island-frozen-in""])",Vega Island Frozen in Fright,jiné,ne,H,K,K,K,titulek hraje s Halloweenem („Fright“); obsah je věcný popis ostrova
+P03,P03-B020,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/photojournal/map-showing-potential-origins-of""])",Map Showing Potential Origins of Martian Meteorite Teghaza 001,jiné,ne,J,K,K,K,
+P03,P03-B021,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/photojournal/slice-of-martian-meteorite-tegha""])",Slice of Martian Meteorite Teghaza 001,jiné,ne,J,K,K,K,
+P03,P03-B022,listing article,".hds-content-item:has(a[href^=""/centers-and-facilities/johnson/halloween-aboard-the-international-spa""])",Halloween Aboard the International Space Station,jiné,ne,J,K,K,K,
+P03,P03-B023,listing article,".hds-content-item:has(a[href^=""/blogs/spacestation/2026/10/29/spacewalkers-install-roll-out-solar-arr""])",Spacewalkers Install Roll-Out Solar Array for Power Generation,jiné,ne,J,K,K,K,
+P03,P03-B024,listing article,".hds-content-item:has(a[href^=""/solar-system/planets/mars/nasa-funded-study-details-one-of-oldest-mar""])",NASA-funded Study Details One of Oldest Mars Meteorites Ever Found,jiné,ne,J,K,K,K,
+P03,P03-B025,listing article,".hds-content-item:has(a[href^=""https://science.nasa.gov/blogs/tracers/2026/10/29/nasas-tracers-first-""])",NASA’s TRACERS First Results Offers Peek into Violent Magnetic Process,jiné,ne,H,K,K,K,"slovo „Violent“ je vědecký popis magnetického děje, ne vyhrocený tón"
+P04,P04-B001,section,div#introduction,Úvod: od roku 1800 zemřelo v bojích přes 37 milionů lidí,válka,ne,J,H,K,K,"statistický text o obětech válek; hlavní téma = válka, ne zpráva o úmrtí"
+P04,P04-B002,section,div.article-block__key-insights (h1#key-insights),Key Insights on War and Peace,válka,ne,J,H,K,K,"obsahuje i grafy (figure.chart), které se dokreslí až po rolování"
+P04,P04-B003,section,section.article-block__research-and-writing (h1#research-writing),Research & Writing (3 články + More on Measuring Conflict),válka,ne,H,H,K,K,seznam odkazů na články o konfliktech
+P04,P04-B004,section,div.article-block__gray-section (h1#explore-data-on-armed-conflict-and-war),Explore Data: Data Explorer a mapa úmrtí v konfliktech,válka,ne,J,H,K,K,figure.explorer a graf se kreslí dynamicky (svg se objeví až po načtení)
+P04,P04-B005,section,section.article-block__all-charts (h1#all-charts),Key Charts on War & Peace: Deaths in wars,válka,ne,J,H,K,K,graf se kreslí dynamicky
+P04,P04-B006,section,section.article-block__featured-metrics,Featured Data on War & Peace (8 odkazů),válka,ne,H,H,K,K,mix: úmrtí v konfliktech i uprchlíci
+P04,P04-B007,section,kontejner s h3#article-endnotes,Endnotes: poznámky a literatura,jiné,ne,H,K,K,K,"bibliografický aparát k tématu války; hlavní téma = citace, ne obsah"
 P05,P05-B001,section,"#mw-content-text .mw-parser-output > section[data-mw-section-id=""0""]",(lead) upozornění na „contentious topic“ a šablony,jiné,ne,J,K,K,K,"administrativní upozornění, ne diskuze; ověřit, zda jde o obsahový blok"
 P05,P05-B002,section,"#mw-content-text .mw-parser-output > section[data-mw-section-id=""1""]","""Clockwise from top left"" – popisky fotografií",jiné,ne,H,K,K,K,o popiscích obrázků; téma válka jen nepřímo
 P05,P05-B003,section,"#mw-content-text .mw-parser-output > section[data-mw-section-id=""2""]","Last sentence of lede – příměří, neochota stran",válka,ne,J,H,K,K,"nejhlubší vnoření: DOM hloubka až 43, <dl> až 17 úrovní; 25 příspěvků"
 P05,P05-B004,section,"#mw-content-text .mw-parser-output > section[data-mw-section-id=""3""]",Still no Response regarding belligerents list,válka,ano,H,H,K,H,"odmítavý tón, hraniční"
 P05,P05-B005,section,"#mw-content-text .mw-parser-output > section[data-mw-section-id=""4""]",Edit request – formulace o Krymu,válka,ne,J,H,K,K,
 P05,P05-B006,section,"#mw-content-text .mw-parser-output > section[data-mw-section-id=""5""]",Pro west propaganda? – název článku,válka,ne,H,H,K,K,"nadpis obviňující, odpovědi věcné"
-P06,P06-B001,section,"div.element-margin-top-half > prvky před h2#h20 (úvod článku, obsahuje reklamní kontejnery div.ad-detail)",Drahé paměti máme i kvůli „krvavé lázni“… (úvod),jiné,ne,J,K,K,K,úvodní sekce bez nadpisu; uvnitř 2 reklamní kontejnery
-P06,P06-B002,section,h2#h20 a sourozenecké prvky do dalšího h2 (kontejner div.element-margin-top-half),Začátek problémů,jiné,ne,J,K,K,K,mezi nadpisem a koncem sekce leží reklamní kontejnery
-P06,P06-B003,section,h2#h21 a sourozenecké prvky do dalšího h2 (kontejner div.element-margin-top-half),Pokus o záchranu,jiné,ne,J,K,K,K,
-P06,P06-B004,section,h2#h22 a sourozenecké prvky do dalšího h2 (kontejner div.element-margin-top-half),Dobrá technologie ve špatný čas,jiné,ne,J,K,K,K,
-P06,P06-B005,section,h2#h23 a sourozenecké prvky do dalšího h2 (kontejner div.element-margin-top-half),Důsledek pro křemíkové Sasko,jiné,ne,J,K,K,K,na konci článku následuje promo box a formulář k odběru newsletteru (nejsou součástí bloku)
-P06,P06-B006,listing article,section.recommended-articles li.ra-entity s odkazem /clanky/evropa-sype-desitky-miliard-do-obrannych-startupu…,Evropa sype desítky miliard do obranných startupů…,jiné,ne,H,K,K,K,"obranné startupy: ekonomika/obrana, ne válečné dění; hraniční vůči „válka“"
-P06,P06-B007,listing article,section.recommended-articles li.ra-entity s odkazem /clanky/netflix-propousti-tisic-lidi-a-vymenil-manazery…,Netflix propouští tisíc lidí a vyměnil manažery…,jiné,ne,J,K,K,K,
-P06,P06-B008,listing article,section.recommended-articles li.ra-entity s odkazem /clanky/anthropic-navrhuje-kvantove-obvody…,"Anthropic navrhuje kvantové obvody, rekordní opravy…",jiné,ne,J,K,K,K,
-P06,P06-B009,listing article,section.recommended-articles li.ra-entity s odkazem /clanky/jak-hospodarila-ct-v-prvnim-pololeti…,Jak hospodařila ČT v prvním pololetí?…,jiné,ne,J,K,K,K,
-P06,P06-B010,listing article,section.recommended-articles li.ra-entity s odkazem /clanky/cesko-se-rozhoupalo-a-podporilo-velky-evropsky-plan…,Česko se rozhoupalo a podpořilo velký evropský plán…,jiné,ne,J,K,K,K,
-P06,P06-B011,listing article,section.recommended-articles li.ra-entity s odkazem /clanky/stat-digitalizuje-ale-aneb-proc-jednotne-mesicni-hlaseni…,"Stát digitalizuje, ale… Aneb proč jednotné měsíční hlášení…",jiné,ne,J,K,K,K,
+P06,P06-B001,section,div.wysiwyg_content.perex_content > p,Perex: kultivované maso a čokoláda jsou témata…,jiné,ne,J,K,K,K,perex je v samostatném div.perex_content před hlavním div#asset_213980
+P06,P06-B002,section,h2 „Rybí prsty z laboratoře“ a sourozenci do dalšího h2 (v div#asset_213980.wysiwyg_content),Rybí prsty z laboratoře,jiné,ne,J,K,K,K,
+P06,P06-B003,section,h2 „Náhrada mléčných výrobků“ a sourozenci do dalšího h2,Náhrada mléčných výrobků,jiné,ne,J,K,K,K,
+P06,P06-B004,section,h2 „Vaječná bílkovina ze zkumavky“ a sourozenci do dalšího h2,Vaječná bílkovina ze zkumavky,jiné,ne,J,K,K,K,
+P06,P06-B005,section,"h2 „Investice? Ano, ale zprostředkovaně…“ a sourozenci do dalšího h2","Investice? Ano, ale zprostředkovaně…",jiné,ne,J,K,K,K,
+P06,P06-B006,section,h2 „Nadějná studie z Finska“ a sourozenci do dalšího h2,Nadějná studie z Finska,jiné,ne,J,K,K,K,
+P06,P06-B007,section,h2 „Velký otazník: Přijme veřejnost potraviny…“ a sourozenci do konce div#asset_213980,Velký otazník: Přijme veřejnost potraviny…,jiné,ne,J,K,K,K,
