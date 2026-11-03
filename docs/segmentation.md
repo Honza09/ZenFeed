@@ -7,7 +7,8 @@ The content script splits the already loaded page into content blocks (articles 
 | File | Responsibility |
 |---|---|
 | `extension/content/segmenter.js` | Segmentation logic, exposed as `ZenFeedSegmenter.segmentPage()` and `serializeBlocks()` |
-| `extension/content/content.js` | Message handler; keeps the last blocks so later steps can find their DOM elements by ID. Injected by the popup, not declared in the manifest (ZF-08) |
+| `extension/content/block-registry.js` | Keeps the last blocks and their analysis results by ID ([`block-mapping.md`](block-mapping.md), ZF-09) |
+| `extension/content/content.js` | Message handler (`extract-blocks`, `apply-results`). Injected by the popup, not declared in the manifest (ZF-08) |
 | `tests/extension/fixtures/segmentation.html` | Local page with edge cases (navigation, form, hidden text, feed cards, comments, missing title, little text) |
 | `tests/extension/segment-pages.mjs` | Runs the segmenter on any URL in headless Chrome and prints the blocks |
 
@@ -24,6 +25,7 @@ Response:
 ```json
 {
   "ok": true,
+  "extractionId": "uuid of this extraction (ZF-09)",
   "title": "Page title or null",
   "url": "https://example.com/",
   "blocks": [
@@ -35,7 +37,7 @@ Response:
 
 On failure: `{ "ok": false, "error": "extraction_failed" }`. Other message types get no response.
 
-- `id`: `zf-<n>` in document order. It is valid for one extraction only; the next extraction assigns IDs again.
+- `id`: `zf-<n>` in document order. It is valid for one extraction only; the next extraction assigns IDs again. Results are therefore tied to `extractionId`; see [`block-mapping.md`](block-mapping.md) (ZF-09) for `zenfeed/apply-results`.
 - `kind`: `article`, `section`, `comment`, `post` (feed or list item) or `other`. It is a hint for classification, not a guarantee.
 - DOM elements never leave the content script (`serializeBlocks` drops them).
 
@@ -44,7 +46,7 @@ This shape is a proposal for ZF-02; it changes only by agreement with Jan and Da
 ## Algorithm
 
 1. **Leaves.** Walk the DOM and collect visible paragraph-like elements, i.e. those that contain only text and inline elements. Inline runs mixed with blocks (a headline link next to a perex) are leaves too.
-2. **Exclusions.** Skip `nav`, `form`, buttons and inputs, `script`/`style`, iframes and media, landmark roles (`navigation`, `banner`, `contentinfo`, `search`, `menu`, `dialog`…), the page `header`/`footer` (not the ones inside an article), and hidden elements (`hidden`, `aria-hidden`, `display:none`, `visibility:hidden`, `opacity:0`).
+2. **Exclusions.** Skip `nav`, `form`, buttons and inputs, `contenteditable` (ZF-09), `script`/`style`, iframes and media, landmark roles (`navigation`, `banner`, `contentinfo`, `search`, `menu`, `dialog`…), the page `header`/`footer` (not the ones inside an article), and hidden elements (`hidden`, `aria-hidden`, `display:none`, `visibility:hidden`, `opacity:0`).
 3. **Menus.** A leaf or block that is mostly links is dropped unless it reads like a headline: at least 4 words and links averaging at least 12 letters. Density is counted on letters only, so `|` separators do not count.
 4. **Containers.** Each leaf belongs to the nearest `article`, `[role=article]`, `[role=comment]`, `li`, `section`, `tr` or repeated sibling. A repeated sibling is an element whose parent has at least 3 children with the same tag and class; paragraphs are excluded from this rule. Without such a container, the leaf belongs to the top-level wrapper under `<main>` or `<body>`. Class names are only used to detect comments, never alone to define blocks.
 5. **Splitting and merging.** A container with more than 1,500 characters is split into chunks, preferably before headings. Chunks under 120 characters are merged with their neighbour. Blocks under 25 characters are dropped.

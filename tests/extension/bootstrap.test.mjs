@@ -45,6 +45,7 @@ function fakeChrome({ tab, inject, reply }) {
 const PAGE = { id: 7, url: "https://example.com/article" };
 const OK_REPLY = () => ({
   ok: true,
+  extractionId: "x1",
   title: "Example",
   url: PAGE.url,
   blocks: [{ id: "zf-0", kind: "article", title: null, text: "Some readable text." }],
@@ -72,23 +73,25 @@ test("supported URLs: only http and https outside the Web Store", () => {
   }
 });
 
-test("injects both content scripts in order, then asks for blocks", async () => {
+test("injects the content scripts in order, then asks for blocks", async () => {
   const { extractActiveTab } = loadBootstrap();
   const { api, calls } = fakeChrome({ tab: PAGE, reply: OK_REPLY });
   const result = await extractActiveTab(api);
 
   assert.equal(result.ok, true);
+  assert.equal(result.tabId, 7);
+  assert.equal(result.extractionId, "x1");
   assert.equal(result.title, "Example");
   assert.equal(result.blocks.length, 1);
   assert.deepEqual(plain(calls.injected), [
-    { target: { tabId: 7 }, files: ["content/segmenter.js", "content/content.js"] },
+    { target: { tabId: 7 }, files: ["content/segmenter.js", "content/block-registry.js", "content/content.js"] },
   ]);
   assert.deepEqual(plain(calls.messages), [{ tabId: 7, message: { type: "zenfeed/extract-blocks" } }]);
 });
 
 test("missing title becomes null and an empty page is still ok", async () => {
   const { extractActiveTab } = loadBootstrap();
-  const { api } = fakeChrome({ tab: PAGE, reply: () => ({ ok: true, title: "", blocks: [] }) });
+  const { api } = fakeChrome({ tab: PAGE, reply: () => ({ ok: true, extractionId: "x1", title: "", blocks: [] }) });
   const result = await extractActiveTab(api);
   assert.equal(result.ok, true);
   assert.equal(result.title, null);
@@ -140,7 +143,8 @@ test("content script errors or invalid replies: extraction_failed", async () => 
     () => undefined,
     () => ({ ok: false, error: "extraction_failed" }),
     () => ({ ok: true, blocks: "nope" }),
-    () => ({ ok: true, blocks: [{ id: 1, text: "x" }] }),
+    () => ({ ok: true, extractionId: "x1", blocks: [{ id: 1, text: "x" }] }),
+    () => ({ ok: true, title: "No extraction ID", blocks: [] }),
   ];
   for (const reply of replies) {
     const { api } = fakeChrome({ tab: PAGE, reply });
@@ -161,4 +165,40 @@ test("manifest: no automatic content scripts or host permissions", () => {
   assert.equal(manifest.content_scripts, undefined);
   assert.equal(manifest.host_permissions, undefined);
   assert.deepEqual([...manifest.permissions].sort(), ["activeTab", "scripting"]);
+});
+
+const APPLY_OK = { ok: true, matched: 1, unknown: 0, invalid: 0, duplicate: 0, detached: 0 };
+
+test("applyResults sends the results with the extraction ID to the tab", async () => {
+  const { applyResults } = loadBootstrap();
+  const { api, calls } = fakeChrome({ tab: PAGE, reply: () => APPLY_OK });
+  const results = [{ id: "zf-0", category: "war", toxicity_score: 0, confidence: 1, recommended_action: "hide" }];
+  assert.deepEqual(plain(await applyResults(api, 7, "x1", results)), APPLY_OK);
+  assert.deepEqual(plain(calls.messages), [
+    { tabId: 7, message: { type: "zenfeed/apply-results", extractionId: "x1", results } },
+  ]);
+});
+
+test("applyResults passes on the content script errors", async () => {
+  const { applyResults } = loadBootstrap();
+  for (const error of ["stale_extraction", "no_extraction", "invalid_results", "apply_failed"]) {
+    const { api } = fakeChrome({ tab: PAGE, reply: () => ({ ok: false, error }) });
+    assert.deepEqual(plain(await applyResults(api, 7, "x1", [])), { ok: false, error });
+  }
+});
+
+test("applyResults: closed tab or odd reply is tab_unavailable", async () => {
+  const { applyResults } = loadBootstrap();
+  const replies = [
+    () => { throw new Error("No tab with id: 7"); },
+    () => undefined,
+    () => ({ ok: true }),
+    () => ({ ...APPLY_OK, matched: -1 }),
+    () => ({ ...APPLY_OK, unknown: "0" }),
+    () => ({ ok: false, error: "something_else" }),
+  ];
+  for (const reply of replies) {
+    const { api } = fakeChrome({ tab: PAGE, reply });
+    assert.deepEqual(plain(await applyResults(api, 7, "x1", [])), { ok: false, error: "tab_unavailable" });
+  }
 });

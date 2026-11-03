@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>ZenFeed editable fixture</title>
+</head>
+<body>
+  <main>
+    <article>
+      <h2>Article that should become a block</h2>
+      <p>This paragraph is ordinary page content. It is long enough to pass the minimum block length and should be returned by the segmenter as part of the article block.</p>
+    </article>
+    <div contenteditable="true">
+      <p>EDITABLE-DRAFT This is text the user is writing in a rich-text editor. It is long enough to be a block, but it must never be segmented or sent anywhere.</p>
+    </div>
+    <section>
+      <h2>Comment box</h2>
+      <textarea>TEXTAREA-DRAFT A comment the user started to write in a plain textarea, long enough to be a block if it were not excluded.</textarea>
+      <div contenteditable="plaintext-only">EDITABLE-PLAIN Plain-text editable area with a draft that is long enough to be a block if it were not excluded.</div>
+    </section>
+  </main>
+</body>
+</html>

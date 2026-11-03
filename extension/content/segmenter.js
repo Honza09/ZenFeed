@@ -67,6 +67,10 @@
     if (element.hidden || element.getAttribute("aria-hidden") === "true") {
       return true;
     }
+    // Text the user is writing (comment boxes, rich-text editors) is not page content (ZF-09).
+    if (element.isContentEditable) {
+      return true;
+    }
     // The page header and footer are excluded, but not the ones inside an article.
     const tag = element.tagName;
     if ((tag === "HEADER" || tag === "FOOTER") && !element.closest("article, [role=article]")) {

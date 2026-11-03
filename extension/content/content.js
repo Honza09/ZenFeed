@@ -7,15 +7,16 @@
   }
   globalThis.zenFeedContentLoaded = true;
 
-  // Blocks of the last extraction, kept so later steps (ZF-09, ZF-10) can find
-  // the DOM elements by block ID. Replaced on every extraction.
-  let lastBlocks = new Map();
+  // Blocks of the last extraction and their analysis results (ZF-09).
+  // ZF-10 finds the DOM elements and results here by block ID.
+  const registry = globalThis.ZenFeedBlockRegistry.createRegistry();
 
   function handleExtract() {
     const { blocks, stats } = globalThis.ZenFeedSegmenter.segmentPage();
-    lastBlocks = new Map(blocks.map((block) => [block.id, block]));
+    const extractionId = registry.replace(blocks);
     return {
       ok: true,
+      extractionId,
       title: document.title || null,
       url: location.href,
       blocks: globalThis.ZenFeedSegmenter.serializeBlocks(blocks),
@@ -23,18 +24,31 @@
     };
   }
 
+  function handleApplyResults(message) {
+    return registry.applyResults(message.extractionId, message.results);
+  }
+
+  const HANDLERS = {
+    "zenfeed/extract-blocks": [handleExtract, "extraction_failed"],
+    "zenfeed/apply-results": [handleApplyResults, "apply_failed"],
+  };
+
   chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-    if (!message || message.type !== "zenfeed/extract-blocks") {
+    const entry = message && HANDLERS[message.type];
+    if (!entry) {
       return false;
     }
+    const [handler, errorCode] = entry;
     try {
-      sendResponse(handleExtract());
+      sendResponse(handler(message));
     } catch (error) {
-      console.error("ZenFeed: block extraction failed", error);
-      sendResponse({ ok: false, error: "extraction_failed" });
+      console.error(`ZenFeed: ${message.type} failed`, error);
+      sendResponse({ ok: false, error: errorCode });
     }
     return false;
   });
 
-  globalThis.zenFeedGetBlock = (id) => lastBlocks.get(id) || null;
+  // { block, containsBlocks, result } or null; result is null until a result
+  // was applied. containsBlocks > 0 means hiding the block would hide others too.
+  globalThis.zenFeedGetBlock = (id) => registry.get(id);
 })();

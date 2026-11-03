@@ -69,8 +69,8 @@ CI (`.github/workflows/ci.yml`) runs the same commands. Run them from the reposi
 ruff check backend
 pytest backend
 python .github/scripts/check_extension.py extension/manifest.json
-find extension -name '*.js' -print0 | xargs -0 -r -n1 node --check
-node --test tests/extension/bootstrap.test.mjs
+find extension tests/extension \( -name '*.js' -o -name '*.mjs' \) -print0 | xargs -0 -r -n1 node --check
+node --test tests/extension/*.test.mjs
 ```
 
 The last two commands need Node.js, used only for checks and unit tests; the extension itself has no build step. The GitHub Actions workflow itself cannot be run locally; it runs when a pull request is opened.

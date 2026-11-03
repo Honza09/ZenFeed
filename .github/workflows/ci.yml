@@ -37,6 +37,6 @@ jobs:
       - name: Validate manifest
         run: python .github/scripts/check_extension.py extension/manifest.json
       - name: Check JavaScript syntax
-        run: find extension -name '*.js' -print0 | xargs -0 -r -n1 node --check
-      - name: Unit tests (bootstrap)
-        run: node --test tests/extension/bootstrap.test.mjs
+        run: find extension tests/extension \( -name '*.js' -o -name '*.mjs' \) -print0 | xargs -0 -r -n1 node --check
+      - name: Unit tests (extension)
+        run: node --test tests/extension/*.test.mjs
