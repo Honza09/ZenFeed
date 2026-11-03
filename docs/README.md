@@ -52,6 +52,7 @@ Adapt this structure to match the actual repository as development progresses.
 - [API Reference](API.md)
 - [Testing](TESTING.md)
 - [Block segmentation (ZF-03 PoC)](segmentation.md)
+- [Extension bootstrap and permissions (ZF-08)](extension-bootstrap.md)
 - [Roadmap](ROADMAP.md)
 - [Product definition and MVP scope (v0.2)](mvp.md) — authoritative; the sections above are generic drafts
 - [Backlog](backlog/README.md)
