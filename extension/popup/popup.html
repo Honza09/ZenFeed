@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ZenFeed</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main>
+    <h1>ZenFeed</h1>
+    <p class="hint">Stránka se načte až po kliknutí. Nic se zatím neodesílá na server.</p>
+    <button id="analyze" type="button">Najít bloky na stránce</button>
+    <p id="status" role="status" aria-live="polite"></p>
+    <dl id="summary" hidden>
+      <dt>Stránka</dt>
+      <dd id="page-title"></dd>
+      <dt>Nalezené bloky</dt>
+      <dd id="block-count"></dd>
+    </dl>
+  </main>
+  <script src="bootstrap.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

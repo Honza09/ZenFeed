@@ -7,13 +7,13 @@ The content script splits the already loaded page into content blocks (articles 
 | File | Responsibility |
 |---|---|
 | `extension/content/segmenter.js` | Segmentation logic, exposed as `ZenFeedSegmenter.segmentPage()` and `serializeBlocks()` |
-| `extension/content/content.js` | Message handler; keeps the last blocks so later steps can find their DOM elements by ID |
+| `extension/content/content.js` | Message handler; keeps the last blocks so later steps can find their DOM elements by ID. Injected by the popup, not declared in the manifest (ZF-08) |
 | `tests/extension/fixtures/segmentation.html` | Local page with edge cases (navigation, form, hidden text, feed cards, comments, missing title, little text) |
 | `tests/extension/segment-pages.mjs` | Runs the segmenter on any URL in headless Chrome and prints the blocks |
 
 ## Message
 
-The popup (ZF-11) asks the content script in the active tab:
+The popup injects the content scripts on the user's click ([`extension-bootstrap.md`](extension-bootstrap.md), ZF-08) and then asks them:
 
 ```js
 const response = await chrome.tabs.sendMessage(tabId, { type: "zenfeed/extract-blocks" });
@@ -63,14 +63,7 @@ node tests/extension/segment-pages.mjs https://www.novinky.cz/ https://news.ycom
 
 `--full` prints the whole block text instead of a 100-character preview. The output contains page text; do not commit it.
 
-In the extension itself (Chrome, **Load unpacked** `extension/`): reload the test page, open `chrome-extension://<extension id>/popup/popup.html` in a new tab, open its DevTools console and run:
-
-```js
-const [tab] = (await chrome.tabs.query({ currentWindow: true })).filter((t) => !t.active);
-await chrome.tabs.sendMessage(tab.id, { type: "zenfeed/extract-blocks" });
-```
-
-Pages opened before the extension was loaded or reloaded have no content script until they are reloaded.
+In the extension itself, click the ZenFeed icon and **Najít bloky na stránce**; the popup injects the scripts and shows the block count. See [`extension-bootstrap.md`](extension-bootstrap.md) (ZF-08). Before ZF-08 the content script was declared in the manifest and this section described sending the message from DevTools; that no longer works because nothing is injected until the user clicks.
 
 ## Test results (1 Nov 2026)
 
@@ -102,4 +95,4 @@ The message interface was checked by loading `extension/` unpacked in headless B
 - The `comment` kind uses class and ID hints (`comment`, `koment`, `reply`, `discussion`), so an opinion piece with a "comment" class is labelled `comment` (seen on novinky.cz).
 - Content in iframes, shadow DOM, canvas and not yet loaded parts of a feed is not segmented. Dynamic updates (`MutationObserver`) are out of scope for this PoC.
 - `chrome://` pages, the Chrome Web Store and other restricted pages do not run content scripts; `sendMessage` then fails and the popup must show an "unsupported page" state (ZF-11, ZF-28).
-- The content script is still declared for all `http`/`https` pages in the manifest. Injecting it on demand (`activeTab` + `scripting`) is decided in ZF-08.
+- Since ZF-08 the content scripts are no longer declared in the manifest; the popup injects them on the user's click (`activeTab` + `scripting`), see [`extension-bootstrap.md`](extension-bootstrap.md).

@@ -7,12 +7,5 @@
     "default_title": "ZenFeed",
     "default_popup": "popup/popup.html"
   },
-  "permissions": ["activeTab"],
-  "content_scripts": [
-    {
-      "matches": ["http://*/*", "https://*/*"],
-      "js": ["content/segmenter.js", "content/content.js"],
-      "run_at": "document_idle"
-    }
-  ]
+  "permissions": ["activeTab", "scripting"]
 }

@@ -70,9 +70,10 @@ ruff check backend
 pytest backend
 python .github/scripts/check_extension.py extension/manifest.json
 find extension -name '*.js' -print0 | xargs -0 -r -n1 node --check
+node --test tests/extension/bootstrap.test.mjs
 ```
 
-The last command needs Node.js, used only for the syntax check; the extension itself has no build step. The GitHub Actions workflow itself cannot be run locally; it runs when a pull request is opened.
+The last two commands need Node.js, used only for checks and unit tests; the extension itself has no build step. The GitHub Actions workflow itself cannot be run locally; it runs when a pull request is opened.
 
 ## Configuration
 
