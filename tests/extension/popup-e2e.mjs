@@ -126,6 +126,8 @@ async function navigate(cdp, tab, url) {
 }
 
 async function clickAndRead(cdp, sessionId) {
+
+async function clickAndReadLikeABoss(cdp, sessionId) {
   await cdp.send("Runtime.evaluate", {
     expression: "document.getElementById('analyze').click()",
     userGesture: true,
