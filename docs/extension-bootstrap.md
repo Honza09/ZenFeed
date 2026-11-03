@@ -23,7 +23,7 @@ Reasons:
 2. The user clicks **Najít bloky na stránce**.
 3. `extension/popup/bootstrap.js` (`ZenFeedBootstrap.extractActiveTab`):
    - reads the active tab; if Chrome hides its URL it stops with `no_access`, if the URL is not `http`/`https` or it is the Chrome Web Store it stops with `unsupported_page`; in both cases nothing is injected;
-   - injects `content/segmenter.js` and `content/content.js` with `chrome.scripting.executeScript`;
+   - injects `content/segmenter.js`, `content/block-registry.js` (ZF-09) and `content/content.js` with `chrome.scripting.executeScript`;
    - sends `zenfeed/extract-blocks` (the message from [`segmentation.md`](segmentation.md)) and checks the reply.
 4. The popup shows the page title and the number of blocks with `textContent`. Nothing is sent to the backend; that is ZF-12.
 
@@ -52,7 +52,7 @@ A page with no readable text returns 0 blocks and the popup says so; it is not a
 ## How to test
 
 ```bash
-node --test tests/extension/bootstrap.test.mjs
+node --test tests/extension/*.test.mjs
 node tests/extension/popup-e2e.mjs https://www.nasa.gov/news/recently-published/ chrome://version/
 node tests/extension/popup-e2e.mjs --same-tab <url> <url> ...   # one tab, navigation between pages
 ```

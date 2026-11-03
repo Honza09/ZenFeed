@@ -1,7 +1,8 @@
-// ZenFeed bootstrap (ZF-08).
+// ZenFeed bootstrap (ZF-08, ZF-09).
 // Injects the content scripts into the active tab only after the user opens the
-// popup and clicks, then asks them for the page blocks. Nothing runs on pages
-// the user has not acted on, and nothing is sent to the backend here.
+// popup and clicks, then asks them for the page blocks and hands analysis
+// results back to them. Nothing runs on pages the user has not acted on, and
+// nothing is sent to the backend here.
 // Exposed as ZenFeedBootstrap so the popup and the Node tests share one copy.
 
 (() => {
@@ -9,8 +10,8 @@
     return;
   }
 
-  // Order matters: content.js uses ZenFeedSegmenter.
-  const CONTENT_SCRIPTS = ["content/segmenter.js", "content/content.js"];
+  // Order matters: content.js uses ZenFeedSegmenter and ZenFeedBlockRegistry.
+  const CONTENT_SCRIPTS = ["content/segmenter.js", "content/block-registry.js", "content/content.js"];
   const SUPPORTED_PROTOCOLS = new Set(["http:", "https:"]);
 
   function isSupportedUrl(url) {
@@ -40,12 +41,13 @@
     return Boolean(
       response
       && response.ok === true
+      && typeof response.extractionId === "string" && response.extractionId.length > 0
       && Array.isArray(response.blocks)
       && response.blocks.every((block) => block && typeof block.id === "string" && typeof block.text === "string"),
     );
   }
 
-  // Returns { ok: true, title, blocks, stats } or { ok: false, error }.
+  // Returns { ok: true, tabId, extractionId, title, blocks, stats } or { ok: false, error }.
   // Errors: no_tab, no_access, unsupported_page, injection_failed, extraction_failed.
   async function extractActiveTab(chromeApi) {
     const [tab] = await chromeApi.tabs.query({ active: true, currentWindow: true });
@@ -83,8 +85,48 @@
     if (!isValidExtraction(response)) {
       return { ok: false, error: "extraction_failed" };
     }
-    return { ok: true, title: response.title || null, blocks: response.blocks, stats: response.stats || null };
+    return {
+      ok: true,
+      tabId: tab.id,
+      extractionId: response.extractionId,
+      title: response.title || null,
+      blocks: response.blocks,
+      stats: response.stats || null,
+    };
   }
 
-  globalThis.ZenFeedBootstrap = { CONTENT_SCRIPTS, isSupportedUrl, isValidExtraction, extractActiveTab };
+  const APPLY_COUNTS = ["matched", "unknown", "invalid", "duplicate", "detached"];
+  const APPLY_ERRORS = new Set(["no_extraction", "stale_extraction", "invalid_results", "apply_failed"]);
+
+  function isValidApplyReply(reply) {
+    if (!reply || typeof reply !== "object") {
+      return false;
+    }
+    if (reply.ok === false) {
+      return APPLY_ERRORS.has(reply.error);
+    }
+    return reply.ok === true && APPLY_COUNTS.every((key) => Number.isInteger(reply[key]) && reply[key] >= 0);
+  }
+
+  // Hands /v1/analyze results to the content script of the extraction they
+  // belong to. Returns the content script's counts, or { ok: false, error }
+  // with stale_extraction (the page was extracted again in the meantime;
+  // analyze again), no_extraction, invalid_results, apply_failed or
+  // tab_unavailable (tab closed, navigated or reloaded).
+  async function applyResults(chromeApi, tabId, extractionId, results) {
+    let reply;
+    try {
+      reply = await chromeApi.tabs.sendMessage(tabId, { type: "zenfeed/apply-results", extractionId, results });
+    } catch (error) {
+      // Tab closed or navigated: its content script is gone with its blocks.
+      console.error("ZenFeed: content script did not answer", error);
+      return { ok: false, error: "tab_unavailable" };
+    }
+    // No reply or an unexpected shape: do not guess what was applied.
+    return isValidApplyReply(reply) ? reply : { ok: false, error: "tab_unavailable" };
+  }
+
+  globalThis.ZenFeedBootstrap = {
+    CONTENT_SCRIPTS, isSupportedUrl, isValidExtraction, extractActiveTab, applyResults,
+  };
 })();
