@@ -35,7 +35,7 @@ def test_analyze_returns_review_for_each_block(client) -> None:
                 {"id": "zf-0", "kind": "article", "text": "First block."},
                 {"id": "zf-1", "kind": "comment", "text": "Second block."},
             ],
-            {"war": True, "harsh_tone": False},
+            {"valka": True, "toxicky": False},
         ),
     )
 
@@ -99,6 +99,8 @@ def test_analyze_accepts_extension_block_shape(client) -> None:
             ]
         ),
         _payload(preferences={"war": "yes"}),
+        _payload(preferences={"war": True}),
+        _payload(preferences={"jine": True}),
         _payload(preferences={"": True}),
         _payload(preferences={"k" * 65: True}),
         _payload(preferences={f"topic-{index}": True for index in range(33)}),

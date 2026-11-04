@@ -2,6 +2,8 @@
 
 The analyze contract follows the draft in ``zenfeed_implementacni_plan.md``.
 ``section`` is included because the content script already emits that kind.
+Preference keys and summary fields are the ZF-14 contract. ``/v1/summarize``
+is not served yet.
 """
 
 from __future__ import annotations
@@ -19,11 +21,18 @@ from pydantic import (
 
 MAX_BLOCKS = 100
 MAX_BLOCK_CHARS = 8000
-MAX_PREFERENCES = 32
-MAX_PREFERENCE_KEY_CHARS = 64
+MAX_SUMMARY_CHARS = 4000
 
 BlockKind = Literal["article", "section", "comment", "post", "other"]
 RecommendedAction = Literal["show", "hide", "review"]
+SummaryLanguage = Literal["cs", "en"]
+HideableTopic = Literal[
+    "valka",
+    "politicke_konflikty",
+    "umrti",
+    "katastrofy",
+    "nasili",
+]
 TopicId = Literal[
     "valka",
     "politicke_konflikty",
@@ -52,21 +61,24 @@ class ContentBlockInput(BaseModel):
         return stripped
 
 
+class Preferences(BaseModel):
+    """Hide switches. Missing keys stay off. ``jine`` is not a switch."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    valka: StrictBool = False
+    politicke_konflikty: StrictBool = False
+    umrti: StrictBool = False
+    katastrofy: StrictBool = False
+    nasili: StrictBool = False
+    toxicky: StrictBool = False
+
+
 class AnalysisRequest(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
     blocks: list[ContentBlockInput] = Field(min_length=1, max_length=MAX_BLOCKS)
-    preferences: dict[str, StrictBool]
-
-    @field_validator("preferences")
-    @classmethod
-    def limit_preferences(cls, value: dict[str, bool]) -> dict[str, bool]:
-        if len(value) > MAX_PREFERENCES:
-            raise ValueError(f"at most {MAX_PREFERENCES} preferences are allowed")
-        for key in value:
-            if not key.strip() or len(key) > MAX_PREFERENCE_KEY_CHARS:
-                raise ValueError("preference keys must be 1 to 64 characters")
-        return value
+    preferences: Preferences
 
     @model_validator(mode="after")
     def reject_duplicate_ids(self) -> AnalysisRequest:
@@ -80,7 +92,7 @@ class BlockAnalysis(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     id: str = Field(min_length=1, max_length=64)
-    category: str = Field(min_length=1, max_length=64)
+    category: TopicId
     topic: TopicId = "jine"
     tone: ToneLabel = "neutralni"
     toxicity_score: float = Field(ge=0, le=1)
@@ -97,3 +109,48 @@ class AnalysisResponse(BaseModel):
 
 class HealthResponse(BaseModel):
     status: Literal["ok"]
+
+
+class SummaryRequest(BaseModel):
+    """Blocks already kept for a later ``/v1/summarize``. Not served yet."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    blocks: list[ContentBlockInput] = Field(min_length=1, max_length=MAX_BLOCKS)
+    preferences: Preferences
+    language: SummaryLanguage = "cs"
+
+    @model_validator(mode="after")
+    def reject_duplicate_ids(self) -> SummaryRequest:
+        ids = [block.id for block in self.blocks]
+        if len(ids) != len(set(ids)):
+            raise ValueError("block ids must be unique")
+        return self
+
+
+class SummaryResponse(BaseModel):
+    """Contract for ZF-15. A blank summary is allowed only with a flag."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    summary: str = Field(max_length=MAX_SUMMARY_CHARS)
+    preferences: Preferences
+    omitted_categories: list[HideableTopic] = Field(max_length=5)
+    insufficient_input: bool = False
+    no_relevant_content: bool = False
+    model_version: str = Field(min_length=1, max_length=64)
+
+    @field_validator("omitted_categories")
+    @classmethod
+    def reject_duplicate_categories(cls, value: list[str]) -> list[str]:
+        if len(value) != len(set(value)):
+            raise ValueError("omitted categories must be unique")
+        return value
+
+    @model_validator(mode="after")
+    def require_summary_when_content_remains(self) -> SummaryResponse:
+        if self.insufficient_input or self.no_relevant_content:
+            return self
+        if not self.summary.strip():
+            raise ValueError("summary is required when content remains")
+        return self
