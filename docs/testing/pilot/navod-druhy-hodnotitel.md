@@ -1,6 +1,6 @@
-# Návod: jak anotaci zopakuje druhý hodnotitel
+# Návod: jak anotaci zopakuje druhý hodnotitel (Claude nebo Libuše)
 
-Proposal (§5) požaduje u finální sady dva nezávislé hodnotitele. V pilotu stačí jeden (anotace je zatím návrh), ale postup je připravený i pro druhého. Hodnotitel nesmí vidět sloupce `téma`, `tón` ani `S1…S3` prvního hodnotitele, dokud svou anotaci nedokončí.
+Proposal (§5) požaduje u finální sady dva nezávislé hodnotitele. V projektu jsou jimi Libuše a Claude (další osoba nebude). Pilotní anotace navrhl Claude a Libuše je potvrdila, takže nejde o nezávislé anotace; pro finální sadu anotuje každý zvlášť podle tohoto návodu, a tím je „druhým hodnotitelem“ ten, kdo anotaci dělá druhý. Hodnotitel nesmí vidět sloupce `téma`, `tón` ani `S1…S3` prvního hodnotitele, dokud svou anotaci nedokončí.
 
 ## Příprava (5 min)
 
@@ -17,7 +17,7 @@ Pro každou stránku zkontroluj, že locator najde právě jeden blok a že úro
 Pro každý blok urči:
 
 - `téma`: jedna hodnota z `politické konflikty`, `válka`, `zprávy o úmrtí`, `katastrofické scénáře`, `násilí`, `jiné`. Rozhoduj podle hlavního tématu bloku; zmínka na okraji se nepočítá.
-- `tón_vyhrocený`: `ano` / `ne`. Tón je nezávislý na tématu. Zpráva o válce, napsaná věcně, má `ne`. `ano` je to u textu, který útočí na lidi, zesměšňuje nebo používá velmi emotivní vyhrocený jazyk.
+- `tón_vyhrocený`: `neutrální` / `toxický/vyhrocený`. Tón je nezávislý na tématu. Zpráva o válce, napsaná věcně, je `neutrální`. `toxický/vyhrocený` je to u textu, který útočí na lidi, zesměšňuje nebo používá velmi emotivní vyhrocený jazyk.
 - `jistota`: `J` nebo `H`, pokud váháš mezi dvěma hodnotami.
 
 Skrýt/ponechat se **nezapisuje ručně**, odvodí se z tématu a tónu podle nastavení S1–S4.

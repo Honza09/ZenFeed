@@ -1,0 +1,233 @@
+block_id,téma,tón,jistota,zdůvodnění
+P01-B001,válka,neutrální,J,
+P01-B002,válka,neutrální,J,
+P01-B003,válka,neutrální,H,"Seznam anotací článků o válečných konfliktech, bez vlastního děje."
+P01-B004,válka,neutrální,H,"Odkaz na datové explorery o válkách a mapa úmrtí, téma sedí, ale blok je spíš navigační."
+P01-B005,válka,neutrální,H,"Seznam názvů grafů o úmrtích ve válkách, bez souvislého textu."
+P01-B006,jiné,neutrální,H,"Poznámky pod čarou a literatura k válečným statistikám, pomocný blok."
+P02-B001,jiné,neutrální,J,
+P02-B002,jiné,neutrální,J,
+P02-B003,jiné,neutrální,J,
+P02-B004,jiné,neutrální,J,
+P02-B005,jiné,neutrální,J,
+P02-B006,jiné,neutrální,J,
+P02-B007,jiné,neutrální,J,
+P02-B008,jiné,neutrální,J,
+P02-B009,jiné,neutrální,J,
+P02-B010,jiné,neutrální,J,
+P02-B011,jiné,neutrální,J,
+P02-B012,jiné,neutrální,J,
+P02-B013,jiné,neutrální,J,
+P02-B014,jiné,neutrální,J,
+P02-B015,jiné,neutrální,J,
+P02-B016,jiné,neutrální,J,
+P02-B017,jiné,neutrální,J,
+P02-B018,jiné,neutrální,J,
+P02-B019,jiné,neutrální,J,
+P02-B020,jiné,neutrální,J,
+P02-B021,jiné,neutrální,J,
+P02-B022,jiné,neutrální,H,"Podrážděná otázka bez urážek, kritéria T1 až T3 nesplněna; tón posuzuji jako neutrální."
+P02-B023,jiné,neutrální,J,
+P02-B024,jiné,neutrální,J,
+P02-B025,jiné,neutrální,J,
+P03-B001,jiné,neutrální,J,
+P03-B002,jiné,neutrální,J,
+P03-B003,jiné,neutrální,J,
+P03-B004,jiné,neutrální,J,
+P03-B005,jiné,neutrální,J,
+P03-B006,jiné,neutrální,J,
+P03-B007,jiné,neutrální,J,
+P03-B008,jiné,neutrální,J,
+P03-B009,jiné,neutrální,J,
+P03-B010,jiné,neutrální,J,
+P03-B011,jiné,neutrální,J,
+P03-B012,jiné,neutrální,J,
+P03-B013,jiné,neutrální,J,
+P03-B014,jiné,neutrální,J,
+P03-B015,jiné,neutrální,J,
+P03-B016,jiné,neutrální,J,
+P03-B017,jiné,neutrální,J,
+P03-B018,jiné,neutrální,J,
+P03-B019,jiné,neutrální,J,
+P03-B020,jiné,neutrální,J,
+P03-B021,jiné,neutrální,J,
+P03-B022,jiné,neutrální,J,
+P03-B023,jiné,neutrální,J,
+P03-B024,jiné,neutrální,J,
+P03-B025,jiné,neutrální,J,
+P04-B001,jiné,neutrální,J,
+P04-B002,jiné,neutrální,J,
+P04-B003,jiné,neutrální,J,
+P04-B004,jiné,neutrální,J,
+P04-B005,jiné,neutrální,J,
+P04-B006,zprávy o úmrtí,neutrální,J,
+P04-B007,jiné,neutrální,J,
+P04-B008,zprávy o úmrtí,neutrální,J,
+P04-B009,jiné,neutrální,J,
+P04-B010,jiné,neutrální,J,
+P04-B011,jiné,neutrální,H,"Pokles populací divokých zvířat je dlouhodobý trend podaný věcně, ne varování před katastrofou."
+P04-B012,zprávy o úmrtí,neutrální,J,
+P04-B013,jiné,neutrální,J,
+P04-B014,jiné,neutrální,J,
+P04-B015,jiné,neutrální,J,
+P04-B016,jiné,neutrální,J,
+P04-B017,jiné,neutrální,J,
+P04-B018,jiné,neutrální,J,
+P04-B019,jiné,neutrální,J,
+P04-B020,jiné,neutrální,J,
+P05-B001,jiné,neutrální,J,
+P05-B002,jiné,neutrální,H,"Diskuse o pořadí popisků fotografií článku o válce; jde o redakční detail, ne o boje."
+P05-B003,válka,neutrální,H,"Spor o formulaci o odmítnutí příměří, obsahově jde o příměří a mírové podmínky, ale v rámci redakční diskuze."
+P05-B004,válka,neutrální,H,"Diskuze, zda západní státy bojují na straně Ukrajiny; obvinění z propagandy je tvrdé, ale bez urážek (T1 až T3 nesplněno)."
+P05-B005,jiné,neutrální,H,"Věcná žádost o úpravu formulace o Putinově přiznání k vojákům na Krymu; redakční spor, ne zpráva o bojích."
+P05-B006,jiné,neutrální,H,"Spor o název článku s obviněním z hypokrize; nadpis s otazníkem, T1 až T3 nesplněno (věcná kritika)."
+P06-B001,jiné,neutrální,J,
+P06-B002,jiné,neutrální,J,
+P06-B003,jiné,neutrální,J,
+P06-B004,jiné,neutrální,J,
+P06-B005,jiné,neutrální,J,
+P06-B006,jiné,neutrální,J,
+P06-B007,jiné,neutrální,J,
+R01-B001,válka,neutrální,J,
+R01-B002,katastrofické scénáře,neutrální,H,"Výjimečný stav před vrcholem silného El Niña, jde o varování před hrozícím scénářem, ne o proběhlou událost."
+R01-B003,zprávy o úmrtí,neutrální,J,
+R01-B004,zprávy o úmrtí,neutrální,J,
+R01-B005,jiné,neutrální,H,"Zpřísnění opatření proti znečištění ovzduší, spíš pomalý trend bez varování před katastrofou."
+R01-B006,politické konflikty,neutrální,H,"Policie rozebírá tábory protestujících, zatčení a zranění; hraničí s násilím, ale převažuje spor protestujících s úřady."
+R01-B007,jiné,neutrální,J,
+R01-B008,násilí,neutrální,H,"Střet dělníků s policií kvůli mzdám; nepokoje, ale nejde o spor politických aktérů."
+R01-B009,politické konflikty,neutrální,J,
+R01-B010,jiné,neutrální,J,
+R01-B011,jiné,neutrální,J,
+R01-B012,jiné,neutrální,J,
+R01-B013,jiné,neutrální,J,
+R01-B014,jiné,neutrální,J,
+R01-B015,jiné,neutrální,J,
+R02-B001,válka,neutrální,H,"Příběh muže naverbovaného na frontu; téma je obchod s lidmi, ale důsledkem je válka. Přívlastek insidious je spíš autorský komentář než T2."
+R02-B002,válka,neutrální,J,
+R02-B003,válka,neutrální,H,"Proč lidé nabídku přijímají; werbování pro válku, hranice s tématem migrace za prací."
+R02-B004,jiné,neutrální,H,"Pracovní migrace a chybějící dohoda mezi státy, válka jen nepřímo."
+R02-B005,válka,neutrální,H,Agentury posílající muže na frontu; hraničí s obchodem s lidmi.
+R02-B006,válka,neutrální,J,
+R02-B007,válka,neutrální,H,Oběti a spravedlnost po verbování do války; hraničí s tématem obchodu s lidmi.
+R03-B001,politické konflikty,neutrální,H,"Vláda proti nezávislým médiím, bez ozbrojených bojů; hraničí s násilím (zatčení, mučení) a s tématem jiné."
+R03-B002,politické konflikty,neutrální,H,"Vláda proti nezávislým médiím, bez ozbrojených bojů; hraničí s násilím (zatčení, mučení) a s tématem jiné."
+R03-B003,politické konflikty,neutrální,H,"Vláda proti nezávislým médiím, bez ozbrojených bojů; hraničí s násilím (zatčení, mučení) a s tématem jiné."
+R04-B001,válka,neutrální,J,
+R04-B002,válka,neutrální,J,
+R04-B003,násilí,neutrální,H,Neznámí ozbrojenci útočí na vesnici; násilí vs. ozbrojený konflikt.
+R04-B004,násilí,neutrální,J,
+R04-B005,násilí,neutrální,H,"Střelba na zdravotníky, ozbrojenci neznámí; násilí vs. konflikt kolem eboly."
+R04-B006,katastrofické scénáře,neutrální,J,
+R04-B007,zprávy o úmrtí,neutrální,J,
+R04-B008,zprávy o úmrtí,neutrální,J,
+R04-B009,katastrofické scénáře,neutrální,J,
+R04-B010,násilí,neutrální,J,
+R04-B011,násilí,neutrální,J,
+R04-B012,násilí,neutrální,J,
+R04-B013,politické konflikty,neutrální,H,"Masové demonstrace proti vládě a zatýkání; spor aktérů, ne boje."
+R04-B014,politické konflikty,neutrální,H,Vlna protestů se střety v několika městech; politický spor vs. nepokoje.
+R04-B015,politické konflikty,neutrální,H,Protivládní protesty a útoky na budovy; politický spor vs. nepokoje.
+R04-B016,jiné,neutrální,J,
+R04-B017,násilí,neutrální,J,
+R04-B018,jiné,neutrální,J,
+R04-B019,politické konflikty,neutrální,J,
+R05-B001,zprávy o úmrtí,neutrální,J,
+R05-B002,zprávy o úmrtí,neutrální,J,
+R05-B003,zprávy o úmrtí,neutrální,J,
+R05-B004,zprávy o úmrtí,neutrální,J,
+R05-B005,zprávy o úmrtí,neutrální,J,
+R05-B006,zprávy o úmrtí,neutrální,J,
+R05-B007,zprávy o úmrtí,neutrální,J,
+R05-B008,zprávy o úmrtí,neutrální,J,
+R05-B009,zprávy o úmrtí,neutrální,J,
+R06-B001,jiné,neutrální,H,"Označení jednání slovem incompetent je ostré, ale míří na chování, ne osobní útok."
+R06-B002,jiné,neutrální,H,"Označení podání jako extremistického je silné, ale věcné hájení."
+R06-B003,jiné,neutrální,J,
+R06-B004,jiné,neutrální,J,
+R06-B005,jiné,neutrální,J,
+R06-B006,jiné,neutrální,H,"Kritika bez urážek (baseless, battleground mentality), spíše věcná."
+R07-B001,jiné,neutrální,H,"Slovo garbage míří na žádosti, ne na osobu."
+R07-B002,jiné,neutrální,J,
+R08-B001,jiné,toxický/vyhrocený,J,
+R08-B002,jiné,toxický/vyhrocený,J,
+R08-B003,jiné,toxický/vyhrocený,J,
+R08-B004,jiné,toxický/vyhrocený,J,
+R08-B005,jiné,toxický/vyhrocený,J,
+R08-B006,jiné,toxický/vyhrocený,J,
+R08-B007,jiné,toxický/vyhrocený,J,
+R08-B008,jiné,toxický/vyhrocený,J,
+R08-B009,jiné,toxický/vyhrocený,H,"You people are crazy je urážka skupiny, ale bez vulgarit a v delší věcné stížnosti."
+R08-B010,jiné,toxický/vyhrocený,J,
+R08-B011,jiné,neutrální,J,
+R08-B012,jiné,neutrální,J,
+R08-B013,jiné,neutrální,J,
+R09-B001,válka,neutrální,J,
+R09-B002,válka,neutrální,J,
+R09-B003,katastrofické scénáře,neutrální,J,
+R09-B004,katastrofické scénáře,neutrální,J,
+R09-B005,zprávy o úmrtí,neutrální,J,
+R09-B006,zprávy o úmrtí,neutrální,H,"Úmrtí dětí na spalničky a celkový počet; epidemie, ale zpráva o úmrtích."
+R09-B007,jiné,neutrální,J,
+R09-B008,politické konflikty,neutrální,H,Vyhoštění ruského blogera z bezpečnostních důvodů; diplomatická roztržka.
+R09-B009,politické konflikty,neutrální,J,
+R09-B010,jiné,neutrální,J,
+R09-B011,jiné,neutrální,J,
+R09-B012,násilí,neutrální,H,Střety demonstrantů s policií po střelbě; násilí vs. politický spor.
+R09-B013,násilí,neutrální,J,
+R09-B014,politické konflikty,neutrální,H,Zatykač na politika z politických důvodů; právní věc s politickým rozměrem.
+R09-B015,násilí,neutrální,J,
+R09-B016,jiné,neutrální,H,Odložení voleb kvůli situaci v regionu; není to spor aktérů ani boje.
+R09-B017,jiné,neutrální,J,
+R09-B018,jiné,neutrální,H,Demise a znovujmenování vlády kvůli výpadkům proudu; není to spor aktérů.
+R09-B019,jiné,neutrální,J,
+R10-B001,válka,neutrální,J,
+R10-B002,katastrofické scénáře,neutrální,J,
+R10-B003,zprávy o úmrtí,neutrální,J,
+R10-B004,zprávy o úmrtí,neutrální,J,
+R10-B005,katastrofické scénáře,neutrální,J,
+R10-B006,jiné,neutrální,H,"První případ eboly v zemi; zdravotní zpráva, ne přímo katastrofa ani úmrtí."
+R10-B007,politické konflikty,neutrální,H,Schválení smlouvy a zrušení rozhodnutí v politickém sporu; hraniční vůči jiné.
+R10-B008,politické konflikty,neutrální,J,
+R10-B009,válka,neutrální,J,
+R10-B010,násilí,neutrální,H,"Zatčení podezřelého z žhářství na radnici; trestný čin, ne násilí na osobách."
+R10-B011,zprávy o úmrtí,neutrální,H,"Rozsudek za pašování, při kterém zemřelo 53 lidí; soudní zpráva o úmrtích."
+R10-B012,jiné,neutrální,J,
+R10-B013,politické konflikty,neutrální,H,Jmenování premiéra po rezignaci kvůli politické krizi.
+R10-B014,politické konflikty,neutrální,J,
+R10-B015,jiné,neutrální,J,
+R10-B016,jiné,neutrální,J,
+R10-B017,jiné,neutrální,J,
+R11-B001,válka,neutrální,J,
+R11-B002,válka,neutrální,H,Nasazení vojáků do Haiti proti gangům při pátrání po zmizelých technicích; hraničí s jiným tématem.
+R11-B003,válka,neutrální,J,
+R11-B004,jiné,neutrální,J,
+R11-B005,jiné,neutrální,J,
+R11-B006,katastrofické scénáře,neutrální,J,
+R11-B007,katastrofické scénáře,neutrální,J,
+R11-B008,zprávy o úmrtí,neutrální,J,
+R11-B009,jiné,neutrální,H,"První lidský případ viru, pacient zemřel s jinou diagnózou; zdravotní zpráva."
+R11-B010,jiné,neutrální,J,
+R11-B011,jiné,neutrální,J,
+R11-B012,politické konflikty,neutrální,H,Zatčení opozičního vůdce kvůli praní peněz; politický spor vs. trestní věc.
+R11-B013,násilí,neutrální,H,Rozsudek za mučení a zabití; soudní zpráva o násilném činu.
+R11-B014,jiné,neutrální,J,
+R11-B015,jiné,neutrální,J,
+R11-B016,jiné,neutrální,J,
+R11-B017,jiné,neutrální,J,
+R11-B018,jiné,neutrální,J,
+R11-B019,jiné,neutrální,J,
+R12-B001,katastrofické scénáře,neutrální,J,
+R12-B002,katastrofické scénáře,neutrální,J,
+R12-B003,katastrofické scénáře,neutrální,H,Zřícení skalního útvaru po dešti se třemi mrtvými; přírodní událost vs. nehoda s oběťmi.
+R12-B004,katastrofické scénáře,neutrální,H,Zesílení hurikánu bez obětí; spíš varování před živlem než katastrofa.
+R12-B005,katastrofické scénáře,neutrální,J,
+R12-B006,katastrofické scénáře,neutrální,J,
+R12-B007,katastrofické scénáře,neutrální,J,
+R12-B008,katastrofické scénáře,neutrální,J,
+R12-B009,jiné,neutrální,H,Vrchol znečištění ovzduší kvůli kouři z požárů; není to rozsáhlá katastrofa.
+R12-B010,katastrofické scénáře,neutrální,H,"Požár historické tržnice bez uvedených obětí; technologická událost, ne vždy rozsáhlá katastrofa."
+R12-B011,katastrofické scénáře,neutrální,H,Zřícení přírodní skalní brány bez obětí; přírodní událost menšího rozsahu.
+R12-B012,zprávy o úmrtí,neutrální,H,Zřícení střechy školy s 35 oběťmi; nehoda s oběťmi (rozhodnutí D) vs. velká technologická katastrofa.
+R12-B013,zprávy o úmrtí,neutrální,H,Zřícení dolu se 14 mrtvými; nehoda s oběťmi vs. technologická katastrofa.
+R12-B014,katastrofické scénáře,neutrální,H,"Zřícení budovy, zatím pohřešovaní bez potvrzených mrtvých; nehoda vs. katastrofa."
