@@ -1,6 +1,6 @@
 # Model, TTS, hosting a strop nákladů (ZF-25)
 
-> **Návrh Daniela, 4. 11. 2026, upraveno týž den: školní projekt bez placení.** Čeká na souhlas Jana. Žádný model neběžel na pilotních blocích. Ceníky jsou přečtené 4. 11. 2026. Denní limit bezplatné vrstvy Google v dokumentaci neuvádí jako pevné číslo; ukazuje ho AI Studio a může se změnit.
+> **Návrh Daniela, 4. 11. 2026, upraveno týž den: školní projekt bez placení. Schválil Jan 4. 11. 2026.** Žádný model neběžel na pilotních blocích. Ceníky jsou přečtené 4. 11. 2026. Denní limit bezplatné vrstvy Google v dokumentaci neuvádí jako pevné číslo; ukazuje ho AI Studio a může se změnit.
 
 ## Volba
 
@@ -19,6 +19,8 @@ Klíč k bezplatnému Gemini, pokud ho tým vůbec použije, je jen na serveru. 
 
 Bezplatná vrstva Gemini používá odeslaný text ke zlepšování produktů Google. Píše to [ceník](https://ai.google.dev/gemini-api/docs/pricing) (sloupec Free Tier, „Used to improve our products: Yes“) a [dodatečné podmínky](https://ai.google.dev/gemini-api/terms), čteno 4. 11. 2026. Na tuhle vrstvu proto nepatří nic, co uživatel neposlal vědomě tlačítkem, a v demu stačí stránky, jejichž text smíme ukázat třetí straně. Logy aplikace text stránky dál neukládají.
 
+Tým ví, že [dodatečné podmínky](https://ai.google.dev/gemini-api/terms) (čteno 4. 11. 2026) mají zvláštní pravidla pro EHP: API klienty dostupné uživatelům v EHP dovolují jen na placených službách a pro bezplatnou kvótu v EHP uvádějí podmínky nakládání s daty z placených služeb. Volbu to nemění.
+
 Hlas z prohlížeče nikam neodchází. Lokální slovník taky ne.
 
 Denní strop requestů Google na stránce [limitů](https://ai.google.dev/gemini-api/docs/rate-limits) negarantuje a ukazuje ho až AI Studio daného projektu (stav dokumentace 28. 10. 2026). Na jednom bezplatném projektu 21. 10. 2026 někdo viděl u Flash-Lite 15 requestů za minutu a 500 za den. To není slib pro nás.
@@ -35,7 +37,6 @@ Pořád jsou levné, ale kartu chtějí, a ta sem nepatří.
 
 ## Co ještě není hotové
 
-- Souhlas Jana, včetně toho, že text z bezplatného Gemini smí Google použít ke zlepšování produktů.
 - Napojení `gemini-3.5-flash-lite` do `/v1/analyze`. Dnes tam běží `lexicon-1`.
 - Hlas v prohlížeči (ZF-16 / ZF-17). Teď není.
-- Kvalita a latence na pilotních stránkách.
+- Kvalita a latence na pilotních stránkách. Porovnání se přesouvá k napojení Gemini do `/v1/analyze`.
