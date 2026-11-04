@@ -12,8 +12,20 @@
 
   // Fields of one /v1/analyze result (docs/API.md).
   const ACTIONS = new Set(["show", "hide", "review"]);
+  const TONES = new Set(["neutralni", "toxicky"]);
   const MAX_ID_CHARS = 64;
   const MAX_CATEGORY_CHARS = 64;
+
+  // topic and tone are optional (older backends send only category).
+  function isOptionalLabel(value, allowed) {
+    if (value === undefined) {
+      return true;
+    }
+    if (allowed) {
+      return allowed.has(value);
+    }
+    return typeof value === "string" && value.length > 0 && value.length <= MAX_CATEGORY_CHARS;
+  }
 
   function isScore(value) {
     return typeof value === "number" && Number.isFinite(value) && value >= 0 && value <= 1;
@@ -28,7 +40,9 @@
       && result.category.length <= MAX_CATEGORY_CHARS
       && isScore(result.toxicity_score)
       && isScore(result.confidence)
-      && ACTIONS.has(result.recommended_action),
+      && ACTIONS.has(result.recommended_action)
+      && isOptionalLabel(result.topic)
+      && isOptionalLabel(result.tone, TONES),
     );
   }
 
@@ -36,6 +50,8 @@
   function pickResult(result) {
     return {
       category: result.category,
+      topic: result.topic ?? result.category,
+      tone: result.tone ?? "neutralni",
       toxicity_score: result.toxicity_score,
       confidence: result.confidence,
       recommended_action: result.recommended_action,
@@ -134,7 +150,11 @@
       return extractionId;
     }
 
-    return { replace, applyResults, get, currentExtractionId };
+    function all() {
+      return [...entries.values()];
+    }
+
+    return { replace, applyResults, get, all, currentExtractionId };
   }
 
   globalThis.ZenFeedBlockRegistry = { createRegistry, isValidResult };

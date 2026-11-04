@@ -42,6 +42,10 @@ const POPUP_MS = 800;
 const CLICK_MS = 1500;
 const ANALYZE_BATCH = 100; // backend limit, docs/API.md
 const MAX_TITLE_CHARS = 300; // backend limit, docs/API.md
+// Every hide switch on, so the hiding check has something to hide (docs/API.md).
+const ALL_PREFERENCES = {
+  valka: true, politicke_konflikty: true, umrti: true, katastrofy: true, nasili: true, toxicky: true,
+};
 
 const args = process.argv.slice(2);
 const sameTab = args.includes("--same-tab");
@@ -199,7 +203,7 @@ async function analyze(blocks) {
     const response = await fetch(`${backend}/v1/analyze`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ blocks: batch, preferences: {} }),
+      body: JSON.stringify({ blocks: batch, preferences: ALL_PREFERENCES }),
       signal: AbortSignal.timeout(15000),
     });
     if (!response.ok) {
@@ -272,6 +276,77 @@ async function evaluateInContentScript(cdp, tab, expression) {
   }
 }
 
+// Runs in the content script's isolated world after apply-hiding: is every
+// block that should be hidden really hidden, with a box in front of it?
+const hidingCheckExpression = `(() => {
+  const report = { shouldHide: 0, hiddenOk: 0, notHiddenButShould: [], boxes: 0, boxLabels: {} };
+  const boxes = [...document.querySelectorAll("[data-zenfeed-box]")];
+  report.boxes = boxes.length;
+  for (const box of boxes) {
+    const host = box.shadowRoot ? box : box.querySelector("div");
+    const label = host.shadowRoot.querySelector(".label").textContent;
+    report.boxLabels[label] = (report.boxLabels[label] || 0) + 1;
+  }
+  return report;
+})()`;
+
+// ZenFeed traces: hidden markers, boxes and its hide rule among the adopted
+// stylesheets. After "Zobrazit vše" there must be none. The original elements
+// are tagged so the check can tell whether any of them was removed.
+const snapshotExpression = `(() => {
+  const traces = document.querySelectorAll("[data-zenfeed-hidden], [data-zenfeed-box]").length
+    + document.adoptedStyleSheets.filter((sheet) => [...sheet.cssRules]
+      .some((rule) => rule.cssText.includes("data-zenfeed-hidden"))).length;
+  globalThis.__zenfeedOriginal = globalThis.__zenfeedOriginal || [...document.body.querySelectorAll("*")];
+  return {
+    html: document.body.innerHTML,
+    traces,
+    originalMissing: globalThis.__zenfeedOriginal.filter((element) => !element.isConnected).length,
+  };
+})()`;
+
+async function checkHiding(cdp, sessionId, tab, extraction) {
+  const ids = JSON.stringify(extraction.blocks.map((block) => block.id));
+  // Display of every block element, to compare after "Zobrazit vše".
+  const blockDisplays = `${ids}.flatMap((id) => globalThis.zenFeedGetBlock(id).block.elements
+    .map((element) => (element.isConnected ? getComputedStyle(element).display : "GONE")))`;
+  const before = await evaluateInContentScript(cdp, tab, snapshotExpression);
+  const displaysBefore = await evaluateInContentScript(cdp, tab, blockDisplays);
+  const hiding = await evaluateInPopup(cdp, sessionId,
+    `ZenFeedBootstrap.applyHiding(chrome, ${extraction.tabId}, ${JSON.stringify(extraction.extractionId)})`);
+  if (!hiding.ok) {
+    return { error: hiding.error };
+  }
+  const visibleCheck = await evaluateInContentScript(cdp, tab, `(() => {
+    let hiddenOk = 0;
+    for (const id of ${JSON.stringify(extraction.blocks.map((block) => block.id))}) {
+      const entry = globalThis.zenFeedGetBlock(id);
+      if (entry && entry.result && entry.result.recommended_action === "hide"
+        && entry.block.elements.every((element) => getComputedStyle(element).display === "none")) {
+        hiddenOk += 1;
+      }
+    }
+    return hiddenOk;
+  })()`);
+  const boxes = await evaluateInContentScript(cdp, tab, hidingCheckExpression);
+  const status = await evaluateInPopup(cdp, sessionId, `ZenFeedBootstrap.getStatus(chrome, ${extraction.tabId})`);
+  const shown = await evaluateInPopup(cdp, sessionId, `ZenFeedBootstrap.showAll(chrome, ${extraction.tabId})`);
+  const after = await evaluateInContentScript(cdp, tab, snapshotExpression);
+  const displaysAfter = await evaluateInContentScript(cdp, tab, blockDisplays);
+  return {
+    blockElementsChanged: displaysAfter.filter((display, index) => display !== displaysBefore[index]).length,
+    counts: hiding,
+    reallyHidden: visibleCheck,
+    boxes: boxes.boxes,
+    boxLabels: boxes.boxLabels,
+    statusHidden: status.ok ? status.hidden : status.error,
+    restored: shown.ok ? shown.restored : shown.error,
+    traces: after.traces,
+    originalMissing: after.originalMissing - before.originalMissing,
+    identical: before.html === after.html,
+  };
+}
+
 async function checkRoundTrip(cdp, sessionId, tab) {
   const extraction = await evaluateInPopup(cdp, sessionId, "ZenFeedBootstrap.extractActiveTab(chrome)");
   if (!extraction.ok) {
@@ -285,6 +360,7 @@ async function checkRoundTrip(cdp, sessionId, tab) {
 
   const applied = await evaluateInPopup(cdp, sessionId, applyExpression(extraction.extractionId));
   const registry = await evaluateInContentScript(cdp, tab, registryCheckExpression([...sentIds]));
+  const hiding = await checkHiding(cdp, sessionId, tab, extraction);
   // A new extraction makes the previous results stale.
   const next = await evaluateInPopup(cdp, sessionId, "ZenFeedBootstrap.extractActiveTab(chrome)");
   const stale = await evaluateInPopup(cdp, sessionId, applyExpression(extraction.extractionId));
@@ -304,6 +380,7 @@ async function checkRoundTrip(cdp, sessionId, tab) {
     applied,
     registry,
     stale: stale.ok ? "accepted (WRONG)" : stale.error,
+    hiding,
     removed,
   };
 }
@@ -323,6 +400,22 @@ function printRoundTrip(roundTrip) {
   console.log(`  wrapper blocks (contain other blocks): ${registry.wrappers.length}`
     + (registry.wrappers.length ? ` ${registry.wrappers.slice(0, 5).join(", ")}` : "")
     + `  registry build: ${registry.registryMs} ms`);
+  const { hiding } = roundTrip;
+  if (hiding.error) {
+    console.log(`  hiding: ${hiding.error}`);
+  } else {
+    const c = hiding.counts;
+    console.log(`  hiding (all preferences on): hidden ${c.hidden}, kept visible: review/show ${c.notHide}, `
+      + `wrapper ${c.wrapper}, table cell ${c.unsupported}, failed ${c.failed}; `
+      + `really hidden ${hiding.reallyHidden}, boxes ${hiding.boxes}, status ${hiding.statusHidden}`);
+    if (Object.keys(hiding.boxLabels).length) {
+      console.log(`  box labels: ${JSON.stringify(hiding.boxLabels)}`);
+    }
+    console.log(`  Zobrazit vše: restored ${hiding.restored}, ZenFeed traces left ${hiding.traces}, `
+      + `block elements gone or with another display ${hiding.blockElementsChanged}, `
+      + `original elements gone ${hiding.originalMissing}, page HTML identical: ${hiding.identical}`
+      + (hiding.identical ? "" : " (the page changed itself, e.g. lazy loading after the layout moved)"));
+  }
   console.log(`  old extraction ID after a new extraction: ${roundTrip.stale}`);
   if (roundTrip.removed) {
     console.log(`  zf-0 removed from the page before results: ${roundTrip.removed}`);

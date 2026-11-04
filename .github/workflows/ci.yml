@@ -27,16 +27,23 @@ jobs:
         run: pytest backend
 
   extension:
-    name: Extension (manifest + JS syntax)
+    name: Extension (manifest, JS syntax, tests)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      # Node 22+ for the built-in WebSocket used by the browser test.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
       - name: Validate manifest
         run: python .github/scripts/check_extension.py extension/manifest.json
       - name: Check JavaScript syntax
         run: find extension tests/extension \( -name '*.js' -o -name '*.mjs' \) -print0 | xargs -0 -r -n1 node --check
       - name: Unit tests (extension)
         run: node --test tests/extension/*.test.mjs
+      # Hiding and restoring in headless Chrome (preinstalled on the runner).
+      - name: Browser test (hiding)
+        run: node tests/extension/hider-browser.mjs

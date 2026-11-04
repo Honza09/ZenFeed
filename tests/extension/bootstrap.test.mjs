@@ -84,7 +84,7 @@ test("injects the content scripts in order, then asks for blocks", async () => {
   assert.equal(result.title, "Example");
   assert.equal(result.blocks.length, 1);
   assert.deepEqual(plain(calls.injected), [
-    { target: { tabId: 7 }, files: ["content/segmenter.js", "content/block-registry.js", "content/content.js"] },
+    { target: { tabId: 7 }, files: ["content/segmenter.js", "content/block-registry.js", "content/hider.js", "content/content.js"] },
   ]);
   assert.deepEqual(plain(calls.messages), [{ tabId: 7, message: { type: "zenfeed/extract-blocks" } }]);
 });
@@ -200,5 +200,55 @@ test("applyResults: closed tab or odd reply is tab_unavailable", async () => {
   for (const reply of replies) {
     const { api } = fakeChrome({ tab: PAGE, reply });
     assert.deepEqual(plain(await applyResults(api, 7, "x1", [])), { ok: false, error: "tab_unavailable" });
+  }
+});
+
+const HIDING_OK = {
+  ok: true, hidden: 2, alreadyHidden: 0, revealed: 0, noResult: 0, notHide: 5,
+  wrapper: 1, detached: 0, unsupported: 0, failed: 0, hiddenTotal: 2,
+};
+
+test("applyHiding, showAll and getStatus send their messages", async () => {
+  const { applyHiding, showAll, getStatus } = loadBootstrap();
+  const replies = [HIDING_OK, { ok: true, restored: 2 }, { ok: true, hidden: 0, newContent: 3 }];
+  const { api, calls } = fakeChrome({ tab: PAGE, reply: () => replies.shift() });
+  assert.deepEqual(plain(await applyHiding(api, 7, "x1")), HIDING_OK);
+  assert.deepEqual(plain(await showAll(api, 7)), { ok: true, restored: 2 });
+  assert.deepEqual(plain(await getStatus(api, 7)), { ok: true, hidden: 0, newContent: 3 });
+  assert.deepEqual(plain(calls.messages.map((call) => call.message)), [
+    { type: "zenfeed/apply-hiding", extractionId: "x1" },
+    { type: "zenfeed/show-all" },
+    { type: "zenfeed/status" },
+  ]);
+});
+
+test("applyHiding passes on known errors only", async () => {
+  const { applyHiding } = loadBootstrap();
+  for (const error of ["no_extraction", "stale_extraction", "hiding_failed"]) {
+    const { api } = fakeChrome({ tab: PAGE, reply: () => ({ ok: false, error }) });
+    assert.deepEqual(plain(await applyHiding(api, 7, "x1")), { ok: false, error });
+  }
+  const odd = [
+    () => { throw new Error("No tab with id: 7"); },
+    () => undefined,
+    () => ({ ok: false, error: "apply_failed" }),
+    () => ({ ...HIDING_OK, hidden: -1 }),
+    () => ({ ...HIDING_OK, wrapper: undefined }),
+  ];
+  for (const reply of odd) {
+    const { api } = fakeChrome({ tab: PAGE, reply });
+    assert.deepEqual(plain(await applyHiding(api, 7, "x1")), { ok: false, error: "tab_unavailable" });
+  }
+});
+
+test("showAll and getStatus reject odd replies", async () => {
+  const { showAll, getStatus } = loadBootstrap();
+  for (const reply of [() => ({ ok: true }), () => ({ ok: true, restored: "2" })]) {
+    const { api } = fakeChrome({ tab: PAGE, reply });
+    assert.deepEqual(plain(await showAll(api, 7)), { ok: false, error: "tab_unavailable" });
+  }
+  for (const reply of [() => ({ ok: true, hidden: 1 }), () => ({ ok: true, hidden: 1.5, newContent: 0 })]) {
+    const { api } = fakeChrome({ tab: PAGE, reply });
+    assert.deepEqual(plain(await getStatus(api, 7)), { ok: false, error: "tab_unavailable" });
   }
 });

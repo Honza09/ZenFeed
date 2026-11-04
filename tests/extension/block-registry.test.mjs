@@ -173,10 +173,32 @@ test("only the known result fields are kept", () => {
   registry.applyResults(extractionId, [makeResult("zf-0", { id: "zf-0", html: "<b>x</b>", extra: 1 })]);
   assert.deepEqual(plain(registry.get("zf-0").result), {
     category: "war",
+    topic: "war",
+    tone: "neutralni",
     toxicity_score: 0.2,
     confidence: 0.9,
     recommended_action: "hide",
   });
+});
+
+test("topic and tone from the ZF-06 backend are kept and validated", () => {
+  const registry = newRegistry();
+  const extractionId = registry.replace(makeBlocks(2));
+  const reply = registry.applyResults(extractionId, [
+    makeResult("zf-0", { category: "valka", topic: "valka", tone: "toxicky" }),
+    makeResult("zf-1", { tone: "angry" }),
+    makeResult("zf-1", { topic: "" }),
+    makeResult("zf-1", { topic: 3 }),
+  ]);
+  assert.deepEqual(plain(reply), { ok: true, matched: 1, unknown: 0, invalid: 3, duplicate: 0, detached: 0 });
+  assert.equal(registry.get("zf-0").result.topic, "valka");
+  assert.equal(registry.get("zf-0").result.tone, "toxicky");
+});
+
+test("all() lists every entry of the current extraction", () => {
+  const registry = newRegistry();
+  registry.replace(makeBlocks(3));
+  assert.deepEqual(plain(registry.all().map((entry) => entry.block.id)), ["zf-0", "zf-1", "zf-2"]);
 });
 
 test("empty results and an empty page are fine", () => {

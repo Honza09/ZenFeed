@@ -71,9 +71,10 @@ pytest backend
 python .github/scripts/check_extension.py extension/manifest.json
 find extension tests/extension \( -name '*.js' -o -name '*.mjs' \) -print0 | xargs -0 -r -n1 node --check
 node --test tests/extension/*.test.mjs
+node tests/extension/hider-browser.mjs
 ```
 
-The last two commands need Node.js, used only for checks and unit tests; the extension itself has no build step. The GitHub Actions workflow itself cannot be run locally; it runs when a pull request is opened.
+The last three commands need Node.js 22+ (the browser test also needs Google Chrome; set `CHROME_PATH` if it is not in the default place), used only for checks and tests; the extension itself has no build step. The GitHub Actions workflow itself cannot be run locally; it runs when a pull request is opened.
 
 ## Configuration
 
