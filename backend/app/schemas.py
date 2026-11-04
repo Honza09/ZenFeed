@@ -24,6 +24,15 @@ MAX_PREFERENCE_KEY_CHARS = 64
 
 BlockKind = Literal["article", "section", "comment", "post", "other"]
 RecommendedAction = Literal["show", "hide", "review"]
+TopicId = Literal[
+    "valka",
+    "politicke_konflikty",
+    "umrti",
+    "katastrofy",
+    "nasili",
+    "jine",
+]
+ToneLabel = Literal["neutralni", "toxicky"]
 
 
 class ContentBlockInput(BaseModel):
@@ -72,6 +81,8 @@ class BlockAnalysis(BaseModel):
 
     id: str = Field(min_length=1, max_length=64)
     category: str = Field(min_length=1, max_length=64)
+    topic: TopicId = "jine"
+    tone: ToneLabel = "neutralni"
     toxicity_score: float = Field(ge=0, le=1)
     confidence: float = Field(ge=0, le=1)
     recommended_action: RecommendedAction

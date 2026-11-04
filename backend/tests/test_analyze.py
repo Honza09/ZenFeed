@@ -8,7 +8,7 @@ from pydantic import ValidationError
 from app.config import Settings
 from app.main import create_app
 from app.schemas import AnalysisResponse, BlockAnalysis
-from app.services.analyze import build_unclassified_response
+from app.services.analyze import analyze_blocks
 
 
 def _payload(blocks: list[dict] | None = None, preferences: dict | None = None) -> dict:
@@ -41,22 +41,26 @@ def test_analyze_returns_review_for_each_block(client) -> None:
 
     assert response.status_code == 200
     body = response.json()
-    assert body["model_version"] == "none"
+    assert body["model_version"] == "lexicon-1"
     assert [item["id"] for item in body["results"]] == ["zf-0", "zf-1"]
     assert body["results"] == [
         {
             "id": "zf-0",
-            "category": "unclassified",
+            "category": "jine",
+            "topic": "jine",
+            "tone": "neutralni",
             "toxicity_score": 0.0,
-            "confidence": 0.0,
-            "recommended_action": "review",
+            "confidence": 0.8,
+            "recommended_action": "show",
         },
         {
             "id": "zf-1",
-            "category": "unclassified",
+            "category": "jine",
+            "topic": "jine",
+            "tone": "neutralni",
             "toxicity_score": 0.0,
-            "confidence": 0.0,
-            "recommended_action": "review",
+            "confidence": 0.8,
+            "recommended_action": "show",
         },
     ]
     AnalysisResponse.model_validate(body)
@@ -67,7 +71,8 @@ def test_analyze_accepts_extension_block_shape(client) -> None:
 
     assert response.status_code == 200
     assert response.json()["results"][0]["id"] == "zf-0"
-    assert response.json()["results"][0]["recommended_action"] == "review"
+    assert response.json()["results"][0]["recommended_action"] == "show"
+    assert response.json()["results"][0]["topic"] == "jine"
 
 
 @pytest.mark.parametrize(
@@ -162,9 +167,9 @@ def test_request_body_over_limit_is_rejected() -> None:
 def test_analyze_timeout(monkeypatch) -> None:
     def too_slow(payload):
         time.sleep(0.2)
-        return build_unclassified_response(payload)
+        return analyze_blocks(payload)
 
-    monkeypatch.setattr("app.main.build_unclassified_response", too_slow)
+    monkeypatch.setattr("app.main.analyze_blocks", too_slow)
     application = create_app(Settings(analyze_timeout_seconds=0.05))
     with TestClient(application) as test_client:
         response = test_client.post("/v1/analyze", json=_payload())
@@ -188,7 +193,7 @@ def test_invalid_analysis_output_is_a_safe_error(monkeypatch) -> None:
             model_version="none",
         )
 
-    monkeypatch.setattr("app.main.build_unclassified_response", invalid_output)
+    monkeypatch.setattr("app.main.analyze_blocks", invalid_output)
     application = create_app(Settings())
     with TestClient(application) as test_client:
         response = test_client.post("/v1/analyze", json=_payload())

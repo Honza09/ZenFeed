@@ -44,10 +44,11 @@ Start the backend (virtual environment active, from the repository root):
     uvicorn app.main:app --app-dir backend --reload
 
 `GET http://127.0.0.1:8000/health` returns `{"status":"ok"}`.
-`POST /v1/analyze` checks the blocks and returns one result per block.
-Classification is not implemented yet, so every block comes back as
-`recommended_action: "review"` and nothing is hidden. Optional settings are
-listed in `.env.example`.
+`POST /v1/analyze` classifies each block into one frozen topic and a separate
+tone. It hides a block only when that preference is on and the match is
+strong. A weak match comes back as `review`. The classifier is a local
+lexicon (`lexicon-1`), not a hosted model. Optional settings are listed in
+`.env.example`.
 
 ## Contributing
 
