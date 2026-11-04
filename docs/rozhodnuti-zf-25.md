@@ -9,11 +9,11 @@ Do projektu se nepřipojuje platební karta. Strop je **0 USD**.
 | Oblast | Volba | Proč |
 |---|---|---|
 | Text | Gemini API, bezplatná vrstva, bez připojeného účtu k fakturaci. Model `gemini-3.5-flash-lite` (pro nové projekty). Když dojde denní limit nebo služba spadne, klasifikace zůstane na lokálním `lexicon-1` | OpenAI i placené Gemini chtějí kartu. `lexicon-1` už v repozitáři je a nic nestojí. Bezplatné Gemini je jediný způsob, jak mít v demu opravdový model a přesto nezaplatit. |
-| Hlas | `speechSynthesis` v Chromu. Žádná cloudová TTS | Hlas čte prohlížeč na počítači uživatele. Čeština zazní jen tehdy, když ji má operační systém nainstalovanou. Není to hlas historické osoby. |
+| Hlas | `speechSynthesis` v Chromu. Žádná cloudová TTS | Hlas čte prohlížeč na počítači uživatele. Čeština zazní jen tehdy, když ji má operační systém nainstalovanou. Hlas je běžný hlas prohlížeče, postava z návrhu ZF-26 je jen ve štítku. |
 | Kde backend poběží | Jen lokálně, `uvicorn` na počítači, který zrovna demuje | Cloud Run má volný limit, ale účet k fakturaci je podmínka. Ten nezakládáme. |
 | Strop | 0 USD. Platební účet se k Gemini ani ke Google Cloud nepřipojuje | Jakmile se připojí karta, překročení volného limitu začne stát peníze. |
 
-Klíč k bezplatnému Gemini, pokud ho tým vůbec použije, je jen na serveru. Do rozšíření ani do gitu nepatří. Švejk a Sherlock se nepoužijí: na jejich napodobeninu není bezplatná cesta, která by nechtěla kartu.
+Klíč k bezplatnému Gemini, pokud ho tým vůbec použije, je jen na serveru. Do rozšíření ani do gitu nepatří. Švejk a Sherlock Holmes z návrhu Libuše zůstávají (možnost E se zálohou C, [`hlas-a-oznaceni.md`](hlas-a-oznaceni.md) část 8): česky Švejk, anglicky Sherlock Holmes, jméno postavy jen ve štítku a žádné napodobení, takže karta není potřeba. Platí to za podmínek z ZF-26, hlavně po ručním ověření ochranných známek. Jinak se použije záloha C bez jména postavy.
 
 ## Co tím platíme místo peněz
 
