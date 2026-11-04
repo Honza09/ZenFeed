@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>ZenFeed hider fixture</title>
+  <style>
+    /* Page CSS that would break a box without a shadow root. */
+    div, span, button, p { color: red !important; font-size: 40px !important; }
+    .grid { display: grid; }
+  </style>
+</head>
+<body>
+  <main>
+    <article id="a1">
+      <h2>HIDE-WAR First article about the war</h2>
+      <p>HIDE-WAR This paragraph reports on fighting and is classified as war, so it should be hidden behind a box.</p>
+    </article>
+    <article id="a2" class="grid" style="color: blue; display: flex !important">
+      <h2>HIDE-TOXIC Article with an inline style</h2>
+      <p>HIDE-TOXIC This block already has an inline display with important priority, which must come back exactly.</p>
+    </article>
+    <article id="a3">
+      <h2>REVIEW Uncertain article</h2>
+      <p>REVIEW The classifier is not sure about this block, so it must stay visible whatever its topic.</p>
+    </article>
+    <article id="a4">
+      <h2>SHOW Neutral article</h2>
+      <p>SHOW A neutral block about gardening that the classifier lets through and that stays visible.</p>
+    </article>
+    <div id="dark" style="background: #111; color: #eee">
+      <section>
+        <p>HIDE-WAR A paragraph on a dark background about the war, long enough to be its own block here.</p>
+      </section>
+    </div>
+    <ul id="list">
+      <li>HIDE-WAR List item one about the war with enough text to be its own block here.</li>
+      <li>SHOW List item two about the weather with enough text to be its own block here.</li>
+      <li>SHOW List item three about cooking with enough text to be its own block here.</li>
+    </ul>
+    <table id="table">
+      <tbody>
+        <tr><td>HIDE-WAR Row one cell</td><td>with enough text in the second cell of the row</td></tr>
+        <tr><td>SHOW Row two cell</td><td>with enough text in the second cell of the row too</td></tr>
+        <tr><td>SHOW Row three cell</td><td>with enough text in the second cell of the row as well</td></tr>
+      </tbody>
+    </table>
+  </main>
+</body>
+</html>

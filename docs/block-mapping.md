@@ -57,7 +57,7 @@ Reply:
 
 Errors: `{ "ok": false, "error": … }` with `no_extraction` (no extraction yet in this tab), `stale_extraction` (another extraction happened since; analyze again), `invalid_results` (`results` is not a list) or `apply_failed` (unexpected exception). `ZenFeedBootstrap.applyResults` adds `tab_unavailable` when the tab was closed, navigated or reloaded, or the reply has an unexpected shape.
 
-Only `category`, `toxicity_score`, `confidence` and `recommended_action` are stored. Other fields from the backend are dropped.
+Only `category`, `topic`, `tone`, `toxicity_score`, `confidence` and `recommended_action` are stored (`topic` defaults to `category`, `tone` to `neutralni`, for backends that do not send them). Other fields from the backend are dropped.
 
 ## Reading the registry (for ZF-10)
 
@@ -68,8 +68,10 @@ const entry = globalThis.zenFeedGetBlock("zf-3");
 // null, or { block, containsBlocks, result }
 //   block.elements      DOM elements of the block (never leave the content script)
 //   containsBlocks      how many other blocks are inside this block's elements
-//   result              null until a result was applied, then the four fields above
+//   result              null until a result was applied, then the fields above
 ```
+
+Hiding uses this registry since ZF-10; see [`hiding.md`](hiding.md).
 
 **`containsBlocks > 0` means the block's element wraps other blocks.** The segmenter sometimes returns a short block (25–460 characters of text) whose element is a page-wide wrapper. Hiding it would hide every block inside it. ZF-10 must not hide such a block. Measured on 3 Nov 2026:
 

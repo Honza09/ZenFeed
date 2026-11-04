@@ -1,7 +1,7 @@
-// ZenFeed bootstrap (ZF-08, ZF-09).
+// ZenFeed bootstrap (ZF-08, ZF-09, ZF-10).
 // Injects the content scripts into the active tab only after the user opens the
-// popup and clicks, then asks them for the page blocks and hands analysis
-// results back to them. Nothing runs on pages the user has not acted on, and
+// popup and clicks, then asks them for the page blocks, hands analysis results
+// back to them and asks them to hide or show blocks. Nothing runs on pages the user has not acted on, and
 // nothing is sent to the backend here.
 // Exposed as ZenFeedBootstrap so the popup and the Node tests share one copy.
 
@@ -10,8 +10,10 @@
     return;
   }
 
-  // Order matters: content.js uses ZenFeedSegmenter and ZenFeedBlockRegistry.
-  const CONTENT_SCRIPTS = ["content/segmenter.js", "content/block-registry.js", "content/content.js"];
+  // Order matters: content.js uses ZenFeedSegmenter, ZenFeedBlockRegistry and ZenFeedHider.
+  const CONTENT_SCRIPTS = [
+    "content/segmenter.js", "content/block-registry.js", "content/hider.js", "content/content.js",
+  ];
   const SUPPORTED_PROTOCOLS = new Set(["http:", "https:"]);
 
   function isSupportedUrl(url) {
@@ -126,7 +128,59 @@
     return isValidApplyReply(reply) ? reply : { ok: false, error: "tab_unavailable" };
   }
 
+  const isCount = (value) => Number.isInteger(value) && value >= 0;
+  const HIDING_COUNTS = [
+    "hidden", "alreadyHidden", "revealed", "noResult", "notHide", "wrapper", "detached", "unsupported", "failed",
+    "hiddenTotal",
+  ];
+
+  // Sends one message to the tab's content script and checks the reply with
+  // isValid. Closed tab, navigation or an odd reply: tab_unavailable.
+  async function askTab(chromeApi, tabId, message, isValid, errors) {
+    let reply;
+    try {
+      reply = await chromeApi.tabs.sendMessage(tabId, message);
+    } catch (error) {
+      console.error("ZenFeed: content script did not answer", error);
+      return { ok: false, error: "tab_unavailable" };
+    }
+    if (reply && reply.ok === false && errors.has(reply.error)) {
+      return reply;
+    }
+    return reply && reply.ok === true && isValid(reply) ? reply : { ok: false, error: "tab_unavailable" };
+  }
+
+  // Hides the blocks of this extraction whose result is "hide" (ZF-10).
+  // Errors: no_extraction, stale_extraction, hiding_failed, tab_unavailable.
+  function applyHiding(chromeApi, tabId, extractionId) {
+    return askTab(
+      chromeApi, tabId, { type: "zenfeed/apply-hiding", extractionId },
+      (reply) => HIDING_COUNTS.every((key) => isCount(reply[key])),
+      new Set(["no_extraction", "stale_extraction", "hiding_failed"]),
+    );
+  }
+
+  // "Zobrazit vše": { ok: true, restored } or { ok: false, error }.
+  function showAll(chromeApi, tabId) {
+    return askTab(
+      chromeApi, tabId, { type: "zenfeed/show-all" },
+      (reply) => isCount(reply.restored),
+      new Set(["show_all_failed"]),
+    );
+  }
+
+  // { ok: true, hidden, newContent }: hidden blocks and content added since the
+  // last extraction (to offer "analyze again"; nothing is analyzed by itself).
+  function getStatus(chromeApi, tabId) {
+    return askTab(
+      chromeApi, tabId, { type: "zenfeed/status" },
+      (reply) => isCount(reply.hidden) && isCount(reply.newContent),
+      new Set(["status_failed"]),
+    );
+  }
+
   globalThis.ZenFeedBootstrap = {
     CONTENT_SCRIPTS, isSupportedUrl, isValidExtraction, extractActiveTab, applyResults,
+    applyHiding, showAll, getStatus,
   };
 })();

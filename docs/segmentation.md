@@ -8,7 +8,8 @@ The content script splits the already loaded page into content blocks (articles 
 |---|---|
 | `extension/content/segmenter.js` | Segmentation logic, exposed as `ZenFeedSegmenter.segmentPage()` and `serializeBlocks()` |
 | `extension/content/block-registry.js` | Keeps the last blocks and their analysis results by ID ([`block-mapping.md`](block-mapping.md), ZF-09) |
-| `extension/content/content.js` | Message handler (`extract-blocks`, `apply-results`). Injected by the popup, not declared in the manifest (ZF-08) |
+| `extension/content/hider.js` | Hides blocks and shows the "Zobrazit" box ([`hiding.md`](hiding.md), ZF-10) |
+| `extension/content/content.js` | Message handler (`extract-blocks`, `apply-results`, `apply-hiding`, `show-all`, `status`). Injected by the popup, not declared in the manifest (ZF-08) |
 | `tests/extension/fixtures/segmentation.html` | Local page with edge cases (navigation, form, hidden text, feed cards, comments, missing title, little text) |
 | `tests/extension/segment-pages.mjs` | Runs the segmenter on any URL in headless Chrome and prints the blocks |
 
