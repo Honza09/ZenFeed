@@ -130,3 +130,19 @@ def test_classify_logs_omit_page_text(caplog) -> None:
     assert response.status_code == 200
     assert secret not in caplog.text
     assert secret not in response.text
+
+
+def test_invalid_classifier_output_is_repaired_to_review(monkeypatch) -> None:
+    monkeypatch.setattr(
+        "app.services.classify._topic",
+        lambda _text: ("nope", 1.5),
+    )
+
+    result = classify_block(_block("The army reported an airstrike."), {"valka": True})
+
+    assert result.topic == "jine"
+    assert result.category == "jine"
+    assert result.tone == "neutralni"
+    assert result.confidence == 0.0
+    assert result.toxicity_score == 0.0
+    assert result.recommended_action == "review"
