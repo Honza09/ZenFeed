@@ -43,6 +43,6 @@ Rozšiř sadu hlavně o zdroje, kde je licence jasná (stejný postup jako ve [`
 ## C. Jak sehnat stovky stránek rozumně
 
 1. **Strukturální profil je levný.** Skript [`nastroje/profil-stranky.js`](nastroje/profil-stranky.js) vypíše na otevřené stránce jeden řádek JSON (počty prvků, hloubka, podezřelé reklamní prvky). Pomůže vybrat, které stránky jsou zajímavé pro konkrétní typ rozložení. Neprohlíží web automaticky: otevřít stránku musí člověk (nebo Claude v prohlížeči po jedné).
-2. **Anotace je drahá.** Pilot má 90 bloků na 6 stránkách; 24 stránek bude zhruba 360 bloků. Kapacita Libuše v `docs/CAPACITY.md` je 25–45 hodin za celý projekt. Stovky plně anotovaných stránek proto nejsou reálné.
+2. **Anotace je drahá.** Pilot má 89 bloků na 6 stránkách; 24 stránek bude zhruba 360 bloků. Kapacita Libuše v `docs/CAPACITY.md` je 25–45 hodin za celý projekt. Stovky plně anotovaných stránek proto nejsou reálné.
 3. **Realistický postup:** (a) 24 stránek anotovat plně (ZF-19); (b) pro větší počet stránek (desítky až stovky) měřit **jen to, co jde automaticky**: zda extraktor neselhal, počet nalezených bloků, čas, reverzibilitu skrytí. Bez ručního „očekávaného“ počtu nelze počítat precision a recall, ale lze hlídat selhání a rozptyl; (c) u vzorku z velké sady udělat kontrolní anotaci.
 4. Sledujte, zda se výpisy a živé přenosy mezi běhy nezměnily (plán §5.1 to žádá).
