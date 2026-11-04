@@ -1,8 +1,8 @@
 # ZenFeed API Reference
 
-Endpoints implemented for ZF-05. `/v1/summarize` and `/v1/tts` are later issues (ZF-15, ZF-16) and are not part of this server.
+Endpoints implemented for ZF-05 and ZF-06. `/v1/summarize` and `/v1/tts` are later issues (ZF-15, ZF-16) and are not part of this server.
 
-The extension sends blocks produced by the content script (`id`, `kind`, `title`, `text`). `title` is accepted and ignored. Classification is not implemented: `/v1/analyze` validates the body and returns `recommended_action: "review"` for every block, so nothing is hidden.
+The extension sends blocks produced by the content script (`id`, `kind`, `title`, `text`). `title` is included in classification. `/v1/analyze` assigns one topic and a separate tone. It is a local lexicon over the categories in `docs/kategorie-mvp.md`, not a hosted model.
 
 ## Principles
 
@@ -10,14 +10,14 @@ The extension sends blocks produced by the content script (`id`, `kind`, `title`
 - JSON request and response bodies.
 - Pydantic request and response validation.
 - Page text and API keys are not written to logs.
-- No secret keys in extension source code. The optional `ZENFEED_AI_API_KEY` is read from the environment and is unused until classification exists.
+- No secret keys in extension source code. `ZENFEED_AI_API_KEY` is read from the environment and is not used by the local classifier.
 
 ## Endpoints
 
 | Method | Path | Purpose | Status |
 |---|---|---|---|
 | GET | `/health` | Check backend availability | Implemented |
-| POST | `/v1/analyze` | Validate blocks and return one unclassified result per block | Implemented, no classifier yet |
+| POST | `/v1/analyze` | Classify topic and tone, then recommend show, hide, or review | Implemented (`lexicon-1`) |
 
 ## GET /health
 
@@ -36,17 +36,17 @@ Request:
   "blocks": [
     {
       "id": "zf-0",
-      "text": "Normalized visible text.",
+      "text": "The report described an airstrike.",
       "kind": "article",
       "title": "Optional heading"
     }
   ],
-  "preferences": {"war": true}
+  "preferences": {"valka": true, "toxicky": false}
 }
 ```
 
-- `blocks`: 1 to 100 items. `id` matches `[A-Za-z0-9_-]+` and is unique in the request. `text` is 1 to 8000 characters after trimming; blank text is rejected. `kind` is `article`, `section`, `comment`, `post`, or `other`.
-- `preferences`: up to 32 keys, each 1 to 64 characters. Values are JSON booleans (`true` / `false` only). Categories are not frozen yet (ZF-24), so the keys are not a fixed list.
+- `blocks`: 1 to 100 items, classified in batches of 20. `id` matches `[A-Za-z0-9_-]+` and is unique in the request. `text` is 1 to 8000 characters after trimming; blank text is rejected. `kind` is `article`, `section`, `comment`, `post`, or `other`.
+- `preferences`: up to 32 keys. Values are JSON booleans (`true` / `false` only). Topic keys are `valka`, `politicke_konflikty`, `umrti`, `katastrofy`, and `nasili`. The tone key is `toxicky`. Other keys are accepted and ignored.
 - The whole body must be at most 1 MiB.
 
 Response `200`:
@@ -56,17 +56,21 @@ Response `200`:
   "results": [
     {
       "id": "zf-0",
-      "category": "unclassified",
+      "category": "valka",
+      "topic": "valka",
+      "tone": "neutralni",
       "toxicity_score": 0.0,
-      "confidence": 0.0,
-      "recommended_action": "review"
+      "confidence": 0.8,
+      "recommended_action": "hide"
     }
   ],
-  "model_version": "none"
+  "model_version": "lexicon-1"
 }
 ```
 
-`model_version: "none"` means no model ran. `toxicity_score` and `confidence` are 0 to 1. `recommended_action` is `show`, `hide`, or `review`. This placeholder never returns `hide`.
+`category` is the same value as `topic`, so the extension can keep storing `category`. `topic` is one of `valka`, `politicke_konflikty`, `umrti`, `katastrofy`, `nasili`, `jine`. `tone` is `neutralni` or `toxicky`. When several topics match, the order is `valka`, then `nasili`, then `katastrofy`, then `umrti`, then `politicke_konflikty`.
+
+`toxicity_score` is 0 for a neutral tone and the tone score otherwise. `confidence` is the topic score. Both are 0 to 1. `recommended_action` is `hide` only when a selected preference matches and the score is at least 0.7. A weaker match is `review`. Otherwise the action is `show`. A factual report about war can be hidden for the topic while its tone stays `neutralni`.
 
 ## Errors
 

@@ -13,7 +13,7 @@ from pydantic import ValidationError
 from app.config import Settings
 from app.middleware import LimitBodySize
 from app.schemas import AnalysisRequest, AnalysisResponse, HealthResponse
-from app.services.analyze import build_unclassified_response
+from app.services.analyze import analyze_blocks
 
 logger = logging.getLogger("zenfeed")
 
@@ -63,7 +63,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         logger.info("analyze request accepted block_count=%s", len(payload.blocks))
         try:
             result = await asyncio.wait_for(
-                asyncio.to_thread(build_unclassified_response, payload),
+                asyncio.to_thread(analyze_blocks, payload),
                 timeout=current.analyze_timeout_seconds,
             )
         except TimeoutError:
