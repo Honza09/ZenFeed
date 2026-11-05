@@ -85,8 +85,14 @@ test("backend not running: backend_unavailable", async () => {
 
 test("timeouts: client abort and backend 504", async () => {
   const client = loadClient();
+  // A real pending request keeps Node's event loop alive; AbortSignal.timeout's
+  // timer does not (it is unref'd), so the fake holds a timer until the abort.
   const hanging = (url, options) => new Promise((resolve, reject) => {
-    options.signal.addEventListener("abort", () => reject(options.signal.reason));
+    const keepAlive = setTimeout(() => {}, 10000);
+    options.signal.addEventListener("abort", () => {
+      clearTimeout(keepAlive);
+      reject(options.signal.reason);
+    });
   });
   assert.deepEqual(plain(await client.analyzeBlocks(hanging, makeBlocks(1), PREFS, { timeoutMs: 20 })), { ok: false, error: "timeout" });
   const gateway = async () => ({ ok: false, status: 504, json: async () => ({ error: "timeout" }) });
