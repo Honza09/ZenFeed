@@ -59,7 +59,7 @@ Start the API from the repository root:
 uvicorn app.main:app --app-dir backend --reload
 ```
 
-`GET http://127.0.0.1:8000/health` returns `{"status":"ok"}`. Generated docs are at `http://127.0.0.1:8000/docs`. Copy `.env.example` to `.env` only when you need to override the timeout, log level, or the future AI key. The server starts without a key.
+`GET http://127.0.0.1:8000/health` returns `{"status":"ok"}`. The extension popup calls this address (port 8000), so keep the default port when using the extension ([`popup.md`](popup.md)). Generated docs are at `http://127.0.0.1:8000/docs`. Copy `.env.example` to `.env` only when you need to override the timeout, log level, or the future AI key. The server starts without a key.
 
 ## Running the checks locally
 

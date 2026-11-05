@@ -169,18 +169,27 @@
     );
   }
 
-  // { ok: true, hidden, newContent }: hidden blocks and content added since the
-  // last extraction (to offer "analyze again"; nothing is analyzed by itself).
+  // { ok: true, hidden, newContent, extractionId, withResults }: hidden blocks,
+  // content added since the last extraction (to offer "analyze again"; nothing
+  // is analyzed by itself), and the extraction whose results can be hidden again.
   function getStatus(chromeApi, tabId) {
     return askTab(
       chromeApi, tabId, { type: "zenfeed/status" },
-      (reply) => isCount(reply.hidden) && isCount(reply.newContent),
+      (reply) => isCount(reply.hidden) && isCount(reply.newContent) && isCount(reply.withResults)
+        && (reply.extractionId === null || typeof reply.extractionId === "string"),
       new Set(["status_failed"]),
     );
   }
 
+  // The active tab without injecting anything, so the popup can ask a content
+  // script that is already there (from an earlier click) for its status.
+  async function activeTabId(chromeApi) {
+    const [tab] = await chromeApi.tabs.query({ active: true, currentWindow: true });
+    return tab && typeof tab.id === "number" ? tab.id : null;
+  }
+
   globalThis.ZenFeedBootstrap = {
     CONTENT_SCRIPTS, isSupportedUrl, isValidExtraction, extractActiveTab, applyResults,
-    applyHiding, showAll, getStatus,
+    applyHiding, showAll, getStatus, activeTabId,
   };
 })();

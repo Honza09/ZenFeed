@@ -2,7 +2,7 @@
 
 The content script hides the blocks whose analysis result is `hide` and puts a small box in front of each: "Skryto: válka — Zobrazit · Proč byl tento obsah skryt?". The page text is never changed, and no page element is removed, moved or replaced. "Zobrazit" shows one block, "Zobrazit vše" returns the page to its original state.
 
-This builds on the block registry ([`block-mapping.md`](block-mapping.md), ZF-09) and on the classifier results (`docs/API.md`, ZF-06). The popup buttons ("Analyzovat", "Pozastavit", "Obnovit vše", count of hidden blocks) are ZF-11. Calling the backend from the extension is ZF-12. Both can use the helpers below.
+This builds on the block registry ([`block-mapping.md`](block-mapping.md), ZF-09) and on the classifier results (`docs/API.md`, ZF-06). The popup buttons "Analyzovat", "Zobrazit vše" and "Znovu skrýt" use the helpers below ([`popup.md`](popup.md), ZF-11).
 
 ## When a block is hidden
 

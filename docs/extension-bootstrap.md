@@ -15,7 +15,7 @@ Reasons:
 - `activeTab` grants access only to the current tab and only after the user clicks the toolbar icon. No host permissions are needed.
 - `scripting` is needed for `executeScript`. It gives no access to any page by itself.
 
-`manifest.json` therefore has `"permissions": ["activeTab", "scripting"]` and no `content_scripts` or `host_permissions`. `tests/extension/bootstrap.test.mjs` fails if either is added back. `storage` stays allowed in `.github/scripts/check_extension.py` for preferences (ZF-11).
+`manifest.json` therefore had `"permissions": ["activeTab", "scripting"]` and no `content_scripts` or `host_permissions`. ZF-11 added `storage` (preferences) and `"host_permissions": ["http://127.0.0.1:8000/*"]` (the local backend only, not web pages); see [`popup.md`](popup.md). `tests/extension/bootstrap.test.mjs` and `.github/scripts/check_extension.py` fail on declared `content_scripts` or any other host permission.
 
 ## Flow
 
