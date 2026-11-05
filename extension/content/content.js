@@ -84,8 +84,15 @@
     return { ok: true, restored: hider.showAll() };
   }
 
+  // extractionId and withResults let a reopened popup hide again without a new analysis.
   function handleStatus() {
-    return { ok: true, hidden: hider.hiddenCount(), newContent };
+    return {
+      ok: true,
+      hidden: hider.hiddenCount(),
+      newContent,
+      extractionId: registry.currentExtractionId(),
+      withResults: registry.all().filter((entry) => entry.result !== null).length,
+    };
   }
 
   const HANDLERS = {

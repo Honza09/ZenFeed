@@ -161,10 +161,11 @@ test("loading the script twice keeps the first copy", () => {
   assert.equal(context.ZenFeedBootstrap, first);
 });
 
-test("manifest: no automatic content scripts or host permissions", () => {
+test("manifest: no automatic content scripts, host access only to the local backend", () => {
   assert.equal(manifest.content_scripts, undefined);
-  assert.equal(manifest.host_permissions, undefined);
-  assert.deepEqual([...manifest.permissions].sort(), ["activeTab", "scripting"]);
+  // ZF-11: the popup calls the backend that runs locally (docs/rozhodnuti-zf-25.md).
+  assert.deepEqual(manifest.host_permissions, ["http://127.0.0.1:8000/*"]);
+  assert.deepEqual([...manifest.permissions].sort(), ["activeTab", "scripting", "storage"]);
 });
 
 const APPLY_OK = { ok: true, matched: 1, unknown: 0, invalid: 0, duplicate: 0, detached: 0 };
@@ -210,11 +211,11 @@ const HIDING_OK = {
 
 test("applyHiding, showAll and getStatus send their messages", async () => {
   const { applyHiding, showAll, getStatus } = loadBootstrap();
-  const replies = [HIDING_OK, { ok: true, restored: 2 }, { ok: true, hidden: 0, newContent: 3 }];
+  const replies = [HIDING_OK, { ok: true, restored: 2 }, { ok: true, hidden: 0, newContent: 3, extractionId: "x1", withResults: 4 }];
   const { api, calls } = fakeChrome({ tab: PAGE, reply: () => replies.shift() });
   assert.deepEqual(plain(await applyHiding(api, 7, "x1")), HIDING_OK);
   assert.deepEqual(plain(await showAll(api, 7)), { ok: true, restored: 2 });
-  assert.deepEqual(plain(await getStatus(api, 7)), { ok: true, hidden: 0, newContent: 3 });
+  assert.deepEqual(plain(await getStatus(api, 7)), { ok: true, hidden: 0, newContent: 3, extractionId: "x1", withResults: 4 });
   assert.deepEqual(plain(calls.messages.map((call) => call.message)), [
     { type: "zenfeed/apply-hiding", extractionId: "x1" },
     { type: "zenfeed/show-all" },
@@ -247,7 +248,12 @@ test("showAll and getStatus reject odd replies", async () => {
     const { api } = fakeChrome({ tab: PAGE, reply });
     assert.deepEqual(plain(await showAll(api, 7)), { ok: false, error: "tab_unavailable" });
   }
-  for (const reply of [() => ({ ok: true, hidden: 1 }), () => ({ ok: true, hidden: 1.5, newContent: 0 })]) {
+  for (const reply of [
+    () => ({ ok: true, hidden: 1 }),
+    () => ({ ok: true, hidden: 1.5, newContent: 0, extractionId: null, withResults: 0 }),
+    () => ({ ok: true, hidden: 0, newContent: 0, extractionId: 5, withResults: 0 }),
+    () => ({ ok: true, hidden: 0, newContent: 0, extractionId: "x1" }),
+  ]) {
     const { api } = fakeChrome({ tab: PAGE, reply });
     assert.deepEqual(plain(await getStatus(api, 7)), { ok: false, error: "tab_unavailable" });
   }

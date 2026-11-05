@@ -1,12 +1,21 @@
 // Loads extension/ unpacked in a headless Chromium browser, clicks the toolbar
-// action on each page (this is what grants activeTab), clicks the popup button
-// twice and prints what the popup shows. Development tool, no dependencies.
+// action on each page (this is what grants activeTab), drives the popup and
+// prints what it shows. Development tool, no dependencies.
+//
+// Popup flow (ZF-11) on each page: turn every preference on (they are stored,
+// so from the second page on they are already on when the popup opens), click
+// "Analyzovat", "Zobrazit vše", "Znovu skrýt", "Zobrazit vše", "Analyzovat"
+// again (must give the same result as the first time) and "Zobrazit vše".
+// The popup calls the backend at http://127.0.0.1:8000, so start it there
+// (uvicorn app.main:app --app-dir backend); without it the popup shows the
+// "server not running" message.
 //
 // Usage (from the repository root, Node.js 22+):
 //   node tests/extension/popup-e2e.mjs <url> [<url> ...]
 //   node tests/extension/popup-e2e.mjs --same-tab <url> <url> ...   # navigate one tab
 //   node tests/extension/popup-e2e.mjs --backend=http://127.0.0.1:8000 <url> ...
 //   BROWSER_PATH=/path/to/chromium node tests/extension/popup-e2e.mjs <url>
+//   ZENFEED_PROFILE=/tmp/zf-profile node tests/extension/popup-e2e.mjs <url>   # keep the browser profile
 //
 // --same-tab opens the first URL and navigates the same tab to the next ones,
 // clicking the action again after each navigation (Chrome drops the activeTab
@@ -39,7 +48,6 @@ const DEFAULT_BROWSER = {
 const PORT = 9334;
 const LOAD_MS = 3000;
 const POPUP_MS = 800;
-const CLICK_MS = 1500;
 const ANALYZE_BATCH = 100; // backend limit, docs/API.md
 const MAX_TITLE_CHARS = 300; // backend limit, docs/API.md
 // Every hide switch on, so the hiding check has something to hide (docs/API.md).
@@ -73,9 +81,15 @@ const popupStateExpression = `(() => {
     error: status.classList.contains("error"),
     title: document.getElementById("page-title").textContent,
     blocks: document.getElementById("block-count").textContent,
+    hidden: document.getElementById("hidden-count").textContent,
+    showAll: !document.getElementById("show-all").hidden,
+    rehide: !document.getElementById("rehide").hidden,
     elementsInSummary: document.querySelectorAll("#summary dd *").length,
   };
 })()`;
+
+const checkedPreferencesExpression = `[...document.querySelectorAll("#preferences input[type=checkbox]")]
+  .filter((input) => input.checked).length`;
 
 async function waitForBrowser() {
   for (let attempt = 0; attempt < 50; attempt++) {
@@ -149,14 +163,54 @@ async function navigate(cdp, tab, url) {
   await cdp.send("Target.detachFromTarget", { sessionId });
 }
 
-async function clickAndRead(cdp, sessionId) {
+async function evaluate(cdp, sessionId, expression) {
+  const { result } = await cdp.send("Runtime.evaluate", { expression, returnByValue: true, awaitPromise: true }, sessionId);
+  return result.value;
+}
+
+// Clicks a popup button and waits until the popup is idle again (buttons enabled).
+async function clickAndRead(cdp, sessionId, buttonId = "analyze") {
   await cdp.send("Runtime.evaluate", {
-    expression: "document.getElementById('analyze').click()",
+    expression: `document.getElementById(${JSON.stringify(buttonId)}).click()`,
     userGesture: true,
   }, sessionId);
-  await sleep(CLICK_MS);
-  const { result } = await cdp.send("Runtime.evaluate", { expression: popupStateExpression, returnByValue: true }, sessionId);
-  return result.value;
+  await sleep(300);
+  for (let waited = 0; waited < 30000; waited += 200) {
+    if (!(await evaluate(cdp, sessionId, "document.getElementById('analyze').disabled"))) {
+      break;
+    }
+    await sleep(200);
+  }
+  await sleep(200);
+  return evaluate(cdp, sessionId, popupStateExpression);
+}
+
+// Turns on every preference switch that is off. Returns how many were on when the popup opened.
+async function turnPreferencesOn(cdp, sessionId) {
+  const onAtOpen = await evaluate(cdp, sessionId, checkedPreferencesExpression);
+  await evaluate(cdp, sessionId, `[...document.querySelectorAll("#preferences input[type=checkbox]")]
+    .filter((input) => !input.checked).forEach((input) => input.click())`);
+  await sleep(300);
+  return onAtOpen;
+}
+
+async function runPopupFlow(cdp, sessionId) {
+  const preferencesAtOpen = await turnPreferencesOn(cdp, sessionId);
+  const first = await clickAndRead(cdp, sessionId);
+  const steps = { preferencesAtOpen, first };
+  if (first.showAll) {
+    steps.shown = await clickAndRead(cdp, sessionId, "show-all");
+    if (steps.shown.rehide) {
+      steps.rehidden = await clickAndRead(cdp, sessionId, "rehide");
+      steps.shownAgain = await clickAndRead(cdp, sessionId, "show-all");
+    }
+  }
+  // Analyzing again injects the content scripts again; their guards must keep them working.
+  steps.second = await clickAndRead(cdp, sessionId);
+  if (steps.second.showAll) {
+    steps.final = await clickAndRead(cdp, sessionId, "show-all");
+  }
+  return steps;
 }
 
 async function openPopupAndCheck(cdp, tab) {
@@ -172,11 +226,10 @@ async function openPopupAndCheck(cdp, tab) {
   }
   try {
     const { sessionId } = await cdp.send("Target.attachToTarget", { targetId: popup.targetId, flatten: true });
-    const first = await clickAndRead(cdp, sessionId);
-    // The second click injects the content scripts again; their guards must keep them working.
-    const second = await clickAndRead(cdp, sessionId);
+    const steps = await runPopupFlow(cdp, sessionId);
+    const { first, second } = steps;
     const roundTrip = backend && !first.error ? await checkRoundTrip(cdp, sessionId, tab) : null;
-    return { first, secondMatches: JSON.stringify(first) === JSON.stringify(second), roundTrip };
+    return { first, steps, secondMatches: JSON.stringify(first) === JSON.stringify(second), roundTrip };
   } finally {
     await cdp.send("Target.closeTarget", { targetId: popup.targetId });
   }
@@ -422,11 +475,18 @@ function printRoundTrip(roundTrip) {
   }
 }
 
-function printResult(url, { first, secondMatches, roundTrip }) {
+function printResult(url, { first, steps, secondMatches, roundTrip }) {
   console.log(`\n=== ${url}`);
   console.log(`status: ${first.status}${first.error ? " (error)" : ""}`);
-  console.log(`title: ${first.title || "-"}  blocks: ${first.blocks || "-"}  `
-    + `second click same: ${secondMatches}  elements from page text: ${first.elementsInSummary}`);
+  console.log(`title: ${first.title || "-"}  blocks: ${first.blocks || "-"}  hidden: ${first.hidden || "-"}  `
+    + `preferences on at open: ${steps.preferencesAtOpen}/6  second analysis same: ${secondMatches}  `
+    + `elements from page text: ${first.elementsInSummary}`);
+  for (const [name, label] of [["shown", "Zobrazit vše"], ["rehidden", "Znovu skrýt"], ["shownAgain", "Zobrazit vše"], ["final", "Zobrazit vše (end)"]]) {
+    const step = steps[name];
+    if (step) {
+      console.log(`  ${label}: ${step.status}${step.error ? " (error)" : ""}  hidden: ${step.hidden}`);
+    }
+  }
   if (roundTrip) {
     printRoundTrip(roundTrip);
   }
@@ -453,7 +513,8 @@ async function run(cdp) {
   }
 }
 
-const profile = mkdtempSync(join(tmpdir(), "zenfeed-popup-"));
+const keepProfile = Boolean(process.env.ZENFEED_PROFILE);
+const profile = process.env.ZENFEED_PROFILE || mkdtempSync(join(tmpdir(), "zenfeed-popup-"));
 const browser = spawn(process.env.BROWSER_PATH || DEFAULT_BROWSER[process.platform], [
   `--user-data-dir=${profile}`,
   `--remote-debugging-port=${PORT}`,
@@ -473,5 +534,7 @@ try {
   cdp?.close();
   browser.kill();
   await sleep(500);
-  rmSync(profile, { recursive: true, force: true });
+  if (!keepProfile) {
+    rmSync(profile, { recursive: true, force: true });
+  }
 }
