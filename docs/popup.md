@@ -111,4 +111,4 @@ Not tested: desktop Google Chrome with a real click; a slow backend close to the
 - One failing request discards all results; keeping partial results and retrying is ZF-12.
 - "Znovu skrýt" after reopening the popup works only for the last analyzed tab and extraction; after navigation the user analyzes again.
 - The new-content notice is shown only when the popup is opened; the popup does not update while it stays open.
-- Edge states with their own wording (little text, no relevant content left, unknown page type) are ZF-28.
+- Edge states (little text, a page that is one block, nothing relevant left, long pages) are handled since ZF-28; see [`edge-states.md`](edge-states.md).

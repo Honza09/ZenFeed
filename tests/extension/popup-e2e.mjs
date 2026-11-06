@@ -84,6 +84,8 @@ const popupStateExpression = `(() => {
     hidden: document.getElementById("hidden-count").textContent,
     showAll: !document.getElementById("show-all").hidden,
     rehide: !document.getElementById("rehide").hidden,
+    hideAnyway: !document.getElementById("hide-anyway").hidden,
+    notes: [...document.querySelectorAll("#notes li")].map((item) => item.textContent),
     elementsInSummary: document.querySelectorAll("#summary dd *").length,
   };
 })()`;
@@ -198,7 +200,13 @@ async function runPopupFlow(cdp, sessionId) {
   const preferencesAtOpen = await turnPreferencesOn(cdp, sessionId);
   const first = await clickAndRead(cdp, sessionId);
   const steps = { preferencesAtOpen, first };
-  if (first.showAll) {
+  // Review mode (ZF-28): the page is one block; hide it only on explicit request.
+  let canShowAll = first.showAll;
+  if (first.hideAnyway) {
+    steps.hiddenAnyway = await clickAndRead(cdp, sessionId, "hide-anyway");
+    canShowAll = steps.hiddenAnyway.showAll;
+  }
+  if (canShowAll) {
     steps.shown = await clickAndRead(cdp, sessionId, "show-all");
     if (steps.shown.rehide) {
       steps.rehidden = await clickAndRead(cdp, sessionId, "rehide");
@@ -481,7 +489,10 @@ function printResult(url, { first, steps, secondMatches, roundTrip }) {
   console.log(`title: ${first.title || "-"}  blocks: ${first.blocks || "-"}  hidden: ${first.hidden || "-"}  `
     + `preferences on at open: ${steps.preferencesAtOpen}/6  second analysis same: ${secondMatches}  `
     + `elements from page text: ${first.elementsInSummary}`);
-  for (const [name, label] of [["shown", "Zobrazit vše"], ["rehidden", "Znovu skrýt"], ["shownAgain", "Zobrazit vše"], ["final", "Zobrazit vše (end)"]]) {
+  if (first.notes.length) {
+    console.log(`  notes: ${first.notes.join(" | ")}`);
+  }
+  for (const [name, label] of [["hiddenAnyway", "Přesto skrýt"], ["shown", "Zobrazit vše"], ["rehidden", "Znovu skrýt"], ["shownAgain", "Zobrazit vše"], ["final", "Zobrazit vše (end)"]]) {
     const step = steps[name];
     if (step) {
       console.log(`  ${label}: ${step.status}${step.error ? " (error)" : ""}  hidden: ${step.hidden}`);

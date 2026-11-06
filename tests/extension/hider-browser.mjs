@@ -88,6 +88,8 @@ const scenario = `(async () => {
   check("blocks to hide = hidden + unsupported", hiding.hidden + hiding.unsupported === toHide.length,
     "toHide " + toHide.length + " " + JSON.stringify(hiding));
   check("no block failed to hide", hiding.failed === 0, JSON.stringify(hiding));
+  check("hiddenIds lists exactly the hidden blocks", hiding.hiddenIds.length === hiding.hidden
+    && hiding.hiddenIds.every((id) => toHide.some((block) => block.id === id)), JSON.stringify(hiding.hiddenIds));
   check("one box per hidden block", boxes().length === hiding.hidden, boxes().length);
 
   const a1 = document.getElementById("a1");
