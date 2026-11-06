@@ -306,11 +306,12 @@
       record.box.remove();
     }
 
-    // Hides every entry that hideDecision allows. Returns counts per outcome.
+    // Hides every entry that hideDecision allows. Returns counts per outcome
+    // and the IDs of the blocks hidden by this call (hiddenIds).
     function applyHiding(entries) {
       const counts = {
         hidden: 0, alreadyHidden: 0, revealed: 0, noResult: 0, notHide: 0,
-        wrapper: 0, detached: 0, unsupported: 0, failed: 0,
+        wrapper: 0, detached: 0, unsupported: 0, failed: 0, hiddenIds: [],
       };
       const keys = {
         no_result: "noResult", not_hide: "notHide", wrapper: "wrapper",
@@ -331,6 +332,7 @@
           try {
             hideEntry(entry);
             counts.hidden += 1;
+            counts.hiddenIds.push(entry.block.id);
           } catch (error) {
             // One odd block must not stop the others; it simply stays visible.
             console.error("ZenFeed: block could not be hidden", error);

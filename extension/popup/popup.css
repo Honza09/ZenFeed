@@ -94,6 +94,13 @@ button:focus-visible,
   color: #b42318;
 }
 
+.notes {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  color: #59636e;
+  font-size: 12px;
+}
+
 .notice {
   margin: 8px 0 0;
   padding: 6px 8px;

@@ -206,7 +206,7 @@ test("applyResults: closed tab or odd reply is tab_unavailable", async () => {
 
 const HIDING_OK = {
   ok: true, hidden: 2, alreadyHidden: 0, revealed: 0, noResult: 0, notHide: 5,
-  wrapper: 1, detached: 0, unsupported: 0, failed: 0, hiddenTotal: 2,
+  wrapper: 1, detached: 0, unsupported: 0, failed: 0, hiddenTotal: 2, hiddenIds: ["zf-1", "zf-4"],
 };
 
 test("applyHiding, showAll and getStatus send their messages", async () => {
@@ -235,6 +235,8 @@ test("applyHiding passes on known errors only", async () => {
     () => ({ ok: false, error: "apply_failed" }),
     () => ({ ...HIDING_OK, hidden: -1 }),
     () => ({ ...HIDING_OK, wrapper: undefined }),
+    () => ({ ...HIDING_OK, hiddenIds: undefined }),
+    () => ({ ...HIDING_OK, hiddenIds: [1] }),
   ];
   for (const reply of odd) {
     const { api } = fakeChrome({ tab: PAGE, reply });

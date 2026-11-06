@@ -155,7 +155,8 @@
   function applyHiding(chromeApi, tabId, extractionId) {
     return askTab(
       chromeApi, tabId, { type: "zenfeed/apply-hiding", extractionId },
-      (reply) => HIDING_COUNTS.every((key) => isCount(reply[key])),
+      (reply) => HIDING_COUNTS.every((key) => isCount(reply[key]))
+        && Array.isArray(reply.hiddenIds) && reply.hiddenIds.every((id) => typeof id === "string"),
       new Set(["no_extraction", "stale_extraction", "hiding_failed"]),
     );
   }
