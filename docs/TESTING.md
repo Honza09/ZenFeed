@@ -1,6 +1,6 @@
 # Testing Strategy
 
-> **Note (Oct 2026):** This is the generic testing strategy. The MVP evaluation (about 24 pages in Czech and English, two annotators, tuning vs. final split, thresholds 80 % / 20 % / 100 %, 5–8 interviews, 3–5 prototype testers) is defined in [`mvp.md`](mvp.md) §7 and will be added here under backlog issue ZF-27.
+> **Note (Nov 2026):** This is the generic testing strategy. The MVP evaluation methodology (ZF-27) is frozen; see [MVP evaluation methodology (ZF-27)](#mvp-evaluation-methodology-zf-27) at the end of this file and [`testing/metodika-hodnoceni.md`](testing/metodika-hodnoceni.md).
 
 ## Goals
 
@@ -52,3 +52,16 @@ Mock external AI services in unit tests whenever practical.
 - Never claim a test passed unless it was actually run.
 - Document tests that could not be executed.
 - Add regression tests for bug fixes when practical.
+
+## MVP evaluation methodology (ZF-27)
+
+Status: frozen on 7 Nov 2026 by the team (per Libuše; chat record not seen). Full text (Czech): [`testing/metodika-hodnoceni.md`](testing/metodika-hodnoceni.md).
+
+- Product thresholds from the proposal (§5): preference respect ≥ 80 %, median time reduction ≥ 20 %, restore 100 %. Other numbers (90 % precision, 3 s / 10 s) are plan assumptions.
+- Evaluable case = page × setting; all cases are counted, reported in two groups ("with a hide target" / "without target"). Pilot: 3 of 24 cases have a target.
+- Preference respect: share of cases with no wrongly hidden and no missed block; block-level accuracy is secondary. "Preferred area" = topic + tone per block, the area derived per setting.
+- Raters (ZF-19): Libuše and Jakub annotate the final set blind and separately (team decision, 7 Nov); agreement as % and Cohen's κ per field (topic, tone, hide decision per setting), target κ ≥ 0.70 (team's proposal, not a proposal requirement). The classifier author does not annotate.
+- Language: 12 CS : 12 EN pages; per-language results with 95 % Wilson intervals (informational only).
+- Split: by page, stratified by type and language, fixed before results; same domain not in both parts; final part evaluated once; pilot is tuning only.
+- Time and latency: procedure in the Czech document (≥ 3 latency measurements per page).
+- Open items: see the checklist of the Czech document.
