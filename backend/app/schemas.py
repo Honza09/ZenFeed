@@ -111,20 +111,48 @@ class HealthResponse(BaseModel):
     status: Literal["ok"]
 
 
+def _reject_duplicate_categories(value: list[str]) -> list[str]:
+    if len(value) != len(set(value)):
+        raise ValueError("omitted categories must be unique")
+    return value
+
+
 class SummaryRequest(BaseModel):
-    """Blocks already kept for a later ``/v1/summarize``. Not served yet."""
+    """Blocks already kept for a later ``/v1/summarize``. Not served yet.
+
+    The extension sends only the blocks it kept, so it also sends which topics
+    it hid. Hidden text never reaches the backend.
+    """
 
     model_config = ConfigDict(extra="ignore")
 
     blocks: list[ContentBlockInput] = Field(min_length=1, max_length=MAX_BLOCKS)
     preferences: Preferences
+    omitted_categories: list[HideableTopic] = Field(default_factory=list, max_length=5)
     language: SummaryLanguage = "cs"
+
+    @field_validator("omitted_categories")
+    @classmethod
+    def reject_duplicate_categories(cls, value: list[str]) -> list[str]:
+        return _reject_duplicate_categories(value)
 
     @model_validator(mode="after")
     def reject_duplicate_ids(self) -> SummaryRequest:
         ids = [block.id for block in self.blocks]
         if len(ids) != len(set(ids)):
             raise ValueError("block ids must be unique")
+        return self
+
+    @model_validator(mode="after")
+    def require_switch_for_omitted(self) -> SummaryRequest:
+        # A topic can only be hidden when its switch is on.
+        switched_off = [
+            topic
+            for topic in self.omitted_categories
+            if not getattr(self.preferences, topic)
+        ]
+        if switched_off:
+            raise ValueError("omitted categories must be switched on in preferences")
         return self
 
 
@@ -143,9 +171,7 @@ class SummaryResponse(BaseModel):
     @field_validator("omitted_categories")
     @classmethod
     def reject_duplicate_categories(cls, value: list[str]) -> list[str]:
-        if len(value) != len(set(value)):
-            raise ValueError("omitted categories must be unique")
-        return value
+        return _reject_duplicate_categories(value)
 
     @model_validator(mode="after")
     def require_summary_when_content_remains(self) -> SummaryResponse:
