@@ -84,9 +84,9 @@ Přepisování nebo úprava textu stránky (včetně změny tónu a titulků), s
 
 ## 5. Technický návrh
 
-- **Rozšíření (MV3):** content script dělí stránku na bloky se stabilními ID, provádí pouze skrytí a zobrazení; popup/panel pro preference, shrnutí a přehrávač; oprávnění `activeTab` (případně `scripting`, ověřit v týdnu 1); `chrome.storage.local`.
-- **Backend (Python, FastAPI, Pydantic):** `/health`, `/v1/analyze` (téma, tón, doporučená akce po blocích), `/v1/summarize`, `/v1/tts`. Validace vstupu i výstupu, limity velikosti a frekvence, API klíče jen na serveru, v logu žádný surový text.
-- **AI:** zero-shot klasifikace témat a tónu, abstraktivní shrnutí, strukturovaný výstup, syntéza řeči.
+- **Rozšíření (MV3):** content script dělí stránku na bloky se stabilními ID, provádí pouze skrytí a zobrazení; popup/panel pro preference, shrnutí a přehrávač; oprávnění `activeTab`, `scripting`, `storage` a `host_permissions` jen pro lokální backend; `chrome.storage.local`. Hlas čte Chrome (`speechSynthesis`, ZF-25).
+- **Backend (Python, FastAPI, Pydantic):** `/health`, `/v1/analyze` (téma, tón, doporučená akce po blocích), `/v1/summarize`. Endpoint pro TTS není, hlas je v rozšíření. Validace vstupu i výstupu, limity velikosti a frekvence, API klíče jen na serveru, v logu žádný surový text. Kontrakt je v `docs/API.md`, architektura v `docs/architecture.md` (ZF-02).
+- **AI:** zero-shot klasifikace témat a tónu, abstraktivní shrnutí, strukturovaný výstup; syntéza řeči v prohlížeči.
 - **Zásady:** klasifikace není neomylná; nejasný výsledek neskrývá. Text stránky je nedůvěryhodný vstup a nesmí přebít instrukce aplikace. Minimální oprávnění. Nic se neodesílá bez akce uživatele. Poskytovatele, přenos a uchovávání dat určíme před nasazením a sdělíme je uživateli (proposal §4.4).
 - **Hlavní technické riziko:** dělení libovolné stránky na bloky. Ověřit hned v týdnu 1 na různých doménách.
 
@@ -123,10 +123,10 @@ Chybné skrytí nebo neskrytí bloku, různorodost HTML, zkreslené shrnutí, so
 
 ## 9. Otevřená rozhodnutí
 
-1. Textový model a TTS služba.
+1. Textový model a TTS služba. *Rozhodnuto v ZF-25 (`docs/rozhodnuti-zf-25.md`).*
 2. Konkrétní historická osobnost a podmínky použití hlasu.
-3. Způsob provozu backendu a limit nákladů.
-4. Konkrétní seznam kategorií témat a tónu v MVP.
+3. Způsob provozu backendu a limit nákladů. *Rozhodnuto v ZF-25.*
+4. Konkrétní seznam kategorií témat a tónu v MVP. *Rozhodnuto v ZF-24 (`docs/kategorie-mvp.md`).*
 5. Rozdělení rolí a kapacita členů týmu.
 
 ## 10. Změny oproti verzi 0.1

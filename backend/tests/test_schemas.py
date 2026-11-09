@@ -44,6 +44,30 @@ def test_summary_contract_rejects_unknown_preference_and_category() -> None:
         )
 
 
+def test_summary_request_carries_the_hidden_topics() -> None:
+    block = {"id": "zf-0", "text": "A kept paragraph.", "kind": "article"}
+    parsed = SummaryRequest(
+        blocks=[block],
+        preferences={"valka": True, "umrti": True},
+        omitted_categories=["valka"],
+    )
+    default = SummaryRequest(blocks=[block], preferences={})
+
+    assert parsed.omitted_categories == ["valka"]
+    assert default.omitted_categories == []
+
+
+def test_summary_request_rejects_invalid_hidden_topics() -> None:
+    block = {"id": "zf-0", "text": "A kept paragraph.", "kind": "article"}
+    for omitted in (["valka", "valka"], ["jine"], ["nasili"]):
+        with pytest.raises(ValidationError):
+            SummaryRequest(
+                blocks=[block],
+                preferences={"valka": True},
+                omitted_categories=omitted,
+            )
+
+
 def test_blank_summary_needs_an_explicit_flag() -> None:
     with pytest.raises(ValidationError):
         SummaryResponse.model_validate(_summary(summary="   "))

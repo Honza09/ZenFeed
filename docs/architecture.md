@@ -1,65 +1,96 @@
 # ZenFeed Architecture
 
-> **Note (Oct 2026):** This is the initial generic draft. The target architecture (block segmentation in a content script, hiding with a reversible "Show" box, preference-aware summary, synthetic-voice playback, user-triggered processing only) is defined in [`mvp.md`](mvp.md) §3 and §5 and in `zadani/zenfeed-final-proposal.md` §4.4. It will be rewritten under backlog issue ZF-02.
+ZenFeed is a Chrome extension (Manifest V3, vanilla JavaScript, no build step) and a small FastAPI backend that runs on the demo machine. The extension divides the open page into blocks, the backend classifies each block by topic and tone, and the extension hides the blocks the user chose not to read. The page text is never changed. A summary of the kept blocks can be read in the popup and played with a voice from Chrome.
 
-## Overview
+Scope is in [`mvp.md`](mvp.md), the endpoint contract in [`API.md`](API.md), and the model, voice and hosting choice in [`rozhodnuti-zf-25.md`](rozhodnuti-zf-25.md). This document was rewritten for ZF-02.
 
-ZenFeed consists of two primary components:
+## Components
 
-1. **Chrome Extension** — provides the user interface and interacts with the current web page.
-2. **Backend** — exposes an API for processing requests and potentially integrating AI services.
+### Extension (`extension/`)
 
-## Chrome Extension
+Nothing runs on a page until the user clicks the ZenFeed icon. The manifest asks for `activeTab`, `scripting` and `storage`, and `host_permissions` only for `http://127.0.0.1:8000/*` (the local backend). There are no automatic content scripts ([`extension-bootstrap.md`](extension-bootstrap.md)).
 
-The extension uses Manifest V3 and JavaScript.
+| File | Responsibility |
+|---|---|
+| `popup/popup.html`, `popup.css`, `popup.js` | Popup: preference switches, the privacy note, Analyze / Show all / Hide again, status messages |
+| `popup/preferences.js` | Hide switches in `chrome.storage.local` ([`popup.md`](popup.md)) |
+| `popup/bootstrap.js` | Injects the content scripts into the active tab after the click, runs extraction, passes results back |
+| `popup/analyze-client.js` | Calls `/v1/analyze` with at most 100 blocks per request |
+| `popup/page-quality.js` | Edge states: little text, a single block, nothing relevant left ([`edge-states.md`](edge-states.md)) |
+| `content/segmenter.js` | Divides the page into blocks with IDs `zf-0`, `zf-1`, … ([`segmentation.md`](segmentation.md)) |
+| `content/block-registry.js` | Keeps the blocks of the current extraction and matches results to them by ID ([`block-mapping.md`](block-mapping.md)) |
+| `content/hider.js` | Hides blocks behind a reversible "Skryto: … — Zobrazit" box ([`hiding.md`](hiding.md)) |
+| `content/content.js` | Message handlers between the popup and the page |
 
-Responsibilities:
-- Display the popup user interface.
-- Extract relevant page content when browser permissions allow it.
-- Display processing results.
-- Communicate with the backend when a feature requires it.
+Planned: the summary panel (ZF-30) and the voice player with its label (ZF-16, ZF-17).
 
-Suggested components:
-- `manifest.json` — extension configuration and permissions.
-- `popup.html`, `popup.css`, `popup.js` — popup interface.
-- Content script — page content extraction, when needed.
-- Service worker — background tasks, when needed.
+### Backend (`backend/app/`)
 
-Actual file names may differ depending on the implementation.
+| File | Responsibility |
+|---|---|
+| `main.py` | Routes, error handlers, timeout |
+| `schemas.py` | Pydantic models for every request and response |
+| `middleware.py` | Rejects bodies larger than 1 MiB |
+| `config.py` | Settings from the environment, including the optional AI key |
+| `services/analyze.py`, `services/classify.py` | Classification; today the local lexicon `lexicon-1` |
 
-## Backend
+Planned: `/v1/summarize` (ZF-15) and the Gemini integration behind the same service layer, so routes do not depend on a provider. The backend keeps no state between requests and stores no page content.
 
-The backend uses Python and FastAPI.
+## Data flow
 
-Responsibilities:
-- Expose HTTP endpoints.
-- Validate requests using Pydantic.
-- Execute application logic.
-- Potentially provide summarization, classification, or other AI features.
+### Hiding
 
-Suggested separation:
-- API routes.
-- Pydantic schemas.
-- Application services.
-- External service integrations.
-- Tests.
+1. The user sets the switches (topics and tone) in the popup and clicks Analyze.
+2. The popup injects the content scripts. The segmenter returns blocks (`id`, `kind`, `title`, `text`) and a new `extractionId`.
+3. `page-quality.js` decides whether the page can be filtered. If not, nothing is sent and the popup explains why.
+4. The popup posts the blocks and switches to `POST /v1/analyze` (at most 100 blocks per request).
+5. The backend returns `topic`, `tone`, scores and `recommended_action` per block ID.
+6. The registry accepts the results only for the current `extractionId`. The hider hides blocks marked `hide`, except wrapper blocks and other blocks that cannot be hidden safely. `review` is never hidden.
+7. Every hidden block has a "Zobrazit" button, and "Show all" restores the page.
 
-## Data Flow
+### Summary (planned, ZF-15, ZF-30)
 
-1. The user opens a web page.
-2. The extension attempts to extract relevant text.
-3. The user triggers a feature.
-4. If a backend is required, the extension sends the necessary data to the API.
-5. The backend validates and processes the request.
-6. The extension displays the result or a meaningful error.
+1. The popup sends only the visible blocks, the switches and the list of hidden topics (`omitted_categories`) to `POST /v1/summarize`. Hidden text does not leave the browser for the summary.
+2. The backend summarizes with Gemini and returns the summary, the switches that were applied and the omitted topics, or a flag (`insufficient_input`, `no_relevant_content`), or an error (`503`, `429`).
+3. The panel shows the summary with the applied preferences, the omitted topics and a link to the original page.
 
-Not every feature needs every step. Basic text extraction may run entirely within the extension.
+If nothing is visible after hiding, the popup does not ask for a summary.
 
-## Security and Privacy
+### Voice (planned, ZF-16, ZF-17)
 
-- Request only the Chrome permissions that are necessary.
-- Treat web page content as untrusted input.
-- Render untrusted text safely, for example, using `textContent`.
-- Never include secret keys in extension source code.
-- Send only necessary content to the backend.
-- Document whether content is transmitted and where it goes.
+The extension reads the summary with `speechSynthesis` in Chrome. There is no TTS endpoint. Only voices with `localService` set are used, so the summary text is not sent to a cloud voice. The voice is chosen by the summary language. The label names the character from ZF-26 (Švejk for Czech, Sherlock Holmes for English) and says it is a synthetic voice ([`hlas-a-oznaceni.md`](hlas-a-oznaceni.md)). Fallback C, without a character name, applies until the trademark check is done. If no voice is available, the summary stays readable.
+
+## What leaves the browser
+
+| Data | Where to | When |
+|---|---|---|
+| Text, kind and heading of the page blocks, the switches | Local backend (127.0.0.1) | After the user clicks Analyze |
+| Text of the visible blocks, switches, omitted topics, language | Local backend, then Gemini | After the user asks for a summary (planned) |
+| Block text for classification | Gemini | When the Gemini integration exists (planned); otherwise classification stays local |
+
+Never sent: the page URL, cookies, login data, form fields, editable text, hidden blocks for the summary. The popup tells the user before analyzing which data is sent. ZF-29 audits this.
+
+Gemini's free tier is used without billing. Its terms have special rules for the EEA ([`rozhodnuti-zf-25.md`](rozhodnuti-zf-25.md)).
+
+## Trust boundaries
+
+- Page content is untrusted. It is never executed, it is shown only with `textContent`, and the hider box lives in a shadow root.
+- The backend validates every request and every response with Pydantic. Invalid classifier output becomes `review` and never hides a block.
+- Text sent to a model is data, not instructions. The summary prompt must not let page text override it (ZF-15).
+- The AI key is read from the environment on the backend only. It is never in the extension or in git.
+- Logs contain counts and error types, never page text or keys.
+
+## Failure behaviour
+
+A failure never hides content and never breaks the page.
+
+- Backend not running, timeout or error during analysis: nothing is hidden and the popup says so.
+- Hosted classifier fails or hits its limit: the backend falls back to `lexicon-1`.
+- Summary fails: an error message instead of the summary; filtering keeps working.
+- No voice: the summary stays readable.
+
+## Known limits
+
+- The backend runs only on the demo machine at a fixed address.
+- One failing analysis request discards all results; partial results and retries are ZF-12.
+- The segmenter still returns wrapper blocks, which are only skipped when hiding (ZF-07 option B is waiting for a team decision).
