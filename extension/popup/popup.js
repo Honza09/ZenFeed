@@ -35,6 +35,14 @@
     failed: "Něco se nepovedlo. Nic se neskrylo.",
   };
 
+  // Why some blocks got no result (ZF-12). Those blocks stay visible.
+  const PARTIAL_REASONS = {
+    backend_unavailable: "server přestal odpovídat",
+    timeout: "server neodpověděl včas",
+    backend_error: "server vrátil chybu",
+    invalid_response: "server vrátil neúplnou odpověď",
+  };
+
   // Summary errors (ZF-30). Filtering keeps working in every one of them.
   const SUMMARY_MESSAGES = {
     summary_not_served: "Shrnutí server ZenFeed zatím neumí (připravuje se). Filtrování funguje dál.",
@@ -55,6 +63,7 @@
     showAll: document.getElementById("show-all"),
     rehide: document.getElementById("rehide"),
     hideAnyway: document.getElementById("hide-anyway"),
+    retryFailed: document.getElementById("retry-failed"),
     notes: document.getElementById("notes"),
     status: document.getElementById("status"),
     newContent: document.getElementById("new-content"),
@@ -98,6 +107,8 @@
   let busy = false;
   // Analysis waiting in review mode (page is one block): hidden only on "Přesto skrýt".
   let pendingReview = null;
+  // Blocks of the current extraction that got no result (ZF-12): visible, can be sent again.
+  let pendingRetry = null;
   let player = null;
   // The analysed page as it is now: its blocks, results and which are hidden.
   // The summary is built from it. Kept only while the popup is open.
@@ -114,7 +125,7 @@
 
   function setBusy(value) {
     busy = value;
-    for (const button of [elements.analyze, elements.showAll, elements.rehide, elements.hideAnyway, elements.summarize]) {
+    for (const button of [elements.analyze, elements.showAll, elements.rehide, elements.hideAnyway, elements.retryFailed, elements.summarize]) {
       button.disabled = value;
     }
   }
@@ -147,7 +158,29 @@
     elements.rehide.hidden = true;
     elements.hideAnyway.hidden = true;
     pendingReview = null;
+    setPendingRetry(null);
     setCurrent(null);
+  }
+
+  function setPendingRetry(state) {
+    pendingRetry = state && state.blocks.length ? state : null;
+    elements.retryFailed.hidden = pendingRetry === null;
+  }
+
+  // "Nevyhodnocené bloky: N (…)": the blocks without a result stay visible.
+  function partialMessage(analysis) {
+    if (!analysis.partial) {
+      return "";
+    }
+    const reason = PARTIAL_REASONS[analysis.error] || PARTIAL_REASONS.backend_error;
+    return ` Nevyhodnocené bloky: ${analysis.failedIds.length} (${reason}); zůstaly viditelné. `
+      + "Můžete je zkusit poslat znovu.";
+  }
+
+  // Blocks of the extraction in the same order, picked by ID.
+  function blocksById(blocks, ids) {
+    const wanted = new Set(ids);
+    return blocks.filter((block) => wanted.has(block.id));
   }
 
   function samePreferences(a, b) {
@@ -402,6 +435,7 @@
     elements.rehide.hidden = true;
     elements.notes.hidden = true;
     pendingReview = null;
+    setPendingRetry(null);
     setCurrent(null);
     showStatus("Hledám bloky na stránce…");
     try {
@@ -459,7 +493,13 @@
       }
       setHidden(hiding.hiddenIds);
       await rememberAnalysis(extraction.tabId, extraction.extractionId);
+      setPendingRetry(analysis.partial ? {
+        tabId: extraction.tabId,
+        extractionId: extraction.extractionId,
+        blocks: blocksById(extraction.blocks, analysis.failedIds),
+      } : null);
       showStatus(describeOutcome(extraction.blocks.length, analysis.results, hiding)
+        + partialMessage(analysis)
         + nothingLeftMessage(extraction.blocks, hiding.hiddenIds));
       await refreshStatus(extraction.tabId);
     } catch (error) {
@@ -512,6 +552,53 @@
     }
   }
 
+  // Sends only the blocks that got no result, for the same extraction and
+  // preferences. Blocks that are already decided are not touched.
+  async function handleRetryFailed() {
+    if (!pendingRetry || !current || current.extractionId !== pendingRetry.extractionId) {
+      setPendingRetry(null);
+      return;
+    }
+    setBusy(true);
+    try {
+      const { tabId, extractionId, blocks } = pendingRetry;
+      showStatus(`Posílám znovu nevyhodnocené bloky (${blocks.length})…`);
+      const analysis = await Client.analyzeBlocks(fetch, blocks, preferences);
+      if (!analysis.ok) {
+        const reason = PARTIAL_REASONS[analysis.error] || PARTIAL_REASONS.backend_error;
+        showStatus(`Ani tentokrát se to nepovedlo (${reason}). Nevyhodnocené bloky: ${blocks.length}; `
+          + "zůstaly viditelné. Ostatní bloky zůstaly, jak byly.", true);
+        return;
+      }
+      const applied = await Bootstrap.applyResults(chrome, tabId, extractionId, analysis.results);
+      if (!applied.ok) {
+        setPendingRetry(null);
+        showError(applied.error);
+        return;
+      }
+      const hiding = await Bootstrap.applyHiding(chrome, tabId, extractionId);
+      if (!hiding.ok) {
+        setPendingRetry(null);
+        showError(hiding.error);
+        return;
+      }
+      const answered = new Set(analysis.results.map((result) => result && result.id));
+      const results = [...current.results.filter((result) => !answered.has(result && result.id)), ...analysis.results];
+      const hiddenIds = [...new Set([...current.hiddenIds, ...hiding.hiddenIds])];
+      setCurrent({ ...current, results, hiddenIds });
+      setPendingRetry(analysis.partial ? { tabId, extractionId, blocks: blocksById(blocks, analysis.failedIds) } : null);
+      showStatus(`Dovyhodnocené bloky: ${blocks.length - analysis.failedIds.length}, nově skryté: ${hiding.hidden}.`
+        + partialMessage(analysis)
+        + nothingLeftMessage(current.blocks, hiddenIds));
+      await refreshStatus(tabId);
+    } catch (error) {
+      console.error("ZenFeed: retry failed", error);
+      showError("failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function handleShowAll() {
     setBusy(true);
     try {
@@ -522,6 +609,8 @@
         return;
       }
       setHidden([]);
+      // A retry would hide blocks again after the user asked to see everything.
+      setPendingRetry(null);
       showStatus(`Zobrazeno vše, obnovené bloky: ${shown.restored}. Stránka je v původním stavu.`);
       await refreshStatus(tabId);
     } catch (error) {
@@ -573,6 +662,7 @@
     elements.showAll.addEventListener("click", () => !busy && handleShowAll());
     elements.rehide.addEventListener("click", () => !busy && handleRehide());
     elements.hideAnyway.addEventListener("click", () => !busy && handleHideAnyway());
+    elements.retryFailed.addEventListener("click", () => !busy && handleRetryFailed());
     elements.summarize.addEventListener("click", () => !busy && handleSummarize());
     elements.play.addEventListener("click", () => player && player.play());
     elements.pause.addEventListener("click", () => player && player.pause());
