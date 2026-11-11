@@ -22,7 +22,7 @@ Nothing runs on a page until the user clicks the ZenFeed icon. The manifest asks
 | `content/hider.js` | Hides blocks behind a reversible "Skryto: … — Zobrazit" box ([`hiding.md`](hiding.md)) |
 | `content/content.js` | Message handlers between the popup and the page |
 
-Planned: the summary panel (ZF-30) and the voice player with its label (ZF-16, ZF-17).
+The popup also holds the summary panel ([`summary-panel.md`](summary-panel.md), ZF-30) and the voice player with its label (`popup/voice.js`, [`voice-player.md`](voice-player.md), ZF-16, ZF-17).
 
 ### Backend (`backend/app/`)
 
@@ -56,9 +56,9 @@ Planned: `/v1/summarize` (ZF-15) and the Gemini integration behind the same serv
 
 If nothing is visible after hiding, the popup does not ask for a summary.
 
-### Voice (planned, ZF-16, ZF-17)
+### Voice (ZF-16, ZF-17)
 
-The extension reads the summary with `speechSynthesis` in Chrome. There is no TTS endpoint. Only voices with `localService` set are used, so the summary text is not sent to a cloud voice. The voice is chosen by the summary language. The label names the character from ZF-26 (Švejk for Czech, Sherlock Holmes for English) and says it is a synthetic voice ([`hlas-a-oznaceni.md`](hlas-a-oznaceni.md)). Fallback C, without a character name, applies until the trademark check is done. If no voice is available, the summary stays readable.
+The extension reads the summary with `speechSynthesis` in Chrome. There is no TTS endpoint. Only voices with `localService` set are used, so the summary text is not sent to a cloud voice. The voice is chosen by the summary language. The label names the character from ZF-26 (Švejk for Czech, Sherlock Holmes for English) and says it is a synthetic voice ([`hlas-a-oznaceni.md`](hlas-a-oznaceni.md)). Fallback C, without a character name, applies until the trademark check is done; that is what the extension uses now ([`voice-player.md`](voice-player.md)). If no voice is available, the summary stays readable.
 
 ## What leaves the browser
 

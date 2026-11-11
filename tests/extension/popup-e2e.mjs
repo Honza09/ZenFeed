@@ -21,7 +21,10 @@
 // --summary (ZF-30) needs tests/extension/summary_stub.py on port 8000 instead
 // of the plain backend. Right after the first analysis it clicks "Shrnout" once
 // per stub mode, reads the panel, and checks the request the stub received:
-// it must contain no text of a block that is hidden on the page.
+// it must contain no text of a block that is hidden on the page. With the ok
+// answer it also drives the voice player (ZF-17): Přehrát, Pozastavit,
+// Pokračovat, Zastavit and Přehrát until the end. The test sets the utterance
+// volume to 0 so nothing is heard; the extension itself is not changed.
 //
 // --same-tab opens the first URL and navigates the same tab to the next ones,
 // clicking the action again after each navigation (Chrome drops the activeTab
@@ -235,6 +238,63 @@ async function hiddenTexts(cdp, tab) {
   }
 }
 
+const playerStateExpression = `(() => ({
+  shown: !document.getElementById("player").hidden,
+  label: document.getElementById("voice-label").textContent,
+  before: document.getElementById("voice-before").hidden ? "" : document.getElementById("voice-before").textContent,
+  status: document.getElementById("player-status").textContent,
+  error: document.getElementById("player-status").classList.contains("error"),
+  play: document.getElementById("play").hidden ? "" : document.getElementById("play").textContent,
+  pause: !document.getElementById("pause").hidden,
+  stop: !document.getElementById("stop").hidden,
+}))()`;
+
+// Mutes the voice for the test: every utterance gets volume 0.
+const muteExpression = `(() => {
+  const Original = globalThis.SpeechSynthesisUtterance;
+  if (Original && !Original.zenfeedMuted) {
+    globalThis.SpeechSynthesisUtterance = class extends Original {
+      constructor(text) { super(text); this.volume = 0; }
+    };
+    globalThis.SpeechSynthesisUtterance.zenfeedMuted = true;
+  }
+})()`;
+
+async function clickPlayer(cdp, sessionId, buttonId, waitMs = 1500) {
+  await evaluate(cdp, sessionId, `document.getElementById(${JSON.stringify(buttonId)}).click()`);
+  await sleep(waitMs);
+  return evaluate(cdp, sessionId, playerStateExpression);
+}
+
+async function checkPlayer(cdp, sessionId) {
+  await evaluate(cdp, sessionId, muteExpression);
+  const steps = { ready: await evaluate(cdp, sessionId, playerStateExpression) };
+  if (!steps.ready.shown) {
+    return steps;
+  }
+  steps.playing = await clickPlayer(cdp, sessionId, "play");
+  if (steps.playing.pause) {
+    steps.paused = await clickPlayer(cdp, sessionId, "pause", 500);
+    steps.resumed = await clickPlayer(cdp, sessionId, "play", 500);
+    steps.stopped = await clickPlayer(cdp, sessionId, "stop", 500);
+    await clickPlayer(cdp, sessionId, "play", 300);
+    for (let waited = 0; waited < 60000; waited += 500) {
+      const state = await evaluate(cdp, sessionId, playerStateExpression);
+      if (!state.pause && !state.stop) {
+        break;
+      }
+      await sleep(500);
+    }
+    steps.end = await evaluate(cdp, sessionId, playerStateExpression);
+    // A computer without a local voice: the player reports it, the summary stays.
+    await evaluate(cdp, sessionId, "speechSynthesis.getVoices = () => []");
+    steps.noVoice = await clickPlayer(cdp, sessionId, "play", 2600);
+    steps.noVoice.summaryStillShown = await evaluate(cdp, sessionId,
+      "!document.getElementById('summary-result').hidden && document.getElementById('summary-text').textContent.length > 0");
+  }
+  return steps;
+}
+
 async function checkSummary(cdp, sessionId, tab) {
   const panel = await evaluate(cdp, sessionId, summaryStateExpression);
   if (!panel.panel) {
@@ -256,6 +316,9 @@ async function checkSummary(cdp, sessionId, tab) {
         omitted: last ? last.omitted_categories : null,
         language: last ? last.language : null,
       };
+      if (modes.ok.result) {
+        modes.player = await checkPlayer(cdp, sessionId);
+      }
     }
   }
   // After the last error, "Zkusit znovu" must show a summary again.
@@ -567,6 +630,17 @@ function printSummary(summary) {
   for (const mode of STUB_MODES.slice(1)) {
     const state = modes[mode];
     console.log(`  summary ${mode}: ${state.status}${state.error ? " (error)" : ""}  result shown: ${state.result}  button: ${state.button}`);
+  }
+  if (modes.player) {
+    const player = modes.player;
+    console.log(`  player label: "${player.ready.label}" | before play: "${player.ready.before}"`);
+    for (const name of ["playing", "paused", "resumed", "stopped", "end", "noVoice"]) {
+      if (player[name]) {
+        const state = player[name];
+        console.log(`  player ${name}: ${state.status}${state.error ? " (error)" : ""}  buttons: ${[state.play, state.pause && "Pozastavit", state.stop && "Zastavit"].filter(Boolean).join(", ")}`
+          + (name === "noVoice" ? `  summary still shown: ${state.summaryStillShown}` : ""));
+      }
+    }
   }
   console.log(`  summary retry after error: result shown: ${modes.retry.result}  text: "${modes.retry.text.slice(0, 40)}"  button: ${modes.retry.button}`);
 }

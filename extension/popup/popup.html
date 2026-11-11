@@ -57,6 +57,17 @@
       <article id="summary-result" hidden>
         <p id="summary-label" class="summary-label"></p>
         <p id="summary-text" class="summary-text"></p>
+        <div id="player" class="player" hidden>
+          <p id="voice-label" class="voice-label"></p>
+          <p id="voice-before" class="hint"></p>
+          <div class="player-controls">
+            <button id="play" type="button">Přehrát</button>
+            <button id="pause" type="button" hidden>Pozastavit</button>
+            <button id="stop" type="button" hidden>Zastavit</button>
+          </div>
+          <p id="player-status" role="status" aria-live="polite"></p>
+          <p class="hint">Čte se jen shrnutí, ne text stránky. Přehrávání skončí, když tento panel zavřete.</p>
+        </div>
         <p class="summary-meta">
           <a id="summary-link" target="_blank" rel="noopener noreferrer"></a>
           <span id="summary-model"></span>
@@ -68,6 +79,7 @@
   <script src="analyze-client.js"></script>
   <script src="page-quality.js"></script>
   <script src="summary-client.js"></script>
+  <script src="voice.js"></script>
   <script src="bootstrap.js"></script>
   <script src="popup.js"></script>
 </body>

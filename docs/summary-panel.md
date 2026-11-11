@@ -2,7 +2,7 @@
 
 After an analysis the popup shows a **Shrnutí** section. It asks the backend for a summary of what is still visible on the page and shows it outside the page, labelled with the preferences that were applied and the topics that were left out (proposal §4.1 #3, §4.2 transparency).
 
-The backend side, `POST /v1/summarize`, is ZF-15 (Daniel). Its contract is frozen in `docs/API.md` (ZF-02), but the route is not served yet. Until it is, the panel says "Shrnutí server ZenFeed zatím neumí (připravuje se). Filtrování funguje dál." Once ZF-15 serves the route, the panel works without changes. The voice player and its "synthetic voice" label are ZF-16 and ZF-17.
+The backend side, `POST /v1/summarize`, is ZF-15 (Daniel). Its contract is frozen in `docs/API.md` (ZF-02), but the route is not served yet. Until it is, the panel says "Shrnutí server ZenFeed zatím neumí (připravuje se). Filtrování funguje dál." Once ZF-15 serves the route, the panel works without changes. The voice player and its "synthetic voice" label are in [`voice-player.md`](voice-player.md) (ZF-16, ZF-17).
 
 ## What is sent
 

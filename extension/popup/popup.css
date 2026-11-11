@@ -185,3 +185,36 @@ dd {
 .summary-meta a {
   color: #0b3d91;
 }
+
+.player {
+  margin: 0 0 8px;
+  padding: 8px;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+}
+
+.voice-label {
+  margin: 0 0 4px;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.player .hint {
+  margin: 4px 0 0;
+}
+
+.player-controls {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+#player-status {
+  min-height: 1.4em;
+  margin: 6px 0 0;
+  font-size: 12px;
+}
+
+#player-status.error {
+  color: #b42318;
+}
