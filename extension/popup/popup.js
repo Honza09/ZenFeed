@@ -1,7 +1,8 @@
-// ZenFeed popup (ZF-11, ZF-28, ZF-30).
+// ZenFeed popup (ZF-11, ZF-28, ZF-30, ZF-17).
 // Preferences (topic × tone), "Analyzovat", "Zobrazit vše", "Znovu skrýt" and
 // the number of hidden blocks, the edge states of ZF-28 (little text, a page
-// that is one block, nothing relevant left) and the summary panel of ZF-30.
+// that is one block, nothing relevant left), the summary panel of ZF-30 and
+// the voice player of ZF-17, which reads only the summary.
 // Nothing is read from or sent about the page until the user clicks
 // "Analyzovat" (or "Shrnout" for the summary). Page and summary text are shown
 // only via textContent, and no replacement content is ever offered.
@@ -9,7 +10,7 @@
 (() => {
   const {
     ZenFeedPreferences: Preferences, ZenFeedAnalyzeClient: Client, ZenFeedBootstrap: Bootstrap,
-    ZenFeedPageQuality: Quality, ZenFeedSummaryClient: Summary,
+    ZenFeedPageQuality: Quality, ZenFeedSummaryClient: Summary, ZenFeedVoice: Voice,
   } = globalThis;
 
   // Which extraction was hidden with which preferences, so "Znovu skrýt" after
@@ -70,12 +71,34 @@
     summaryText: document.getElementById("summary-text"),
     summaryLink: document.getElementById("summary-link"),
     summaryModel: document.getElementById("summary-model"),
+    player: document.getElementById("player"),
+    voiceLabel: document.getElementById("voice-label"),
+    voiceBefore: document.getElementById("voice-before"),
+    play: document.getElementById("play"),
+    pause: document.getElementById("pause"),
+    stop: document.getElementById("stop"),
+    playerStatus: document.getElementById("player-status"),
+  };
+
+  // Player messages (ZF-17). The summary stays readable in every error.
+  const PLAYER_MESSAGES = {
+    loading: "Připravuji hlas…",
+    paused: "Pozastaveno.",
+    ended: "Dočteno.",
+    stopped: "Zastaveno.",
+    not_supported: "Tento prohlížeč neumí číst text nahlas. Shrnutí si můžete přečíst.",
+    no_voice_cs: "V počítači není nainstalovaný český hlas, který běží bez internetu. Shrnutí si můžete přečíst.",
+    no_voice_en: "V počítači není nainstalovaný anglický hlas, který běží bez internetu. Shrnutí si můžete přečíst.",
+    speech_failed: "Přehrávání se nepovedlo. Shrnutí si můžete přečíst, nebo to zkuste znovu.",
+    not_allowed: "Prohlížeč přehrávání nedovolil. Klikněte na Zkusit znovu.",
+    empty: "Není co přehrát.",
   };
 
   let preferences = Preferences.defaults();
   let busy = false;
   // Analysis waiting in review mode (page is one block): hidden only on "Přesto skrýt".
   let pendingReview = null;
+  let player = null;
   // The analysed page as it is now: its blocks, results and which are hidden.
   // The summary is built from it. Kept only while the popup is open.
   let current = null;
@@ -223,6 +246,7 @@
   // Sets what is on the page now and resets the panel; a summary of an older
   // state must not stay on screen.
   function setCurrent(state) {
+    stopPlayer();
     current = state;
     elements.summaryPanel.hidden = state === null;
     elements.summaryResult.hidden = true;
@@ -264,12 +288,65 @@
     return parts.join(" ");
   }
 
+  // --- Voice player (ZF-17) ---
+
+  function stopPlayer() {
+    if (player) {
+      player.stop();
+      player = null;
+    }
+    elements.player.hidden = true;
+  }
+
+  function renderPlayer({ state, error, voice }, language) {
+    const playing = state === "speaking";
+    const active = playing || state === "paused" || state === "loading";
+    elements.pause.hidden = !playing;
+    elements.stop.hidden = !active;
+    elements.play.hidden = playing || state === "loading";
+    elements.play.textContent = {
+      paused: "Pokračovat", ended: "Přehrát znovu", error: "Zkusit znovu",
+    }[state] || "Přehrát";
+    // Shown before the first playback only (variant 3); the player label stays.
+    if (state !== "idle") {
+      elements.voiceBefore.hidden = true;
+    }
+    let text = PLAYER_MESSAGES[state] || "";
+    if (playing) {
+      text = `Přehrávám syntetickým hlasem (${voice}).`;
+    }
+    if (state === "error") {
+      text = PLAYER_MESSAGES[error === "no_voice" ? `no_voice_${language}` : error] || PLAYER_MESSAGES.speech_failed;
+    }
+    elements.playerStatus.textContent = text;
+    elements.playerStatus.classList.toggle("error", state === "error");
+  }
+
+  // Only the summary text is ever passed to the player, never page text.
+  function setupPlayer(summaryText, language) {
+    stopPlayer();
+    const labels = Voice.LABELS[language] || Voice.LABELS.cs;
+    elements.voiceLabel.textContent = labels.player;
+    elements.voiceBefore.textContent = labels.beforePlay;
+    elements.voiceBefore.hidden = false;
+    player = Voice.createPlayer({
+      synth: globalThis.speechSynthesis,
+      Utterance: globalThis.SpeechSynthesisUtterance,
+      text: summaryText,
+      language,
+      onState: (update) => renderPlayer(update, language),
+    });
+    renderPlayer({ state: "idle" }, language);
+    elements.player.hidden = false;
+  }
+
   async function handleSummarize() {
     if (!current) {
       return;
     }
     const language = elements.summaryLanguage.value;
     const built = Summary.buildRequest({ ...current, preferences, language });
+    stopPlayer();
     elements.summaryResult.hidden = true;
     if (!built) {
       // Contract: nothing visible, nothing to send (docs/API.md).
@@ -297,6 +374,7 @@
       } else {
         elements.summaryText.textContent = summary.summary;
         showSummaryStatus("");
+        setupPlayer(summary.summary, built.request.language);
       }
       elements.summaryText.hidden = !elements.summaryText.textContent;
       elements.summaryLink.href = current.url;
@@ -496,6 +574,9 @@
     elements.rehide.addEventListener("click", () => !busy && handleRehide());
     elements.hideAnyway.addEventListener("click", () => !busy && handleHideAnyway());
     elements.summarize.addEventListener("click", () => !busy && handleSummarize());
+    elements.play.addEventListener("click", () => player && player.play());
+    elements.pause.addEventListener("click", () => player && player.pause());
+    elements.stop.addEventListener("click", () => player && player.stop());
 
     const tabId = await Bootstrap.activeTabId(chrome);
     const status = await refreshStatus(tabId);
