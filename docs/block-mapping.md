@@ -65,9 +65,10 @@ In the content script:
 
 ```js
 const entry = globalThis.zenFeedGetBlock("zf-3");
-// null, or { block, containsBlocks, result }
+// null, or { block, containedIds, containsBlocks, result }
 //   block.elements      DOM elements of the block (never leave the content script)
-//   containsBlocks      how many other blocks are inside this block's elements
+//   containedIds        IDs of the blocks inside this block's elements or sharing an element with it (ZF-30)
+//   containsBlocks      containedIds.length
 //   result              null until a result was applied, then the fields above
 ```
 

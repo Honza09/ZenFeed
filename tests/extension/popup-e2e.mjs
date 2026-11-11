@@ -16,6 +16,12 @@
 //   node tests/extension/popup-e2e.mjs --backend=http://127.0.0.1:8000 <url> ...
 //   BROWSER_PATH=/path/to/chromium node tests/extension/popup-e2e.mjs <url>
 //   ZENFEED_PROFILE=/tmp/zf-profile node tests/extension/popup-e2e.mjs <url>   # keep the browser profile
+//   node tests/extension/popup-e2e.mjs --summary <url> ...   # summary panel, needs the stub
+//
+// --summary (ZF-30) needs tests/extension/summary_stub.py on port 8000 instead
+// of the plain backend. Right after the first analysis it clicks "Shrnout" once
+// per stub mode, reads the panel, and checks the request the stub received:
+// it must contain no text of a block that is hidden on the page.
 //
 // --same-tab opens the first URL and navigates the same tab to the next ones,
 // clicking the action again after each navigation (Chrome drops the activeTab
@@ -57,6 +63,9 @@ const ALL_PREFERENCES = {
 
 const args = process.argv.slice(2);
 const sameTab = args.includes("--same-tab");
+const withSummary = args.includes("--summary");
+const STUB_URL = "http://127.0.0.1:8000";
+const STUB_MODES = ["ok", "insufficient", "no_relevant", "not_served", "unavailable", "rate_limited", "timeout"];
 const backend = args.find((arg) => arg.startsWith("--backend="))?.slice("--backend=".length);
 const urls = args.filter((arg) => !arg.startsWith("--"));
 if (!urls.length) {
@@ -196,10 +205,72 @@ async function turnPreferencesOn(cdp, sessionId) {
   return onAtOpen;
 }
 
-async function runPopupFlow(cdp, sessionId) {
+const summaryStateExpression = `(() => ({
+  panel: !document.getElementById("summary-panel").hidden,
+  button: document.getElementById("summarize").textContent,
+  status: document.getElementById("summary-status").textContent,
+  error: document.getElementById("summary-status").classList.contains("error"),
+  result: !document.getElementById("summary-result").hidden,
+  label: document.getElementById("summary-label").textContent,
+  text: document.getElementById("summary-text").textContent,
+  link: document.getElementById("summary-link").href,
+  model: document.getElementById("summary-model").textContent,
+}))()`;
+
+async function stub(path, body) {
+  const response = await fetch(`${STUB_URL}${path}`, body === undefined ? {} : {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
+  });
+  return response.json();
+}
+
+// Text of every element ZenFeed hid, read in the page itself.
+async function hiddenTexts(cdp, tab) {
+  const { sessionId } = await cdp.send("Target.attachToTarget", { targetId: tab.pageId, flatten: true });
+  try {
+    return await evaluate(cdp, sessionId, `[...document.querySelectorAll("[data-zenfeed-hidden]")]
+      .map((element) => element.textContent.replace(/\\s+/g, "")).filter((text) => text.length >= 20)`);
+  } finally {
+    await cdp.send("Target.detachFromTarget", { sessionId });
+  }
+}
+
+async function checkSummary(cdp, sessionId, tab) {
+  const panel = await evaluate(cdp, sessionId, summaryStateExpression);
+  if (!panel.panel) {
+    return { panel: false };
+  }
+  const hidden = await hiddenTexts(cdp, tab);
+  const modes = {};
+  let privacy = null;
+  for (const mode of STUB_MODES) {
+    await stub("/__stub/mode", { mode });
+    modes[mode] = await clickAndRead(cdp, sessionId, "summarize").then(() => evaluate(cdp, sessionId, summaryStateExpression));
+    if (mode === "ok") {
+      const { last } = await stub("/__stub/last");
+      const sent = last ? last.blocks.map((block) => block.text.replace(/\s+/g, "")) : [];
+      privacy = {
+        hiddenElements: hidden.length,
+        sentBlocks: sent.length,
+        leaked: hidden.filter((text) => sent.some((block) => block.includes(text.slice(0, 40)))).length,
+        omitted: last ? last.omitted_categories : null,
+        language: last ? last.language : null,
+      };
+    }
+  }
+  // After the last error, "Zkusit znovu" must show a summary again.
+  await stub("/__stub/mode", { mode: "ok" });
+  modes.retry = await clickAndRead(cdp, sessionId, "summarize").then(() => evaluate(cdp, sessionId, summaryStateExpression));
+  return { panel: true, privacy, modes };
+}
+
+async function runPopupFlow(cdp, sessionId, tab) {
   const preferencesAtOpen = await turnPreferencesOn(cdp, sessionId);
   const first = await clickAndRead(cdp, sessionId);
   const steps = { preferencesAtOpen, first };
+  if (withSummary && !first.error) {
+    steps.summary = await checkSummary(cdp, sessionId, tab);
+  }
   // Review mode (ZF-28): the page is one block; hide it only on explicit request.
   let canShowAll = first.showAll;
   if (first.hideAnyway) {
@@ -234,7 +305,7 @@ async function openPopupAndCheck(cdp, tab) {
   }
   try {
     const { sessionId } = await cdp.send("Target.attachToTarget", { targetId: popup.targetId, flatten: true });
-    const steps = await runPopupFlow(cdp, sessionId);
+    const steps = await runPopupFlow(cdp, sessionId, tab);
     const { first, second } = steps;
     const roundTrip = backend && !first.error ? await checkRoundTrip(cdp, sessionId, tab) : null;
     return { first, steps, secondMatches: JSON.stringify(first) === JSON.stringify(second), roundTrip };
@@ -483,6 +554,23 @@ function printRoundTrip(roundTrip) {
   }
 }
 
+function printSummary(summary) {
+  if (!summary.panel) {
+    console.log("  summary panel: not shown");
+    return;
+  }
+  const { privacy, modes } = summary;
+  console.log(`  summary request: blocks sent ${privacy.sentBlocks}, hidden elements on page ${privacy.hiddenElements}, `
+    + `hidden text found in request ${privacy.leaked}, omitted ${JSON.stringify(privacy.omitted)}, language ${privacy.language}`);
+  const ok = modes.ok;
+  console.log(`  summary ok: label "${ok.label}" | text "${ok.text.slice(0, 80)}" | link ${ok.link} | ${ok.model}`);
+  for (const mode of STUB_MODES.slice(1)) {
+    const state = modes[mode];
+    console.log(`  summary ${mode}: ${state.status}${state.error ? " (error)" : ""}  result shown: ${state.result}  button: ${state.button}`);
+  }
+  console.log(`  summary retry after error: result shown: ${modes.retry.result}  text: "${modes.retry.text.slice(0, 40)}"  button: ${modes.retry.button}`);
+}
+
 function printResult(url, { first, steps, secondMatches, roundTrip }) {
   console.log(`\n=== ${url}`);
   console.log(`status: ${first.status}${first.error ? " (error)" : ""}`);
@@ -491,6 +579,9 @@ function printResult(url, { first, steps, secondMatches, roundTrip }) {
     + `elements from page text: ${first.elementsInSummary}`);
   if (first.notes.length) {
     console.log(`  notes: ${first.notes.join(" | ")}`);
+  }
+  if (steps.summary) {
+    printSummary(steps.summary);
   }
   for (const [name, label] of [["hiddenAnyway", "Přesto skrýt"], ["shown", "Zobrazit vše"], ["rehidden", "Znovu skrýt"], ["shownAgain", "Zobrazit vše"], ["final", "Zobrazit vše (end)"]]) {
     const step = steps[name];

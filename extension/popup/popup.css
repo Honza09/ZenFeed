@@ -124,3 +124,64 @@ dd {
   margin: 0;
   overflow-wrap: anywhere;
 }
+
+.summary-panel {
+  margin: 14px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid #d0d7de;
+}
+
+.summary-panel h2 {
+  margin: 0 0 4px;
+  font-size: 15px;
+}
+
+.summary-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.summary-controls select {
+  font: inherit;
+  padding: 6px;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  background: #fff;
+}
+
+#summary-status {
+  min-height: 1.4em;
+  margin: 8px 0 0;
+}
+
+#summary-status.error {
+  color: #b42318;
+}
+
+.summary-label {
+  margin: 8px 0;
+  padding: 6px 8px;
+  border-left: 3px solid #1f6feb;
+  background: #f6f8fa;
+  font-size: 12px;
+}
+
+.summary-text {
+  margin: 0 0 8px;
+  white-space: pre-line;
+}
+
+.summary-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 8px;
+  margin: 0;
+  color: #59636e;
+  font-size: 12px;
+}
+
+.summary-meta a {
+  color: #0b3d91;
+}

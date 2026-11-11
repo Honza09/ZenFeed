@@ -11,7 +11,7 @@ A block is hidden only if all of these hold. Otherwise it stays visible and is c
 1. It has a result in the current extraction (`noResult`).
 2. The result is `recommended_action: "hide"`. `review` and `show` never hide; uncertainty never hides (`notHide`).
 3. The result names a reason: a topic from `docs/kategorie-mvp.md` other than `jine`, or the tone `toxicky` (`notHide`).
-4. The block's element does not contain other blocks, `containsBlocks === 0` (`wrapper`). The segmenter sometimes returns a page-wide wrapper as a short block. On P01 and P05 the backend recommended hiding such wrappers (2 and 3 of them); hiding one would have hidden most of the page.
+4. The block's element neither contains other blocks nor shares an element with another block, `containsBlocks === 0` (`wrapper`; shared elements count since ZF-30, see [`summary-panel.md`](summary-panel.md)). The segmenter sometimes returns a page-wide wrapper as a short block. On P01 and P05 the backend recommended hiding such wrappers (2 and 3 of them); hiding one would have hidden most of the page.
 5. All its elements are still in the page (`detached`).
 6. None of its elements is a table cell (`td`, `th`) or another table part (`unsupported`). A cell cannot be hidden without breaking the table. Table rows (`tr`) can be hidden.
 7. The user has not clicked "Zobrazit" on it since the last extraction (`revealed`).

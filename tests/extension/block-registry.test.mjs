@@ -164,7 +164,25 @@ test("a block whose element wraps other blocks is counted", () => {
   const wrapper = { id: "zf-w", kind: "other", title: null, text: "Menu", elements: [fakeElement(inner.map((block) => block.elements[0]))] };
   registry.replace([wrapper, ...inner]);
   assert.equal(registry.get("zf-w").containsBlocks, 3);
+  assert.deepEqual(plain(registry.get("zf-w").containedIds), ["zf-0", "zf-1", "zf-2"]);
+  assert.deepEqual(plain(registry.get("zf-0").containedIds), []);
   assert.equal(registry.get("zf-0").containsBlocks, 0);
+});
+
+test("blocks that share an element count as overlapping both ways", () => {
+  const registry = newRegistry();
+  // One long paragraph split into two blocks with the same element (seen on
+  // en.wikipedia Rosetta Stone, zf-35 and zf-36).
+  const paragraph = fakeElement();
+  const blocks = [
+    { id: "zf-35", kind: "section", title: null, text: "Start of the paragraph", elements: [fakeElement(), paragraph] },
+    { id: "zf-36", kind: "section", title: null, text: "rest of the paragraph", elements: [paragraph] },
+    { id: "zf-37", kind: "section", title: null, text: "Next section", elements: [fakeElement()] },
+  ];
+  registry.replace(blocks);
+  assert.deepEqual(plain(registry.get("zf-35").containedIds), ["zf-36"]);
+  assert.deepEqual(plain(registry.get("zf-36").containedIds), ["zf-35"]);
+  assert.equal(registry.get("zf-37").containsBlocks, 0);
 });
 
 test("only the known result fields are kept", () => {
