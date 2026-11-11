@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <title>ZenFeed privacy fixture (ZF-29)</title>
+</head>
+<body>
+  <!-- Every element with SECRET must never become a block (ZF-29). -->
+  <header>
+    <p>SECRET-ACCOUNT Přihlášen jako jan.novak@example.com, poslední přihlášení dnes v 8:15 z Brna.</p>
+  </header>
+  <nav><p>SECRET-NAV Můj účet, Moje objednávky, Nastavení profilu a odhlášení z aplikace.</p></nav>
+  <main>
+    <article id="visible">
+      <h2>Zprávy dne</h2>
+      <p>VISIBLE-ARTICLE Město otevřelo novou knihovnu s čítárnou a dětským koutkem pro všechny obyvatele.</p>
+    </article>
+    <form>
+      <p>SECRET-FORM Vyplňte své rodné číslo a číslo účtu, abychom mohli zpracovat žádost o půjčku.</p>
+      <input type="password" value="SECRET-PASSWORD-VALUE">
+      <textarea>SECRET-TEXTAREA Rozepsaná zpráva, kterou uživatel ještě neodeslal kamarádovi.</textarea>
+    </form>
+    <div contenteditable="true"><p>SECRET-EDITABLE Koncept komentáře, který uživatel právě píše do editoru stránky.</p></div>
+    <section data-private><p>SECRET-PRIVATE Zůstatek na účtu 48 210 Kč, poslední platba nájemné 12 500 Kč.</p></section>
+    <section data-hj-suppress><p>SECRET-HOTJAR Doručovací adresa Lipová 12, Brno, telefon 777 123 456.</p></section>
+    <section data-clarity-mask="True"><p>SECRET-CLARITY Číslo pojistky a výše plnění, které vidí jen přihlášený klient.</p></section>
+    <section class="fs-exclude"><p>SECRET-FULLSTORY Diagnóza a termín další kontroly u praktického lékaře v pondělí.</p></section>
+    <section class="note ph-no-capture"><p>SECRET-POSTHOG Seznam soukromých zpráv ve schránce uživatele s náhledem obsahu.</p></section>
+    <div role="dialog"><p>SECRET-DIALOG Ověřovací kód z SMS zadejte do pole níže a potvrďte transakci.</p></div>
+    <div hidden><p>SECRET-HIDDEN Skrytý obsah, který stránka uživateli nezobrazuje vůbec nikde.</p></div>
+    <div aria-hidden="true"><p>SECRET-ARIA Obsah skrytý pro čtečky obrazovky, který není součástí stránky.</p></div>
+    <iframe srcdoc="<p>SECRET-IFRAME Vložená stránka třetí strany s přihlášeným uživatelem a jeho daty.</p>"></iframe>
+    <section data-clarity-mask="false"><p>VISIBLE-UNMASKED Clarity s hodnotou false text nemaskuje, takže zůstává běžným obsahem.</p></section>
+  </main>
+</body>
+</html>

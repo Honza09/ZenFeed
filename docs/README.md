@@ -59,6 +59,7 @@ Adapt this structure to match the actual repository as development progresses.
 - [Edge states (ZF-28)](edge-states.md)
 - [Summary panel (ZF-30)](summary-panel.md)
 - [Voice and player (ZF-16, ZF-17)](voice-player.md)
+- [Privacy and audit (ZF-29)](privacy.md)
 - [Roadmap](ROADMAP.md)
 - [Product definition and MVP scope (v0.2)](mvp.md) — authoritative; the sections above are generic drafts
 - [Backlog](backlog/README.md)
