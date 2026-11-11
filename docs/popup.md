@@ -112,7 +112,7 @@ Not tested: desktop Google Chrome with a real click; a slow backend close to the
 
 ## Test results ZF-12 (11 Nov 2026)
 
-Automated: `node --test tests/extension/*.test.mjs` 92 of 92 passed (Node 25), `node --check` OK on all extension and test scripts, `check_extension.py` manifest OK. `analyze-client.test.mjs` covers: retry after a `5xx`, timeout and network error, no retry for `4xx` and invalid bodies, no further requests when the server is down, partial results when the second of three requests fails, and a block missing from a `200` answer.
+Automated: `node --test tests/extension/*.test.mjs` 92 of 92 passed (Node 23.7), `node --check` OK on all extension and test scripts, `check_extension.py` manifest OK. `analyze-client.test.mjs` covers: retry after a `5xx`, timeout and network error, no retry for `4xx` and invalid bodies, no further requests when the server is down, partial results when the second of three requests fails, and a block missing from a `200` answer.
 
 `popup-e2e.mjs` was not run (no Brave on the machine, and the backend needs Python 3.11+). Instead the real popup (`popup.html` with its scripts unchanged) was loaded in a browser with a fake `chrome` API and a fake `/v1/analyze` (250 blocks, every fifth one `hide`, the request with blocks `zf-100`…`zf-199` answering `500`):
 
