@@ -32,6 +32,13 @@
     "toolbar", "dialog", "alertdialog", "tablist", "button", "form",
   ]);
 
+  // Parts the site itself marks as private for session-recording tools
+  // (LogRocket, Hotjar, Microsoft Clarity, FullStory, PostHog). ZF-29.
+  const PRIVATE_SELECTOR = [
+    "[data-private]", "[data-hj-suppress]", "[data-clarity-mask='true' i]",
+    ".fs-exclude", ".fs-mask", ".ph-no-capture",
+  ].join(",");
+
   // Inline elements do not end a paragraph.
   const INLINE_TAGS = new Set([
     "A", "ABBR", "B", "BDI", "BDO", "BR", "CITE", "CODE", "DATA", "DFN", "EM",
@@ -69,6 +76,9 @@
     }
     // Text the user is writing (comment boxes, rich-text editors) is not page content (ZF-09).
     if (element.isContentEditable) {
+      return true;
+    }
+    if (element.matches(PRIVATE_SELECTOR)) {
       return true;
     }
     // The page header and footer are excluded, but not the ones inside an article.

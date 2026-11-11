@@ -2,6 +2,8 @@
 // the real content scripts (segmenter, registry, hider, content.js) with a
 // stub of chrome.runtime, and drives them through their messages:
 // extract → apply-results → apply-hiding → "Zobrazit" / "Proč?" → show-all.
+// privacy.html (ZF-29) only extracts and checks that no form, editable, hidden
+// or site-marked private text becomes a block.
 // Exits with code 1 if a check fails. No dependencies, no extension loading.
 //
 // Usage (from the repository root, Node.js 22+):
@@ -20,7 +22,6 @@ const DEFAULT_CHROME = {
   win32: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
 };
 const PORT = 9335;
-const FIXTURES = ["hider.html", "hider-csp.html"];
 
 const here = dirname(fileURLToPath(import.meta.url));
 const read = (path) => readFileSync(join(here, "../../extension", path), "utf8");
@@ -190,6 +191,28 @@ const scenario = `(async () => {
   return { checks, counts: hiding };
 })()`;
 
+// ZF-29: what the content script hands to the popup, which sends it unchanged.
+const privacyScenario = `(async () => {
+  const checks = [];
+  const check = (name, ok, detail = "") => checks.push({ name, ok: Boolean(ok), detail: String(detail) });
+  const send = (message) => new Promise((resolve) => globalThis.__zenfeedListener(message, {}, resolve));
+  const extraction = await send({ type: "zenfeed/extract-blocks" });
+  check("extraction ok", extraction.ok, JSON.stringify(extraction.error || ""));
+  const texts = extraction.blocks.map((block) => (block.title || "") + " " + block.text).join("\\n");
+  const leaked = texts.match(/SECRET-[A-Z]+/g) || [];
+  check("no form, editable, hidden, header, dialog or private-marked text in any block", leaked.length === 0, leaked.join(", "));
+  check("ordinary article is a block", texts.includes("VISIBLE-ARTICLE"));
+  check("data-clarity-mask=false is not treated as private", texts.includes("VISIBLE-UNMASKED"));
+  const keys = [...new Set(extraction.blocks.flatMap((block) => Object.keys(block)))].sort();
+  check("blocks carry only id, kind, title, text (and contains)",
+    keys.every((key) => ["contains", "id", "kind", "text", "title"].includes(key)), keys.join(","));
+  return { checks, counts: { blocks: extraction.blocks.length } };
+})()`;
+
+const FIXTURES = [
+  ["hider.html", scenario], ["hider-csp.html", scenario], ["privacy.html", privacyScenario],
+];
+
 async function waitForBrowser() {
   for (let attempt = 0; attempt < 50; attempt++) {
     try {
@@ -234,7 +257,7 @@ async function connect(webSocketUrl) {
   };
 }
 
-async function runFixture(cdp, fixture) {
+async function runFixture(cdp, fixture, fixtureScenario) {
   const url = pathToFileURL(join(here, "fixtures", fixture)).href;
   const { result: { targetId } } = await cdp.send("Target.createTarget", { url: "about:blank" });
   const { result: { sessionId } } = await cdp.send("Target.attachToTarget", { targetId, flatten: true });
@@ -254,7 +277,7 @@ async function runFixture(cdp, fixture) {
       throw new Error(injected.result.exceptionDetails.exception?.description || "injection failed");
     }
     const evaluated = await cdp.send("Runtime.evaluate", {
-      expression: scenario, awaitPromise: true, returnByValue: true,
+      expression: fixtureScenario, awaitPromise: true, returnByValue: true,
     }, sessionId);
     if (evaluated.result?.exceptionDetails) {
       throw new Error(evaluated.result.exceptionDetails.exception?.description || "scenario failed");
@@ -278,9 +301,9 @@ let failed = 0;
 let cdp;
 try {
   cdp = await connect(await waitForBrowser());
-  for (const fixture of FIXTURES) {
-    const { checks, counts } = await runFixture(cdp, fixture);
-    console.log(`\n=== ${fixture}  hiding counts: ${JSON.stringify(counts)}`);
+  for (const [fixture, fixtureScenario] of FIXTURES) {
+    const { checks, counts } = await runFixture(cdp, fixture, fixtureScenario);
+    console.log(`\n=== ${fixture}  counts: ${JSON.stringify(counts)}`);
     for (const { name, ok, detail } of checks) {
       console.log(`${ok ? "PASS" : "FAIL"}  ${name}${!ok && detail ? `  (${detail})` : ""}`);
       if (!ok) {
