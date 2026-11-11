@@ -57,6 +57,7 @@ Adapt this structure to match the actual repository as development progresses.
 - [Hiding blocks and restoring (ZF-10)](hiding.md)
 - [Popup and preferences (ZF-11)](popup.md)
 - [Edge states (ZF-28)](edge-states.md)
+- [Summary panel (ZF-30)](summary-panel.md)
 - [Roadmap](ROADMAP.md)
 - [Product definition and MVP scope (v0.2)](mvp.md) — authoritative; the sections above are generic drafts
 - [Backlog](backlog/README.md)

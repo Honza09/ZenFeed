@@ -45,11 +45,13 @@
       && response.ok === true
       && typeof response.extractionId === "string" && response.extractionId.length > 0
       && Array.isArray(response.blocks)
-      && response.blocks.every((block) => block && typeof block.id === "string" && typeof block.text === "string"),
+      && response.blocks.every((block) => block && typeof block.id === "string" && typeof block.text === "string"
+        && (block.contains === undefined
+          || (Array.isArray(block.contains) && block.contains.every((id) => typeof id === "string")))),
     );
   }
 
-  // Returns { ok: true, tabId, extractionId, title, blocks, stats } or { ok: false, error }.
+  // Returns { ok: true, tabId, extractionId, url, lang, title, blocks, stats } or { ok: false, error }.
   // Errors: no_tab, no_access, unsupported_page, injection_failed, extraction_failed.
   async function extractActiveTab(chromeApi) {
     const [tab] = await chromeApi.tabs.query({ active: true, currentWindow: true });
@@ -91,6 +93,9 @@
       ok: true,
       tabId: tab.id,
       extractionId: response.extractionId,
+      // The tab URL was checked by isSupportedUrl above; the page cannot change it.
+      url: tab.url,
+      lang: typeof response.lang === "string" ? response.lang.slice(0, 35) : null,
       title: response.title || null,
       blocks: response.blocks,
       stats: response.stats || null,

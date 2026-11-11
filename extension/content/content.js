@@ -60,7 +60,11 @@
       extractionId,
       title: document.title || null,
       url: location.href,
-      blocks: globalThis.ZenFeedSegmenter.serializeBlocks(blocks),
+      // Page language, used as the default summary language (ZF-30).
+      lang: document.documentElement.lang || null,
+      // contains: IDs of blocks inside this one; the summary needs them (ZF-30).
+      blocks: globalThis.ZenFeedSegmenter.serializeBlocks(blocks)
+        .map((block) => ({ ...block, contains: registry.get(block.id).containedIds })),
       stats,
     };
   }

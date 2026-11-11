@@ -111,7 +111,7 @@ Request:
 }
 ```
 
-- `blocks`: only the blocks that are visible after hiding, with the same rules as `/v1/analyze`. Hidden text is not sent. At least one block is required; an empty list is a 422.
+- `blocks`: only the blocks that are visible after hiding, with the same rules as `/v1/analyze`. Hidden text is not sent. The extension also leaves out a visible block that wraps or shares an element with a hidden one, because its text includes the hidden text ([`summary-panel.md`](summary-panel.md)). At least one block is required; an empty list is a 422.
 - `preferences`: the switches that were applied, same object as in `/v1/analyze`.
 - `omitted_categories`: the topics that were actually hidden on the page, taken by the extension from the `/v1/analyze` results. Unique values from `valka`, `politicke_konflikty`, `umrti`, `katastrofy`, `nasili`; default `[]`. Each one must be switched on in `preferences`, otherwise 422. Blocks hidden only for their tone are covered by `preferences.toxicky`.
 - `language`: `cs` or `en`, default `cs`.

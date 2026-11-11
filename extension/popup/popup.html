@@ -41,10 +41,33 @@
       <dt>Skryto</dt>
       <dd id="hidden-count"></dd>
     </dl>
+
+    <section id="summary-panel" class="summary-panel" aria-labelledby="summary-heading" hidden>
+      <h2 id="summary-heading">Shrnutí</h2>
+      <p class="hint">Na server ZenFeed se pošle jen text bloků, které na stránce zůstaly viditelné. Skrytý obsah ne.</p>
+      <div class="summary-controls">
+        <label for="summary-language">Jazyk</label>
+        <select id="summary-language">
+          <option value="cs">Čeština</option>
+          <option value="en">English</option>
+        </select>
+        <button id="summarize" type="button">Shrnout viditelný obsah</button>
+      </div>
+      <p id="summary-status" role="status" aria-live="polite"></p>
+      <article id="summary-result" hidden>
+        <p id="summary-label" class="summary-label"></p>
+        <p id="summary-text" class="summary-text"></p>
+        <p class="summary-meta">
+          <a id="summary-link" target="_blank" rel="noopener noreferrer"></a>
+          <span id="summary-model"></span>
+        </p>
+      </article>
+    </section>
   </main>
   <script src="preferences.js"></script>
   <script src="analyze-client.js"></script>
   <script src="page-quality.js"></script>
+  <script src="summary-client.js"></script>
   <script src="bootstrap.js"></script>
   <script src="popup.js"></script>
 </body>

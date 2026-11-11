@@ -64,23 +64,27 @@
     return block.elements.length > 0 && block.elements.every((element) => element.isConnected);
   }
 
-  // How many other blocks lie inside this block's elements. The segmenter can
-  // return a wrapper (e.g. a page-wide <div>) as a short block; hiding it would
-  // hide the blocks inside too, so ZF-10 must not hide a block with a count > 0.
-  function countContainedBlocks(block, blocks) {
-    let count = 0;
+  // IDs of the other blocks that lie inside this block's elements or share an
+  // element with it. The segmenter can return a wrapper (e.g. a page-wide
+  // <div>) as a short block, and it can split one long paragraph into two
+  // blocks with the same element. Hiding such a block would hide (part of) the
+  // others too, so ZF-10 must not hide it. Its text can also include theirs, so
+  // the summary (ZF-30) leaves it out when one of those blocks is hidden.
+  function containedBlockIds(block, blocks) {
+    const ids = [];
     for (const other of blocks) {
       if (other === block) {
         continue;
       }
+      // contains() is true for the element itself, so a shared element counts too.
       const inside = other.elements.some((otherElement) => block.elements.some(
-        (element) => element !== otherElement && element.contains(otherElement),
+        (element) => element.contains(otherElement),
       ));
       if (inside) {
-        count += 1;
+        ids.push(other.id);
       }
     }
-    return count;
+    return ids;
   }
 
   function defaultExtractionId() {
@@ -94,10 +98,10 @@
     // Replaces the previous extraction; its results are dropped with it.
     function replace(blocks) {
       extractionId = newExtractionId();
-      entries = new Map(blocks.map((block) => [
-        block.id,
-        { block, containsBlocks: countContainedBlocks(block, blocks), result: null },
-      ]));
+      entries = new Map(blocks.map((block) => {
+        const containedIds = containedBlockIds(block, blocks);
+        return [block.id, { block, containedIds, containsBlocks: containedIds.length, result: null }];
+      }));
       return extractionId;
     }
 

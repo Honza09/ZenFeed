@@ -1,14 +1,15 @@
-// ZenFeed popup (ZF-11, ZF-28).
+// ZenFeed popup (ZF-11, ZF-28, ZF-30).
 // Preferences (topic × tone), "Analyzovat", "Zobrazit vše", "Znovu skrýt" and
-// the number of hidden blocks, plus the edge states of ZF-28 (little text, a
-// page that is one block, nothing relevant left). Nothing is read from or sent
-// about the page until the user clicks "Analyzovat". Page text is shown only
-// via textContent, and no replacement content is ever offered.
+// the number of hidden blocks, the edge states of ZF-28 (little text, a page
+// that is one block, nothing relevant left) and the summary panel of ZF-30.
+// Nothing is read from or sent about the page until the user clicks
+// "Analyzovat" (or "Shrnout" for the summary). Page and summary text are shown
+// only via textContent, and no replacement content is ever offered.
 
 (() => {
   const {
     ZenFeedPreferences: Preferences, ZenFeedAnalyzeClient: Client, ZenFeedBootstrap: Bootstrap,
-    ZenFeedPageQuality: Quality,
+    ZenFeedPageQuality: Quality, ZenFeedSummaryClient: Summary,
   } = globalThis;
 
   // Which extraction was hidden with which preferences, so "Znovu skrýt" after
@@ -33,6 +34,18 @@
     failed: "Něco se nepovedlo. Nic se neskrylo.",
   };
 
+  // Summary errors (ZF-30). Filtering keeps working in every one of them.
+  const SUMMARY_MESSAGES = {
+    summary_not_served: "Shrnutí server ZenFeed zatím neumí (připravuje se). Filtrování funguje dál.",
+    summary_unavailable: "Shrnutí teď není k dispozici (model není nastavený nebo neodpovídá). Filtrování funguje dál.",
+    rate_limited: "Bezplatný limit pro shrnutí je vyčerpaný. Zkuste to později. Filtrování funguje dál.",
+    timeout: "Shrnutí nedorazilo včas. Zkuste to znovu.",
+    backend_unavailable: "Server ZenFeed neběží. Spusťte ho a zkuste to znovu.",
+    backend_error: "Server ZenFeed vrátil při shrnutí chybu. Zkuste to znovu.",
+    invalid_response: "Server ZenFeed vrátil neplatné shrnutí, proto se nezobrazuje. Zkuste to znovu.",
+    failed: "Shrnutí se nepovedlo. Zkuste to znovu.",
+  };
+
   const elements = {
     form: document.getElementById("preferences"),
     topics: document.getElementById("topics"),
@@ -48,12 +61,24 @@
     pageTitle: document.getElementById("page-title"),
     blockCount: document.getElementById("block-count"),
     hiddenCount: document.getElementById("hidden-count"),
+    summaryPanel: document.getElementById("summary-panel"),
+    summaryLanguage: document.getElementById("summary-language"),
+    summarize: document.getElementById("summarize"),
+    summaryStatus: document.getElementById("summary-status"),
+    summaryResult: document.getElementById("summary-result"),
+    summaryLabel: document.getElementById("summary-label"),
+    summaryText: document.getElementById("summary-text"),
+    summaryLink: document.getElementById("summary-link"),
+    summaryModel: document.getElementById("summary-model"),
   };
 
   let preferences = Preferences.defaults();
   let busy = false;
   // Analysis waiting in review mode (page is one block): hidden only on "Přesto skrýt".
   let pendingReview = null;
+  // The analysed page as it is now: its blocks, results and which are hidden.
+  // The summary is built from it. Kept only while the popup is open.
+  let current = null;
 
   function showStatus(text, isError = false) {
     elements.status.textContent = text;
@@ -66,7 +91,7 @@
 
   function setBusy(value) {
     busy = value;
-    for (const button of [elements.analyze, elements.showAll, elements.rehide, elements.hideAnyway]) {
+    for (const button of [elements.analyze, elements.showAll, elements.rehide, elements.hideAnyway, elements.summarize]) {
       button.disabled = value;
     }
   }
@@ -99,6 +124,7 @@
     elements.rehide.hidden = true;
     elements.hideAnyway.hidden = true;
     pendingReview = null;
+    setCurrent(null);
   }
 
   function samePreferences(a, b) {
@@ -187,6 +213,105 @@
     return parts.join(" ");
   }
 
+  // --- Summary panel (ZF-30) ---
+
+  function showSummaryStatus(text, isError = false) {
+    elements.summaryStatus.textContent = text;
+    elements.summaryStatus.classList.toggle("error", isError);
+  }
+
+  // Sets what is on the page now and resets the panel; a summary of an older
+  // state must not stay on screen.
+  function setCurrent(state) {
+    current = state;
+    elements.summaryPanel.hidden = state === null;
+    elements.summaryResult.hidden = true;
+    elements.summarize.textContent = "Shrnout viditelný obsah";
+    showSummaryStatus("");
+    if (state) {
+      elements.summaryLanguage.value = Summary.defaultLanguage(state.lang);
+    }
+  }
+
+  function setHidden(hiddenIds) {
+    if (current) {
+      setCurrent({ ...current, hiddenIds });
+    }
+  }
+
+  function labelsFor(keys) {
+    const all = [...Preferences.TOPICS, Preferences.TONE];
+    return all.filter((item) => keys.includes(item.key)).map((item) => item.label);
+  }
+
+  // "Použité nastavení … Vynechaná témata …": shown with every summary (proposal §4.2).
+  function describeSummaryLabel(summary, built) {
+    const applied = labelsFor(Object.keys(summary.preferences).filter((key) => summary.preferences[key] === true));
+    const omitted = labelsFor(summary.omitted_categories).map((label) => label.toLowerCase());
+    const parts = [
+      `Použité nastavení: ${applied.length ? applied.join(", ") : "žádné"}.`,
+      `Vynechaná témata: ${omitted.length ? omitted.join(", ") : "žádná"}.`,
+    ];
+    if (current.hiddenIds.length) {
+      parts.push("Shrnutí je záměrně neúplné: skrytý obsah v něm není.");
+    }
+    if (built.wrappersLeftOut) {
+      parts.push(`Vynechané jsou i části stránky, které skrytý obsah obalují (bloky: ${built.wrappersLeftOut}).`);
+    }
+    if (built.sentCount < built.visibleCount) {
+      parts.push(`Vychází z prvních ${built.sentCount} viditelných bloků (z ${built.visibleCount}).`);
+    }
+    return parts.join(" ");
+  }
+
+  async function handleSummarize() {
+    if (!current) {
+      return;
+    }
+    const language = elements.summaryLanguage.value;
+    const built = Summary.buildRequest({ ...current, preferences, language });
+    elements.summaryResult.hidden = true;
+    if (!built) {
+      // Contract: nothing visible, nothing to send (docs/API.md).
+      showSummaryStatus("Po skrytí nezůstal žádný viditelný obsah, takže není co shrnout. ZenFeed nic nedoplňuje.");
+      return;
+    }
+    setBusy(true);
+    showSummaryStatus(`Připravuji shrnutí (bloky: ${built.sentCount})…`);
+    try {
+      const reply = await Summary.summarize(fetch, built.request);
+      if (!reply.ok) {
+        showSummaryStatus(SUMMARY_MESSAGES[reply.error] || SUMMARY_MESSAGES.failed, true);
+        elements.summarize.textContent = "Zkusit znovu";
+        return;
+      }
+      const summary = reply.summary;
+      elements.summarize.textContent = "Shrnout znovu";
+      elements.summaryLabel.textContent = describeSummaryLabel(summary, built);
+      if (summary.insufficient_input) {
+        elements.summaryText.textContent = "";
+        showSummaryStatus("Ve viditelné části stránky nezůstalo dost textu ke shrnutí.");
+      } else if (summary.no_relevant_content) {
+        elements.summaryText.textContent = "";
+        showSummaryStatus("Ve viditelné části stránky není nic, co by stálo za shrnutí.");
+      } else {
+        elements.summaryText.textContent = summary.summary;
+        showSummaryStatus("");
+      }
+      elements.summaryText.hidden = !elements.summaryText.textContent;
+      elements.summaryLink.href = current.url;
+      elements.summaryLink.textContent = `Původní stránka (${new URL(current.url).hostname})`;
+      elements.summaryModel.textContent = `model: ${summary.model_version}`;
+      elements.summaryResult.hidden = false;
+    } catch (error) {
+      console.error("ZenFeed: summary failed", error);
+      showSummaryStatus(SUMMARY_MESSAGES.failed, true);
+      elements.summarize.textContent = "Zkusit znovu";
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function handleAnalyze() {
     if (!Preferences.anySelected(preferences)) {
       showError("nothing_selected");
@@ -199,6 +324,7 @@
     elements.rehide.hidden = true;
     elements.notes.hidden = true;
     pendingReview = null;
+    setCurrent(null);
     showStatus("Hledám bloky na stránce…");
     try {
       const extraction = await Bootstrap.extractActiveTab(chrome);
@@ -234,6 +360,15 @@
         showError(applied.error);
         return;
       }
+      setCurrent({
+        tabId: extraction.tabId,
+        extractionId: extraction.extractionId,
+        url: extraction.url,
+        lang: extraction.lang,
+        blocks: extraction.blocks,
+        results: analysis.results,
+        hiddenIds: [],
+      });
       if (quality.mode === "review") {
         await refreshStatus(extraction.tabId);
         showReview(extraction, analysis.results);
@@ -244,6 +379,7 @@
         showError(hiding.error);
         return;
       }
+      setHidden(hiding.hiddenIds);
       await rememberAnalysis(extraction.tabId, extraction.extractionId);
       showStatus(describeOutcome(extraction.blocks.length, analysis.results, hiding)
         + nothingLeftMessage(extraction.blocks, hiding.hiddenIds));
@@ -286,6 +422,7 @@
       }
       pendingReview = null;
       elements.hideAnyway.hidden = true;
+      setHidden(hiding.hiddenIds);
       await rememberAnalysis(tabId, extractionId);
       showStatus(`Skryté bloky: ${hiding.hidden}.` + nothingLeftMessage(blocks, hiding.hiddenIds));
       await refreshStatus(tabId);
@@ -306,6 +443,7 @@
         showError(shown.error);
         return;
       }
+      setHidden([]);
       showStatus(`Zobrazeno vše, obnovené bloky: ${shown.restored}. Stránka je v původním stavu.`);
       await refreshStatus(tabId);
     } catch (error) {
@@ -336,6 +474,9 @@
         showError(hiding.error);
         return;
       }
+      if (current && current.extractionId === status.extractionId) {
+        setHidden(hiding.hiddenIds);
+      }
       showStatus(`Znovu skryté bloky: ${hiding.hidden}.`);
       await refreshStatus(tabId);
     } catch (error) {
@@ -354,6 +495,7 @@
     elements.showAll.addEventListener("click", () => !busy && handleShowAll());
     elements.rehide.addEventListener("click", () => !busy && handleRehide());
     elements.hideAnyway.addEventListener("click", () => !busy && handleHideAnyway());
+    elements.summarize.addEventListener("click", () => !busy && handleSummarize());
 
     const tabId = await Bootstrap.activeTabId(chrome);
     const status = await refreshStatus(tabId);

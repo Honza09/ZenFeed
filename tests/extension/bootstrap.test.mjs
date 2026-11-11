@@ -81,6 +81,8 @@ test("injects the content scripts in order, then asks for blocks", async () => {
   assert.equal(result.ok, true);
   assert.equal(result.tabId, 7);
   assert.equal(result.extractionId, "x1");
+  assert.equal(result.url, "https://example.com/article");
+  assert.equal(result.lang, null);
   assert.equal(result.title, "Example");
   assert.equal(result.blocks.length, 1);
   assert.deepEqual(plain(calls.injected), [
@@ -145,6 +147,8 @@ test("content script errors or invalid replies: extraction_failed", async () => 
     () => ({ ok: true, blocks: "nope" }),
     () => ({ ok: true, extractionId: "x1", blocks: [{ id: 1, text: "x" }] }),
     () => ({ ok: true, title: "No extraction ID", blocks: [] }),
+    () => ({ ok: true, extractionId: "x1", blocks: [{ id: "zf-0", text: "x", contains: "zf-1" }] }),
+    () => ({ ok: true, extractionId: "x1", blocks: [{ id: "zf-0", text: "x", contains: [1] }] }),
   ];
   for (const reply of replies) {
     const { api } = fakeChrome({ tab: PAGE, reply });
