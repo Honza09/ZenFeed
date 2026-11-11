@@ -15,7 +15,8 @@ All texts are in the popup ([`popup.md`](popup.md)); the decision logic is in `e
 | Long page (note) | The segmenter stopped at 400 blocks | yes | yes | Stránka je dlouhá: zpracovalo se prvních 400 bloků, zbytek stránky zůstal beze změny. |
 | Very long block (note) | A block was cut to 3,000 characters | yes | yes | Velmi dlouhé bloky se posuzovaly jen podle začátku textu (bloky: N). |
 | Inaccessible page | `chrome://`, `about:`, Chrome Web Store, `file://`, or the access was lost (ZF-08) | no | no | Na této stránce ZenFeed nefunguje … / ZenFeed k této stránce nemá přístup … |
-| Service error | Backend not running, timeout, error status, invalid response (ZF-11) | – | no | Server ZenFeed neběží … / neodpověděl včas … / vrátil chybu … / vrátil neplatnou odpověď … — each ends "Nic se neskrylo." |
+| Service error | Backend not running, timeout, error status, invalid response, also after one retry (ZF-11, ZF-12) | – | no | Server ZenFeed neběží … / neodpověděl včas … / vrátil chybu … / vrátil neplatnou odpověď … — each ends "Nic se neskrylo." |
+| Partial service error | Some requests failed after one retry, others succeeded (ZF-12) | yes | only blocks with a result | … Nevyhodnocené bloky: N (server vrátil chybu); zůstaly viditelné. Můžete je zkusit poslat znovu. Button **Zkusit znovu nevyhodnocené**. |
 | Uncertain or unsafe blocks | `review` results, wrapper blocks, table cells (ZF-10) | yes | those blocks no | Nejisté, ponechané viditelné: N. / Nešlo bezpečně skrýt, ponechané viditelné: N. |
 | Nothing matches | No block matches the chosen topics or tone | yes | no | Nic na stránce neodpovídá zvoleným tématům ani tónu. |
 

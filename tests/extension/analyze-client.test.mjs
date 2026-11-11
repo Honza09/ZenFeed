@@ -12,7 +12,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const source = readFileSync(join(here, "../../extension/popup/analyze-client.js"), "utf8");
 
 function loadClient() {
-  const context = { AbortSignal, console: { error() {} } };
+  const context = { AbortSignal, setTimeout, console: { error() {} } };
   context.globalThis = context;
   vm.runInNewContext(source, context);
   return context.ZenFeedAnalyzeClient;
@@ -77,10 +77,27 @@ test("more than 100 blocks are sent in requests of at most 100", async () => {
   assert.deepEqual(plain(client.buildRequests(makeBlocks(100), PREFS).map((request) => request.blocks.length)), [100]);
 });
 
-test("backend not running: backend_unavailable", async () => {
+const NO_DELAY = { retryDelayMs: 0 };
+
+function counting(calls, fetchFn) {
+  return async (url, options) => {
+    calls.push(JSON.parse(options.body));
+    return fetchFn(url, options);
+  };
+}
+
+const serverError = async () => ({ ok: false, status: 500, json: async () => ({}) });
+
+test("backend not running: tried twice, then backend_unavailable for every block", async () => {
   const client = loadClient();
-  const reply = await client.analyzeBlocks(async () => { throw new TypeError("Failed to fetch"); }, makeBlocks(1), PREFS);
-  assert.deepEqual(plain(reply), { ok: false, error: "backend_unavailable" });
+  const calls = [];
+  const down = counting(calls, async () => { throw new TypeError("Failed to fetch"); });
+  const reply = await client.analyzeBlocks(down, makeBlocks(250), PREFS, NO_DELAY);
+  assert.equal(reply.ok, false);
+  assert.equal(reply.error, "backend_unavailable");
+  assert.equal(reply.failedIds.length, 250);
+  // The first request is tried twice; the other two are not sent at all.
+  assert.equal(calls.length, client.MAX_ATTEMPTS);
 });
 
 test("timeouts: client abort and backend 504", async () => {
@@ -94,30 +111,73 @@ test("timeouts: client abort and backend 504", async () => {
       reject(options.signal.reason);
     });
   });
-  assert.deepEqual(plain(await client.analyzeBlocks(hanging, makeBlocks(1), PREFS, { timeoutMs: 20 })), { ok: false, error: "timeout" });
+  const failed = { ok: false, error: "timeout", failedIds: ["zf-0"] };
+  const calls = [];
+  assert.deepEqual(plain(await client.analyzeBlocks(counting(calls, hanging), makeBlocks(1), PREFS, { timeoutMs: 20, ...NO_DELAY })), failed);
+  assert.equal(calls.length, 2, "a timeout is tried once more");
   const gateway = async () => ({ ok: false, status: 504, json: async () => ({ error: "timeout" }) });
-  assert.deepEqual(plain(await client.analyzeBlocks(gateway, makeBlocks(1), PREFS)), { ok: false, error: "timeout" });
+  assert.deepEqual(plain(await client.analyzeBlocks(gateway, makeBlocks(1), PREFS, NO_DELAY)), failed);
 });
 
-test("error status and invalid bodies", async () => {
+test("error status and invalid bodies; only 5xx, timeouts and network errors are retried", async () => {
   const client = loadClient();
   const cases = [
-    [async () => ({ ok: false, status: 422, json: async () => ({ error: "validation_error" }) }), "backend_error"],
-    [async () => ({ ok: false, status: 500, json: async () => ({}) }), "backend_error"],
-    [async () => ({ ok: true, status: 200, json: async () => { throw new SyntaxError("bad json"); } }), "invalid_response"],
-    [async () => okResponse({ result: [] }), "invalid_response"],
-    [async () => okResponse(null), "invalid_response"],
+    [async () => ({ ok: false, status: 422, json: async () => ({ error: "validation_error" }) }), "backend_error", 1],
+    [async () => ({ ok: false, status: 413, json: async () => ({ error: "request_too_large" }) }), "backend_error", 1],
+    [serverError, "backend_error", 2],
+    [async () => ({ ok: true, status: 200, json: async () => { throw new SyntaxError("bad json"); } }), "invalid_response", 1],
+    [async () => okResponse({ result: [] }), "invalid_response", 1],
+    [async () => okResponse(null), "invalid_response", 1],
   ];
-  for (const [fetchFn, error] of cases) {
-    assert.deepEqual(plain(await client.analyzeBlocks(fetchFn, makeBlocks(1), PREFS)), { ok: false, error });
+  for (const [fetchFn, error, attempts] of cases) {
+    const calls = [];
+    const reply = await client.analyzeBlocks(counting(calls, fetchFn), makeBlocks(1), PREFS, NO_DELAY);
+    assert.deepEqual(plain(reply), { ok: false, error, failedIds: ["zf-0"] });
+    assert.equal(calls.length, attempts, `${error}: attempts`);
   }
 });
 
-test("a failing second request returns no results at all", async () => {
+test("a request that fails once and then succeeds gives full results", async () => {
   const client = loadClient();
   const calls = [];
   const ok = backendFetch(calls);
   let count = 0;
-  const flaky = async (url, options) => (++count === 2 ? { ok: false, status: 500, json: async () => ({}) } : ok(url, options));
-  assert.deepEqual(plain(await client.analyzeBlocks(flaky, makeBlocks(150), PREFS)), { ok: false, error: "backend_error" });
+  const flaky = async (url, options) => (++count === 1 ? serverError() : ok(url, options));
+  const reply = await client.analyzeBlocks(flaky, makeBlocks(3), PREFS, NO_DELAY);
+  assert.equal(reply.ok, true);
+  assert.equal(reply.partial, undefined);
+  assert.equal(reply.results.length, 3);
+  assert.deepEqual(plain(reply.failedIds), []);
+});
+
+test("a failing second request keeps the results of the others", async () => {
+  const client = loadClient();
+  const calls = [];
+  const ok = backendFetch(calls);
+  // 250 blocks: requests 1 (zf-0…99), 2 (zf-100…199) and 3 (zf-200…249).
+  const flaky = async (url, options) => (JSON.parse(options.body).blocks[0].id === "zf-100" ? serverError() : ok(url, options));
+  const reply = await client.analyzeBlocks(flaky, makeBlocks(250), PREFS, NO_DELAY);
+  assert.equal(reply.ok, true);
+  assert.equal(reply.partial, true);
+  assert.equal(reply.error, "backend_error");
+  assert.equal(reply.results.length, 150);
+  assert.deepEqual(plain(reply.failedIds), makeBlocks(250).slice(100, 200).map((block) => block.id));
+  assert.equal(reply.results.some((result) => result.id === "zf-150"), false);
+});
+
+test("a block missing from a 200 response counts as failed", async () => {
+  const client = loadClient();
+  const calls = [];
+  const ok = backendFetch(calls);
+  const dropsOne = async (url, options) => {
+    const response = await ok(url, options);
+    const body = await response.json();
+    return okResponse({ ...body, results: body.results.filter((result) => result.id !== "zf-1") });
+  };
+  const reply = await client.analyzeBlocks(dropsOne, makeBlocks(3), PREFS, NO_DELAY);
+  assert.equal(reply.ok, true);
+  assert.equal(reply.partial, true);
+  assert.equal(reply.error, "invalid_response");
+  assert.deepEqual(plain(reply.failedIds), ["zf-1"]);
+  assert.equal(calls.length, 1, "an incomplete answer is not retried");
 });

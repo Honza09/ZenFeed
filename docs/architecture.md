@@ -84,7 +84,7 @@ Gemini's free tier is used without billing. Its terms have special rules for the
 
 A failure never hides content and never breaks the page.
 
-- Backend not running, timeout or error during analysis: nothing is hidden and the popup says so.
+- Backend not running, timeout or error during analysis: each request is tried once more. Blocks without a result stay visible, the results that arrived are used, and the popup offers to send the rest again (ZF-12).
 - Hosted classifier fails or hits its limit: the backend falls back to `lexicon-1`.
 - Summary fails: an error message instead of the summary; filtering keeps working.
 - No voice: the summary stays readable.
@@ -92,5 +92,4 @@ A failure never hides content and never breaks the page.
 ## Known limits
 
 - The backend runs only on the demo machine at a fixed address.
-- One failing analysis request discards all results; partial results and retries are ZF-12.
 - The segmenter still returns wrapper blocks, which are only skipped when hiding (ZF-07 option B is waiting for a team decision).
