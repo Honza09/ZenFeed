@@ -112,7 +112,7 @@ Automated: `ruff check backend` passed, `pytest backend` 42 passed, manifest OK,
 | cs.wikipedia.org Globální oteplování | 400 | 21 | 0 | katastrofické scénáře 14, zprávy o úmrtí 4, válka 2, politické konflikty 1 | identical |
 | `hider.html`, `hider-csp.html` | 11 | 4 | 0 | válka 4 | identical |
 
-On every page the number of hidden blocks equals the number of boxes, the number of elements really computed as `display: none`, and the hidden count in `zenfeed/status`. Restoring worked in 100 % of the tested cases: no ZenFeed attribute, box or stylesheet was left, and no block element was missing or had another `display` than before.
+The number of hidden blocks equals the number of boxes and the hidden count in the popup. The number of elements with data-zenfeed-hidden can be higher, because a block made of several elements (a long container split into chunks) has one box and every one of its elements is marked. Restoring worked in 100 % of the tested cases: no ZenFeed attribute, box or stylesheet was left, and no block element was missing or had another `display` than before.
 
 P01: after hiding, the layout moved and the page itself lazy-loaded its embedded "Data Explorer", replacing its own placeholder element. That is why the page HTML is not identical after restoring. A control run without hiding gave identical HTML 3 seconds apart, and the only extra adopted stylesheet belonged to the page.
 
