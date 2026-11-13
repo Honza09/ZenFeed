@@ -65,4 +65,5 @@ Adapt this structure to match the actual repository as development progresses.
 - [Product definition and MVP scope (v0.2)](mvp.md) — authoritative; the sections above are generic drafts
 - [Backlog](backlog/README.md)
 - [Pilotní sada ZF-04: anotace a šablona měření](testing/pilot/README.md)
+- [Uživatelský dotazník: text a otázky formuláře (ZF-32)](testing/rozhovory/scenar.md)
 - [Návrh modelu, TTS, hostingu a stropu nákladů (ZF-25)](rozhodnuti-zf-25.md)
