@@ -89,28 +89,45 @@
   }
 
   const BOX_CSS = `
-    :host { all: initial; display: block; margin: 6px 0; }
+    /* In a flex or grid parent (cards, feeds) the host would shrink to its content;
+       it takes the whole row instead. */
+    :host {
+      all: initial; display: block; margin: 8px 0; box-sizing: border-box;
+      width: 100%; min-width: 0; max-width: 100%; flex: 1 1 100%; grid-column: 1 / -1;
+    }
     .box {
-      display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px;
-      padding: 8px 12px; border: 1px solid #d3dfd9; border-left: 3px solid #2c6e63;
-      border-radius: 8px; background: #f1f6f3; color: #1b2b2a;
+      display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px;
+      padding: 8px 10px 8px 14px; border: 1px solid #a9cbbf; border-left: 4px solid #2c6e63;
+      border-radius: 10px; background: #e4f1ec; color: #12302a;
+      box-shadow: 0 2px 6px rgba(31, 82, 73, 0.18);
       font: 13px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif;
     }
-    .label { flex: 1 1 auto; font-weight: 500; }
-    button {
-      font: inherit; color: #1f5249; background: none; border: 0; padding: 0;
-      text-decoration: underline; text-underline-offset: 2px; cursor: pointer;
+    .label { flex: 1 1 auto; display: flex; align-items: center; gap: 8px; font-weight: 600; }
+    .label::before {
+      content: ""; flex: none; width: 8px; height: 8px; border-radius: 50%;
+      background: #2c6e63; box-shadow: 0 0 0 3px #c4ded5;
     }
-    button:hover { color: #14382f; }
+    button {
+      font: inherit; text-align: left; color: #1f5249; background: none; border: 0; border-radius: 999px;
+      padding: 4px 10px; cursor: pointer; transition: background-color 0.12s, color 0.12s;
+    }
+    button:hover { background: #cfe5dd; color: #12302a; }
+    .label + button { color: #fff; background: #2c6e63; font-weight: 600; }
+    .label + button:hover { background: #1f5249; color: #fff; }
     button:focus-visible { outline: 2px solid #1f5249; outline-offset: 2px; }
-    .why { flex-basis: 100%; margin: 4px 0 0; color: #566865; }
+    .why { flex-basis: 100%; margin: 2px 0 2px 16px; color: #3f5651; }
     /* Follows the page's own background, not the browser theme. */
-    :host([data-zenfeed-theme="dark"]) .box { background: #172120; color: #e3eeea; border-color: #34504a; border-left-color: #4aa393; }
+    :host([data-zenfeed-theme="dark"]) .box { background: #1f3330; color: #e8f3ef; border-color: #3d6b61; border-left-color: #4aa393; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5); }
+    :host([data-zenfeed-theme="dark"]) .label::before { background: #4aa393; box-shadow: 0 0 0 3px #2c4a44; }
     :host([data-zenfeed-theme="dark"]) button { color: #8fd6c8; }
-    :host([data-zenfeed-theme="dark"]) button:hover { color: #b6e8de; }
+    :host([data-zenfeed-theme="dark"]) button:hover { background: #2c4a44; color: #e8f3ef; }
+    :host([data-zenfeed-theme="dark"]) .label + button { color: #0e1f1c; background: #6fc3b3; }
+    :host([data-zenfeed-theme="dark"]) .label + button:hover { background: #8fd6c8; color: #0e1f1c; }
     :host([data-zenfeed-theme="dark"]) button:focus-visible { outline-color: #8fd6c8; }
-    :host([data-zenfeed-theme="dark"]) .why { color: #9db1ac; }
+    :host([data-zenfeed-theme="dark"]) .why { color: #b3c8c2; }
   `;
+
+
 
   // Parses "rgb(r, g, b)" / "rgba(r, g, b, a)"; null for anything else.
   function parseRgb(value) {
@@ -213,6 +230,27 @@
 
     // A box that fits where the first element was: a row in a table, an
     // item in a list, a block elsewhere.
+    // The box stands in for the block, so it gets the block's width and side
+    // margins (read while the block is still visible); a card with its own
+    // margins keeps its gap from the edge.
+    function matchBlockSize(host, element) {
+      const width = element.getBoundingClientRect().width;
+      if (!width) {
+        return;
+      }
+      const style = getComputedStyle(element);
+      host.style.setProperty("width", `${width}px`);
+      host.style.setProperty("flex", "0 1 auto");
+      host.style.setProperty("margin-left", style.marginLeft);
+      host.style.setProperty("margin-right", style.marginRight);
+      // Where the page places the block inside a grid or flex parent (a column
+      // set by a class, auto margins) the box stands in the same place.
+      host.style.setProperty("grid-column", `${style.gridColumnStart} / ${style.gridColumnEnd}`);
+      host.style.setProperty("justify-self", style.justifySelf);
+      host.style.setProperty("align-self", style.alignSelf);
+      host.style.setProperty("order", style.order);
+    }
+
     function createBox(firstElement, result, onShow) {
       const tag = firstElement.tagName.toUpperCase();
       let outer;
@@ -235,6 +273,9 @@
         outer = host;
       }
       outer.setAttribute(BOX_MARKER, "");
+      if (outer === host) {
+        matchBlockSize(host, firstElement);
+      }
       if (hasDarkBackground(firstElement.parentElement || firstElement)) {
         host.setAttribute("data-zenfeed-theme", "dark");
       }
@@ -364,6 +405,36 @@
     function hiddenCount() {
       return hidden.size;
     }
+
+    // The box copies the block's width and placement, which depend on the
+    // window width (responsive grids). After a resize the copy is read again:
+    // the block is shown and hidden again within one task, so nothing is painted.
+    function remeasureBoxes() {
+      for (const record of hidden.values()) {
+        const saved = record.elements[0];
+        if (!saved || saved.inline || !record.box.shadowRoot) {
+          continue;
+        }
+        saved.element.removeAttribute(HIDDEN_MARKER);
+        try {
+          matchBlockSize(record.box, saved.element);
+        } finally {
+          saved.element.setAttribute(HIDDEN_MARKER, "");
+        }
+      }
+    }
+
+    let remeasureQueued = false;
+    doc.defaultView.addEventListener("resize", () => {
+      if (remeasureQueued || !hidden.size) {
+        return;
+      }
+      remeasureQueued = true;
+      doc.defaultView.requestAnimationFrame(() => {
+        remeasureQueued = false;
+        remeasureBoxes();
+      });
+    });
 
     function isOwnNode(node) {
       const element = node.nodeType === Node.ELEMENT_NODE ? node : node.parentElement;
