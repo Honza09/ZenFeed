@@ -63,6 +63,12 @@ const scenario = `(async () => {
   const a2DisplayBefore = a2Style.getPropertyValue("display") + " " + a2Style.getPropertyPriority("display");
   const sheetsBefore = document.adoptedStyleSheets.length;
   const htmlBefore = document.body.innerHTML;
+  const placeOf = (element) => {
+    const rect = element.getBoundingClientRect();
+    return Math.round(rect.left) + "+" + Math.round(rect.width);
+  };
+  const a1PlaceBefore = placeOf(document.getElementById("a1"));
+  const a2PlaceBefore = placeOf(document.getElementById("a2"));
   const elementsBefore = [...document.body.querySelectorAll("*")];
 
   // 1. Extract and fake classifier results by the marker words in the text.
@@ -104,6 +110,9 @@ const scenario = `(async () => {
 
   const a1Box = a1.previousElementSibling;
   check("box sits right before the hidden block", a1Box && a1Box.hasAttribute("data-zenfeed-box"));
+  check("box has the same left edge and width as its block",
+    placeOf(a1Box) === a1PlaceBefore && placeOf(a2.previousElementSibling) === a2PlaceBefore,
+    placeOf(a1Box) + " / " + a1PlaceBefore + ", " + placeOf(a2.previousElementSibling) + " / " + a2PlaceBefore);
   check("box label names the topic", a1Box && boxText(a1Box).includes("Skryto: válka"), a1Box && boxText(a1Box));
   check("toxic box names the tone", boxText(a2.previousElementSibling).includes("Skryto: toxický/vyhrocený tón"));
   const boxStyle = getComputedStyle(boxRoot(a1Box).querySelector(".box"));
