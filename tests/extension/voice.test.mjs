@@ -107,11 +107,12 @@ test("English prefers en-GB and skips macOS effect voices", () => {
   assert.equal(voice.pickVoice([{ name: "cz", lang: "cs_CZ", localService: true }], "cs").name, "cz");
 });
 
-test("labels say synthetic voice in both languages, without a character name (fallback C)", () => {
+test("labels say synthetic voice in Czech for both summary languages, without a character name (fallback C)", () => {
   const { LABELS } = loadVoice();
-  assert.equal(LABELS.cs.player, "Syntetický hlas · shrnutí napsal stroj");
-  assert.match(LABELS.cs.beforePlay, /syntetický hlas.*ne původní text stránky/);
-  assert.equal(LABELS.en.player, "Synthetic voice · summary written by AI");
+  for (const language of ["cs", "en"]) {
+    assert.equal(LABELS[language].player, "Syntetický hlas · shrnutí napsal stroj");
+    assert.match(LABELS[language].beforePlay, /syntetický hlas.*ne původní text stránky/);
+  }
   for (const text of [LABELS.cs.player, LABELS.cs.beforePlay, LABELS.en.player, LABELS.en.beforePlay]) {
     assert.doesNotMatch(text, /Švejk|Sherlock|Holmes/);
   }

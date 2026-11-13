@@ -89,25 +89,27 @@
   }
 
   const BOX_CSS = `
-    :host { all: initial; display: block; margin: 4px 0; }
+    :host { all: initial; display: block; margin: 6px 0; }
     .box {
-      display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px;
-      padding: 6px 10px; border: 1px dashed #8c959f; border-radius: 6px;
-      background: #f6f8fa; color: #1f2328;
-      font: 13px/1.4 system-ui, sans-serif;
+      display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px;
+      padding: 8px 12px; border: 1px solid #d3dfd9; border-left: 3px solid #2c6e63;
+      border-radius: 8px; background: #f1f6f3; color: #1b2b2a;
+      font: 13px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif;
     }
-    .label { flex: 1 1 auto; }
+    .label { flex: 1 1 auto; font-weight: 500; }
     button {
-      font: inherit; color: #0b3d91; background: none; border: 0; padding: 0;
-      text-decoration: underline; cursor: pointer;
+      font: inherit; color: #1f5249; background: none; border: 0; padding: 0;
+      text-decoration: underline; text-underline-offset: 2px; cursor: pointer;
     }
-    button:focus-visible { outline: 2px solid #0b3d91; outline-offset: 2px; }
-    .why { flex-basis: 100%; margin: 4px 0 0; color: #59636e; }
+    button:hover { color: #14382f; }
+    button:focus-visible { outline: 2px solid #1f5249; outline-offset: 2px; }
+    .why { flex-basis: 100%; margin: 4px 0 0; color: #566865; }
     /* Follows the page's own background, not the browser theme. */
-    :host([data-zenfeed-theme="dark"]) .box { background: #161b22; color: #e6edf3; border-color: #6e7681; }
-    :host([data-zenfeed-theme="dark"]) button { color: #79c0ff; }
-    :host([data-zenfeed-theme="dark"]) button:focus-visible { outline-color: #79c0ff; }
-    :host([data-zenfeed-theme="dark"]) .why { color: #9198a1; }
+    :host([data-zenfeed-theme="dark"]) .box { background: #172120; color: #e3eeea; border-color: #34504a; border-left-color: #4aa393; }
+    :host([data-zenfeed-theme="dark"]) button { color: #8fd6c8; }
+    :host([data-zenfeed-theme="dark"]) button:hover { color: #b6e8de; }
+    :host([data-zenfeed-theme="dark"]) button:focus-visible { outline-color: #8fd6c8; }
+    :host([data-zenfeed-theme="dark"]) .why { color: #9db1ac; }
   `;
 
   // Parses "rgb(r, g, b)" / "rgba(r, g, b, a)"; null for anything else.

@@ -25,6 +25,8 @@ Perform manual tests in Chrome:
 
 Test at least three different regular web pages.
 
+Regression checklist for milestone M2 (ZF-13): [`testing/checklist-m2.md`](testing/checklist-m2.md); bug log: [`testing/evidence-chyb.md`](testing/evidence-chyb.md).
+
 ## Backend Testing
 
 Use pytest and, where appropriate, HTTPX or FastAPI's test client.

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ZenFeed: testovací stránky</title>
+  <style>
+    :root { color-scheme: light dark; --ink: #1b2b2a; --soft: #5a6b68; --paper: #fbfcfa; --line: #dbe4df; --moss: #2c6e63; --tint: #eef4f1; }
+    @media (prefers-color-scheme: dark) {
+      :root { --ink: #e6efec; --soft: #9db1ac; --paper: #141c1b; --line: #2d3b39; --moss: #6fc3b3; --tint: #1b2625; }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--ink); background: var(--paper); }
+    main { max-width: 44rem; margin: 0 auto; padding: 3rem 1.25rem 4rem; }
+    h1 { margin: 0 0 .5rem; font-size: 1.75rem; font-weight: 650; letter-spacing: -.01em; }
+    .lead { margin: 0 0 2rem; max-width: 60ch; color: var(--soft); }
+    ul { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+    li { border-bottom: 1px solid var(--line); }
+    a { display: grid; grid-template-columns: 11.5rem 1fr; gap: .25rem 1.5rem; align-items: baseline; padding: .85rem .5rem; color: inherit; text-decoration: none; }
+    a:hover, a:focus-visible { background: var(--tint); outline: none; }
+    a:focus-visible { box-shadow: inset 3px 0 0 var(--moss); }
+    .file { color: var(--moss); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+    .what { color: var(--soft); font-size: .94rem; }
+    .note { margin: 2rem 0 0; max-width: 60ch; color: var(--soft); font-size: .9rem; }
+    @media (max-width: 34rem) { a { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Testovací stránky ZenFeed</h1>
+    <p class="lead">Vlastní stránky projektu pro ruční testy rozšíření. Čísla scénářů odpovídají souboru <code>docs/testing/checklist-m2.md</code>.</p>
+    <ul>
+      <li><a href="hider.html"><span class="file">hider.html</span><span class="what">Skrývání a obnovení bloků (UI-01 až UI-27)</span></a></li>
+      <li><a href="hider-csp.html"><span class="file">hider-csp.html</span><span class="what">Skrývání na stránce se striktním CSP (UI-26)</span></a></li>
+      <li><a href="mostly-war.html"><span class="file">mostly-war.html</span><span class="what">Skryje se téměř vše; chyby backendu (UI-08, UI-28 až UI-31)</span></a></li>
+      <li><a href="empty.html"><span class="file">empty.html</span><span class="what">Prázdná stránka (UI-05)</span></a></li>
+      <li><a href="no-title.html"><span class="file">no-title.html</span><span class="what">Velmi málo textu (UI-06)</span></a></li>
+      <li><a href="editable.html"><span class="file">editable.html</span><span class="what">Editovatelná pole se nesmí číst ani posílat (UI-06)</span></a></li>
+      <li><a href="single-block.html"><span class="file">single-block.html</span><span class="what">Celá stránka je jeden blok (UI-07)</span></a></li>
+      <li><a href="html-title.html"><span class="file">html-title.html</span><span class="what">Jeden blok bez shody, název s HTML (UI-07)</span></a></li>
+      <li><a href="long-block.html"><span class="file">long-block.html</span><span class="what">Velmi dlouhý blok (UI-09)</span></a></li>
+      <li><a href="segmentation.html"><span class="file">segmentation.html</span><span class="what">Dělení na bloky (není v checklistu M2)</span></a></li>
+      <li><a href="privacy.html"><span class="file">privacy.html</span><span class="what">Soukromí (ZF-29, není v checklistu M2)</span></a></li>
+    </ul>
+    <p class="note">Samotné stránky jsou záměrně holé: zkoušejí, co rozšíření udělá s obyčejným HTML, takže se jejich vzhled neupravuje.</p>
+  </main>
+</body>
+</html>

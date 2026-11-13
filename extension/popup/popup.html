@@ -48,7 +48,7 @@
       <p class="hint">Na server ZenFeed se pošle jen text bloků, které na stránce zůstaly viditelné. Skrytý obsah ne.</p>
       <div class="summary-controls">
         <label for="summary-language">Jazyk</label>
-        <select id="summary-language">
+        <select id="summary-language" data-custom>
           <option value="cs">Čeština</option>
           <option value="en">English</option>
         </select>
@@ -63,8 +63,8 @@
           <p id="voice-before" class="hint"></p>
           <div class="player-controls">
             <button id="play" type="button">Přehrát</button>
-            <button id="pause" type="button" hidden>Pozastavit</button>
-            <button id="stop" type="button" hidden>Zastavit</button>
+            <button id="pause" type="button" hidden>Pauza</button>
+            <button id="stop" type="button" hidden>Ukončit čtení</button>
           </div>
           <p id="player-status" role="status" aria-live="polite"></p>
           <p class="hint">Čte se jen shrnutí, ne text stránky. Přehrávání skončí, když tento panel zavřete.</p>
@@ -82,6 +82,7 @@
   <script src="summary-client.js"></script>
   <script src="voice.js"></script>
   <script src="bootstrap.js"></script>
+  <script src="custom-select.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>
