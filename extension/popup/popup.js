@@ -266,15 +266,18 @@
   function describeOutcome(blockCount, results, hiding) {
     const review = results.filter((result) => result && result.recommended_action === "review").length;
     const unsafe = hiding.wrapper + hiding.unsupported + hiding.failed;
+    // A repeated analysis does not see blocks hidden earlier (they are display:none),
+    // so they are added to both numbers: the status shows the state of the page.
+    const earlier = Math.max(0, hiding.hiddenTotal - hiding.hidden);
     // Phrased as "label: number" so no Czech plural forms are needed.
-    const parts = [`Skryté bloky: ${hiding.hidden} z ${blockCount}.`];
+    const parts = [`Skryté bloky: ${hiding.hiddenTotal} z ${blockCount + earlier}.`];
     if (review) {
       parts.push(`Nejisté, ponechané viditelné: ${review}.`);
     }
     if (unsafe) {
       parts.push(`Nešlo bezpečně skrýt, ponechané viditelné: ${unsafe}.`);
     }
-    if (!hiding.hidden && !review && !unsafe) {
+    if (!hiding.hiddenTotal && !review && !unsafe) {
       parts.push("Nic na stránce neodpovídá zvoleným tématům ani tónu.");
     }
     return parts.join(" ");
