@@ -27,6 +27,8 @@ Test at least three different regular web pages.
 
 Regression checklist for milestone M2 (ZF-13): [`testing/checklist-m2.md`](testing/checklist-m2.md); bug log: [`testing/evidence-chyb.md`](testing/evidence-chyb.md). End-to-end regression for M3 (ZF-18), one command: `bash tests/extension/run-e2e.sh`; results in [`testing/regrese-m3.md`](testing/regrese-m3.md).
 
+User survey (ZF-32): anonymous questionnaire, form text and questions in [`testing/rozhovory/scenar.md`](testing/rozhovory/scenar.md).
+
 ## Backend Testing
 
 Use pytest and, where appropriate, HTTPX or FastAPI's test client.
