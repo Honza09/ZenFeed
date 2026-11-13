@@ -25,9 +25,10 @@
       player: "Syntetický hlas · shrnutí napsal stroj",
       beforePlay: "Uslyšíte syntetický hlas. Čte strojově vytvořené shrnutí, ne původní text stránky.",
     },
+    // The interface stays Czech even when the summary is English.
     en: {
-      player: "Synthetic voice · summary written by AI",
-      beforePlay: "You will hear a synthetic voice reading an AI-written summary, not the original page text.",
+      player: "Syntetický hlas · shrnutí napsal stroj",
+      beforePlay: "Uslyšíte syntetický hlas. Čte strojově vytvořené shrnutí, ne původní text stránky.",
     },
   };
 

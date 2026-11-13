@@ -114,9 +114,20 @@
   // The summary is built from it. Kept only while the popup is open.
   let current = null;
 
+  // A message below the fold must not go unnoticed: scroll it into view.
+  function bringIntoView(element) {
+    if (!element.textContent || typeof element.scrollIntoView !== "function") {
+      return;
+    }
+    const reduceMotion = typeof matchMedia === "function"
+      && matchMedia("(prefers-reduced-motion: reduce)").matches;
+    element.scrollIntoView({ block: "nearest", behavior: reduceMotion ? "auto" : "smooth" });
+  }
+
   function showStatus(text, isError = false) {
     elements.status.textContent = text;
     elements.status.classList.toggle("error", isError);
+    bringIntoView(elements.status);
   }
 
   function showError(code) {
@@ -274,6 +285,7 @@
   function showSummaryStatus(text, isError = false) {
     elements.summaryStatus.textContent = text;
     elements.summaryStatus.classList.toggle("error", isError);
+    bringIntoView(elements.summaryStatus);
   }
 
   // Sets what is on the page now and resets the panel; a summary of an older

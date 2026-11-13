@@ -1,220 +1,474 @@
-body {
-  margin: 0;
-  width: 320px;
-  font: 14px/1.4 system-ui, sans-serif;
-  color: #1f2328;
-  background: #fff;
-}
-
-main {
-  padding: 12px 16px 16px;
-}
-
-h1 {
-  margin: 0 0 8px;
-  font-size: 18px;
-}
-
-fieldset {
-  margin: 0 0 8px;
-  padding: 0;
-  border: 0;
-}
-
-legend {
-  margin-bottom: 4px;
-  font-weight: 600;
-}
-
-.switch {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 2px 0;
-  cursor: pointer;
-}
-
-.switch input {
-  margin: 0;
-}
-
-.hint,
-.privacy {
-  margin: 0 0 10px;
-  color: #59636e;
-  font-size: 12px;
-}
-
-.privacy {
-  padding: 8px;
-  border-radius: 6px;
-  background: #f6f8fa;
-}
-
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-button {
-  flex: 1 1 auto;
-  padding: 8px;
-  border: 1px solid #d0d7de;
-  border-radius: 6px;
-  font: inherit;
-  color: #1f2328;
-  background: #f6f8fa;
-  cursor: pointer;
-}
-
-button.primary {
-  border-color: #1f6feb;
-  color: #fff;
-  background: #1f6feb;
-}
-
-button:disabled {
-  opacity: 0.6;
-  cursor: default;
-}
-
-button:focus-visible,
-.switch input:focus-visible {
-  outline: 2px solid #0b3d91;
-  outline-offset: 2px;
-}
-
-#status {
-  min-height: 1.4em;
-  margin: 12px 0 0;
-}
-
-#status.error {
-  color: #b42318;
-}
-
-.notes {
-  margin: 8px 0 0;
-  padding-left: 18px;
-  color: #59636e;
-  font-size: 12px;
-}
-
-.notice {
-  margin: 8px 0 0;
-  padding: 6px 8px;
-  border-left: 3px solid #bf8700;
-  background: #fff8c5;
-  font-size: 12px;
-}
-
-dl {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 4px 8px;
-  margin: 8px 0 0;
-}
-
-dt {
-  color: #59636e;
-}
-
-dd {
-  margin: 0;
-  overflow-wrap: anywhere;
-}
-
-.summary-panel {
-  margin: 14px 0 0;
-  padding-top: 10px;
-  border-top: 1px solid #d0d7de;
-}
-
-.summary-panel h2 {
-  margin: 0 0 4px;
-  font-size: 15px;
-}
-
-.summary-controls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.summary-controls select {
-  font: inherit;
-  padding: 6px;
-  border: 1px solid #d0d7de;
-  border-radius: 6px;
-  background: #fff;
-}
-
-#summary-status {
-  min-height: 1.4em;
-  margin: 8px 0 0;
-}
-
-#summary-status.error {
-  color: #b42318;
-}
-
-.summary-label {
-  margin: 8px 0;
-  padding: 6px 8px;
-  border-left: 3px solid #1f6feb;
-  background: #f6f8fa;
-  font-size: 12px;
-}
-
-.summary-text {
-  margin: 0 0 8px;
-  white-space: pre-line;
-}
-
-.summary-meta {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 4px 8px;
-  margin: 0;
-  color: #59636e;
-  font-size: 12px;
-}
-
-.summary-meta a {
-  color: #0b3d91;
-}
-
-.player {
-  margin: 0 0 8px;
-  padding: 8px;
-  border: 1px solid #d0d7de;
-  border-radius: 6px;
-}
-
-.voice-label {
-  margin: 0 0 4px;
-  font-weight: 600;
-  font-size: 12px;
-}
-
-.player .hint {
-  margin: 4px 0 0;
-}
-
-.player-controls {
-  display: flex;
-  gap: 8px;
-  margin-top: 6px;
-}
-
-#player-status {
-  min-height: 1.4em;
-  margin: 6px 0 0;
-  font-size: 12px;
-}
-
-#player-status.error {
-  color: #b42318;
-}
+/* ZenFeed popup. Calm, quiet surface: one accent (moss), the toggles are the
+   only strong element. Colours follow the browser theme. */
+   :root {
+    --ink: #1b2b2a;
+    --ink-soft: #5a6b68;
+    --paper: #fbfcfa;
+    --surface: #f1f5f2;
+    --line: #dbe4df;
+    --moss: #2c6e63;
+    --moss-dark: #1f5249;
+    --moss-tint: #e3efea;
+    --amber: #8a5a00;
+    --amber-tint: #fff4d6;
+    --danger: #b42318;
+    --focus: #1f5249;
+    color-scheme: light dark;
+  }
+  
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink: #e6efec;
+      --ink-soft: #9db1ac;
+      --paper: #141c1b;
+      --surface: #1d2827;
+      --line: #2d3b39;
+      --moss: #4aa393;
+      --moss-dark: #6fc3b3;
+      --moss-tint: #20332f;
+      --amber: #f0c36a;
+      --amber-tint: #3a2f12;
+      --danger: #ff8f84;
+      --focus: #8fd6c8;
+    }
+  }
+  
+  /* The hidden attribute must win over the display rules below. */
+  [hidden] {
+    display: none !important;
+  }
+  
+  body {
+    margin: 0;
+    width: 340px;
+    font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: var(--ink);
+    background: var(--paper);
+  }
+  
+  main {
+    padding: 16px 16px 18px;
+  }
+  
+  h1 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 14px;
+    font-size: 18px;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+  }
+  
+  h1::before {
+    content: "";
+    width: 14px;
+    height: 14px;
+    border-radius: 50% 50% 50% 4px;
+    background: var(--moss);
+    transform: rotate(-45deg);
+  }
+  
+  fieldset {
+    margin: 0 0 12px;
+    padding: 0;
+    border: 0;
+  }
+  
+  legend {
+    margin: 0 0 4px;
+    padding: 0;
+    color: var(--ink-soft);
+    font-size: 13px;
+    font-weight: 600;
+  }
+  
+  /* A list of rows: text on the left, toggle on the right. */
+  .switch {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 2px;
+    border-bottom: 1px solid var(--line);
+    cursor: pointer;
+  }
+  
+  fieldset .switch:last-child {
+    border-bottom: 0;
+  }
+  
+  .switch input {
+    appearance: none;
+    flex: none;
+    order: 2;
+    position: relative;
+    width: 36px;
+    height: 20px;
+    margin: 0;
+    border-radius: 999px;
+    background: var(--line);
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+  }
+  
+  .switch input::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+    transition: transform 0.15s ease;
+  }
+  
+  .switch input:checked {
+    background: var(--moss);
+  }
+  
+  .switch input:checked::after {
+    transform: translateX(16px);
+  }
+  
+  .hint,
+  .privacy {
+    margin: 0 0 12px;
+    color: var(--ink-soft);
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  
+  .privacy {
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: var(--surface);
+  }
+  
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  button {
+    flex: 1 1 auto;
+    padding: 9px 12px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    font: inherit;
+    font-weight: 550;
+    color: var(--ink);
+    background: var(--surface);
+    cursor: pointer;
+    transition: background-color 0.12s ease, border-color 0.12s ease;
+  }
+  
+  button:hover:not(:disabled) {
+    border-color: var(--moss);
+  }
+  
+  button.primary {
+    flex-basis: 100%;
+    border-color: var(--moss);
+    color: #fff;
+    background: var(--moss);
+  }
+  
+  button.primary:hover:not(:disabled) {
+    border-color: var(--moss-dark);
+    background: var(--moss-dark);
+  }
+  
+  button:disabled {
+    opacity: 0.55;
+    cursor: default;
+  }
+  
+  button:focus-visible,
+  .switch input:focus-visible,
+  select:focus-visible,
+  a:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+  
+  #status {
+    min-height: 1.4em;
+    margin: 14px 0 0;
+    font-weight: 500;
+  }
+  
+  #status.error {
+    color: var(--danger);
+  }
+  
+  .notes {
+    margin: 8px 0 0;
+    padding-left: 18px;
+    color: var(--ink-soft);
+    font-size: 12px;
+  }
+  
+  .notice {
+    margin: 10px 0 0;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border-left: 3px solid var(--amber);
+    color: var(--ink);
+    background: var(--amber-tint);
+    font-size: 12px;
+  }
+  
+  dl {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 6px 12px;
+    margin: 12px 0 0;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: var(--surface);
+    font-size: 13px;
+  }
+  
+  dt {
+    color: var(--ink-soft);
+  }
+  
+  dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+    font-weight: 550;
+  }
+  
+  .summary-panel {
+    margin: 16px 0 0;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+  }
+  
+  .summary-panel h2 {
+    margin: 0 0 4px;
+    font-size: 15px;
+    font-weight: 650;
+  }
+  
+  .summary-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .summary-controls button {
+    flex: 0 0 100%;
+    width: 100%;
+  }
+  
+  .summary-controls label {
+    color: var(--ink-soft);
+    font-size: 13px;
+  }
+  
+  .summary-controls select {
+    font: inherit;
+    padding: 7px 8px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    color: var(--ink);
+    background: var(--paper);
+  }
+  
+  #summary-status {
+    min-height: 1.4em;
+    margin: 10px 0 0;
+  }
+  
+  #summary-status.error {
+    color: var(--danger);
+  }
+  
+  .summary-label {
+    margin: 10px 0;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border-left: 3px solid var(--moss);
+    background: var(--moss-tint);
+    font-size: 12px;
+  }
+  
+  .summary-text {
+    margin: 0 0 10px;
+    white-space: pre-line;
+  }
+  
+  .summary-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 4px 8px;
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 12px;
+  }
+  
+  .summary-meta a {
+    color: var(--moss-dark);
+  }
+  
+  .player {
+    margin: 0 0 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+  }
+  
+  .voice-label {
+    margin: 0 0 4px;
+    font-weight: 600;
+    font-size: 12px;
+  }
+  
+  .player .hint {
+    margin: 4px 0 0;
+  }
+  
+  .player-controls {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  
+  #player-status {
+    min-height: 1.4em;
+    margin: 6px 0 0;
+    font-size: 12px;
+  }
+  
+  #player-status.error {
+    color: var(--danger);
+  }
+  
+  /* Custom dropdown (custom-select.js). The native <select> stays in the DOM as
+     the source of truth and is only hidden visually. */
+  .select-native {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  
+  .select {
+    position: relative;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  
+  .select-button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 10px;
+    font: inherit;
+    text-align: left;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+  }
+  
+  .select-button:hover {
+    border-color: var(--moss);
+  }
+  
+  .select-button:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+  
+  .select-button::after {
+    content: "";
+    flex: none;
+    width: 7px;
+    height: 7px;
+    margin-top: -3px;
+    border-right: 2px solid var(--ink-soft);
+    border-bottom: 2px solid var(--ink-soft);
+    transform: rotate(45deg);
+    transition: transform 0.15s ease;
+  }
+  
+  .select.open .select-button {
+    border-color: var(--moss);
+  }
+  
+  .select.open .select-button::after {
+    margin-top: 3px;
+    transform: rotate(-135deg);
+  }
+  
+  .select-list {
+    position: absolute;
+    z-index: 10;
+    left: 0;
+    right: 0;
+    top: calc(100% + 4px);
+    margin: 0;
+    padding: 4px;
+    list-style: none;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(20, 40, 36, 0.18);
+  }
+  
+  .select-list[hidden] {
+    display: none;
+  }
+  
+  .select-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 7px 8px;
+    border-radius: 7px;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  
+  .select-option.active {
+    background: var(--moss-tint);
+  }
+  
+  .select-option[aria-selected="true"] {
+    font-weight: 650;
+    color: var(--moss-dark);
+  }
+  
+  .select-option[aria-selected="true"]::after {
+    content: "";
+    flex: none;
+    width: 5px;
+    height: 9px;
+    margin-top: -2px;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg);
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    .select-button,
+    .select-button::after {
+      transition: none;
+    }
+  }
