@@ -13,6 +13,10 @@
   const BACKEND_URL = "http://127.0.0.1:8000";
   // Contract limits (docs/API.md, backend/app/schemas.py).
   const MAX_BLOCKS = 100;
+  // The backend passes at most this much text to the model (MAX_INPUT_CHARS in
+  // backend/app/services/summarize.py). Sending no more keeps the panel's
+  // "based on the first N blocks" true.
+  const MAX_TEXT_CHARS = 30000;
   const MAX_TITLE_CHARS = 300;
   const MAX_SUMMARY_CHARS = 4000;
   const HIDEABLE_TOPICS = ["valka", "politicke_konflikty", "umrti", "katastrofy", "nasili"];
@@ -41,7 +45,16 @@
     const topicById = new Map(results.filter(Boolean).map((result) => [result.id, result.topic || result.category]));
     const omitted = HIDEABLE_TOPICS.filter((topic) => preferences[topic] === true
       && [...hidden].some((id) => topicById.get(id) === topic));
-    const sent = visible.slice(0, MAX_BLOCKS).map(({ id, kind, title, text }) => ({
+    let textChars = 0;
+    const fitting = [];
+    for (const block of visible.slice(0, MAX_BLOCKS)) {
+      if (fitting.length && textChars + block.text.length > MAX_TEXT_CHARS) {
+        break;
+      }
+      fitting.push(block);
+      textChars += block.text.length;
+    }
+    const sent = fitting.map(({ id, kind, title, text }) => ({
       id, kind, text, title: typeof title === "string" ? title.slice(0, MAX_TITLE_CHARS) : null,
     }));
     return {
@@ -86,7 +99,7 @@
   };
 
   // Returns { ok: true, summary } or { ok: false, error } with
-  // summary_not_served (the backend has no /v1/summarize yet, ZF-15),
+  // summary_not_served (an older backend without /v1/summarize; served since ZF-15),
   // summary_unavailable, rate_limited, timeout, backend_unavailable,
   // backend_error or invalid_response.
   async function summarize(fetchFn, request, { url = BACKEND_URL, timeoutMs = REQUEST_TIMEOUT_MS } = {}) {
@@ -117,6 +130,6 @@
   }
 
   globalThis.ZenFeedSummaryClient = {
-    BACKEND_URL, MAX_BLOCKS, HIDEABLE_TOPICS, defaultLanguage, buildRequest, isValidSummary, summarize,
+    BACKEND_URL, MAX_BLOCKS, MAX_TEXT_CHARS, HIDEABLE_TOPICS, defaultLanguage, buildRequest, isValidSummary, summarize,
   };
 })();

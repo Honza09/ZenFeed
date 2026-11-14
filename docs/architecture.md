@@ -34,7 +34,7 @@ The popup also holds the summary panel ([`summary-panel.md`](summary-panel.md), 
 | `config.py` | Settings from the environment, including the optional AI key |
 | `services/analyze.py`, `services/classify.py` | Classification; today the local lexicon `lexicon-1` |
 
-Planned: `/v1/summarize` (ZF-15) and the Gemini integration behind the same service layer, so routes do not depend on a provider. The backend keeps no state between requests and stores no page content.
+`/v1/summarize` (ZF-15) calls Gemini through `services/gemini.py`, behind `services/summarize.py`, so the route does not depend on the provider ([`summarize.md`](summarize.md)). Gemini is not used for `/v1/analyze`; classification stays on `lexicon-1`. The backend keeps no state between requests and stores no page content.
 
 ## Data flow
 
@@ -48,7 +48,7 @@ Planned: `/v1/summarize` (ZF-15) and the Gemini integration behind the same serv
 6. The registry accepts the results only for the current `extractionId`. The hider hides blocks marked `hide`, except wrapper blocks and other blocks that cannot be hidden safely. `review` is never hidden.
 7. Every hidden block has a "Zobrazit" button, and "Show all" restores the page.
 
-### Summary (planned, ZF-15, ZF-30)
+### Summary (ZF-15, ZF-30)
 
 1. The popup sends only the visible blocks, the switches and the list of hidden topics (`omitted_categories`) to `POST /v1/summarize`. Hidden text does not leave the browser for the summary.
 2. The backend summarizes with Gemini and returns the summary, the switches that were applied and the omitted topics, or a flag (`insufficient_input`, `no_relevant_content`), or an error (`503`, `429`).
@@ -76,7 +76,7 @@ Gemini's free tier is used without billing. Its terms have special rules for the
 
 - Page content is untrusted. It is never executed, it is shown only with `textContent`, and the hider box lives in a shadow root.
 - The backend validates every request and every response with Pydantic. Invalid classifier output becomes `review` and never hides a block.
-- Text sent to a model is data, not instructions. The summary prompt must not let page text override it (ZF-15).
+- Text sent to a model is data, not instructions. The summary prompt says so and the blocks go as a JSON value; the answer is checked for shape and length (ZF-15, [`summarize.md`](summarize.md)).
 - The AI key is read from the environment on the backend only. It is never in the extension or in git.
 - Logs contain counts and error types, never page text or keys.
 

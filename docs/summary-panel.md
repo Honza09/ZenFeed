@@ -2,13 +2,13 @@
 
 After an analysis the popup shows a **Shrnutí** section. It asks the backend for a summary of what is still visible on the page and shows it outside the page, labelled with the preferences that were applied and the topics that were left out (proposal §4.1 #3, §4.2 transparency).
 
-The backend side, `POST /v1/summarize`, is ZF-15 (Daniel). Its contract is frozen in `docs/API.md` (ZF-02), but the route is not served yet. Until it is, the panel says "Shrnutí server ZenFeed zatím neumí (připravuje se). Filtrování funguje dál." Once ZF-15 serves the route, the panel works without changes. The voice player and its "synthetic voice" label are in [`voice-player.md`](voice-player.md) (ZF-16, ZF-17).
+The backend side, `POST /v1/summarize`, is served since ZF-15 ([`summarize.md`](summarize.md)); without a key on the server it answers 503 and the panel says the summary is not available. The voice player and its "synthetic voice" label are in [`voice-player.md`](voice-player.md) (ZF-16, ZF-17).
 
 ## What is sent
 
 `extension/popup/summary-client.js` builds the request from the current state of the page:
 
-- `blocks`: the blocks that are **visible now**, at most 100 (contract limit) in page order, with `id`, `kind`, `title` (cut to 300 characters) and `text`.
+- `blocks`: the blocks that are **visible now**, at most 100 (contract limit) and at most 30 000 characters of text (what the backend passes to the model, ZF-15) in page order, with `id`, `kind`, `title` (cut to 300 characters) and `text`.
   - Hidden blocks are not sent.
   - A visible block that **wraps or shares an element with a hidden block** is not sent either, because its text was read before hiding and includes the hidden text. The panel says how many such blocks were left out.
 - `preferences`: the switches that were applied.
@@ -30,7 +30,7 @@ The state is kept only while the popup is open. "Zobrazit vše", "Znovu skrýt" 
 
 | Error | When | Message |
 |---|---|---|
-| `summary_not_served` | 404/405: no `/v1/summarize` yet | Shrnutí server ZenFeed zatím neumí (připravuje se). Filtrování funguje dál. |
+| `summary_not_served` | 404/405: an older backend without `/v1/summarize` | Shrnutí server ZenFeed zatím neumí (připravuje se). Filtrování funguje dál. |
 | `summary_unavailable` | 503 | Shrnutí teď není k dispozici (model není nastavený nebo neodpovídá). Filtrování funguje dál. |
 | `rate_limited` | 429 | Bezplatný limit pro shrnutí je vyčerpaný. Zkuste to později. Filtrování funguje dál. |
 | `timeout` | 504 or no answer within 30 s | Shrnutí nedorazilo včas. Zkuste to znovu. |
@@ -101,7 +101,7 @@ Before the overlap fix the same run found hidden text in the request on P05 (1 e
 
 OWID "latest" (P04) currently renders only its footer (125 characters, checked with `segment-pages.mjs`), so the popup correctly reports little text there; it was not used.
 
-Not tested: the real `/v1/summarize` (ZF-15 does not exist yet); desktop Google Chrome with a real click.
+Not tested here: the real `/v1/summarize` (added later in ZF-15 and tested end to end with a fake Gemini, see [`summarize.md`](summarize.md)); desktop Google Chrome with a real click.
 
 ## Known limitations
 

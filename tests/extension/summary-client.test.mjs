@@ -106,6 +106,17 @@ test("at most 100 visible blocks are sent", () => {
   assert.equal(built.visibleCount, 130);
 });
 
+test("at most 30 000 characters of text are sent, so the panel's count is what the model gets", () => {
+  const big = Array.from({ length: 20 }, (_, index) => ({ id: `zf-${index}`, kind: "post", title: null, text: "x".repeat(3000) }));
+  const built = build({ blocks: big, hiddenIds: [], results: [] });
+  assert.equal(built.sentCount, 10);
+  assert.equal(built.visibleCount, 20);
+  assert.ok(built.request.blocks.reduce((sum, block) => sum + block.text.length, 0) <= 30000);
+  // A single block larger than the limit is still sent (the backend cuts it).
+  const one = build({ blocks: [{ id: "zf-0", kind: "post", title: null, text: "y".repeat(31000) }], hiddenIds: [], results: [] });
+  assert.equal(one.sentCount, 1);
+});
+
 test("language: cs or en, defaulting from the page language", () => {
   const client = loadClient();
   assert.equal(client.defaultLanguage("en-GB"), "en");

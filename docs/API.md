@@ -1,6 +1,6 @@
 # ZenFeed API Reference
 
-Contract between the extension and the backend (ZF-02). `/health` and `/v1/analyze` are served (ZF-05, ZF-06). `/v1/summarize` is defined here and in `backend/app/schemas.py` but not served yet (ZF-15). There is no `/v1/tts`: the voice is read by Chrome in the extension (`docs/rozhodnuti-zf-25.md`, ZF-16, ZF-17). The overall design is in [`architecture.md`](architecture.md).
+Contract between the extension and the backend (ZF-02). `/health`, `/v1/analyze` (ZF-05, ZF-06) and `/v1/summarize` (ZF-15, [`summarize.md`](summarize.md)) are served. There is no `/v1/tts`: the voice is read by Chrome in the extension (`docs/rozhodnuti-zf-25.md`, ZF-16, ZF-17). The overall design is in [`architecture.md`](architecture.md).
 
 Changes to this contract need the agreement of Jan and Daniel.
 
@@ -20,7 +20,7 @@ The extension sends blocks produced by the content script (`id`, `kind`, `title`
 |---|---|---|---|
 | GET | `/health` | Check backend availability | Implemented |
 | POST | `/v1/analyze` | Classify topic and tone, then recommend show, hide, or review | Implemented (`lexicon-1`) |
-| POST | `/v1/summarize` | Summarize the kept blocks | Contract only (ZF-15) |
+| POST | `/v1/summarize` | Summarize the kept blocks | Implemented (Gemini free tier; 503 without a key) |
 
 The backend listens on `http://127.0.0.1:8000` on the demo machine. The extension reaches it through `host_permissions` for that address only. The backend sets no CORS headers, so ordinary web pages cannot read its responses.
 
@@ -94,9 +94,9 @@ If the classifier builds a result that does not match this schema, it is replace
 | 504 | `{"error":"timeout"}` | Analysis exceeds `ZENFEED_ANALYZE_TIMEOUT_SECONDS` (default 10, maximum 120). |
 | 500 | `{"error":"internal_error"}` | Unexpected failure or a response that does not match the output schema. No stack trace. |
 
-## POST /v1/summarize (contract, not served)
+## POST /v1/summarize
 
-`SummaryRequest` and `SummaryResponse` in `backend/app/schemas.py` are the shape for ZF-15. There is no `POST /v1/summarize` yet.
+`SummaryRequest` and `SummaryResponse` in `backend/app/schemas.py`. Served since ZF-15 with the Gemini free tier; how the model is called, the prompt rules and the limits are in [`summarize.md`](summarize.md). Below 200 characters of kept text the answer is `insufficient_input: true` without calling the model; at most 30 000 characters of block text reach the model.
 
 Request:
 
