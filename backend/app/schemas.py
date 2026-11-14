@@ -2,8 +2,8 @@
 
 The analyze contract follows the draft in ``zenfeed_implementacni_plan.md``.
 ``section`` is included because the content script already emits that kind.
-Preference keys and summary fields are the ZF-14 contract. ``/v1/summarize``
-is not served yet.
+Preference keys and summary fields are the ZF-14 contract; ``/v1/summarize``
+serves them since ZF-15.
 """
 
 from __future__ import annotations
@@ -118,7 +118,7 @@ def _reject_duplicate_categories(value: list[str]) -> list[str]:
 
 
 class SummaryRequest(BaseModel):
-    """Blocks already kept for a later ``/v1/summarize``. Not served yet.
+    """Blocks the extension kept, for ``/v1/summarize`` (ZF-15).
 
     The extension sends only the blocks it kept, so it also sends which topics
     it hid. Hidden text never reaches the backend.

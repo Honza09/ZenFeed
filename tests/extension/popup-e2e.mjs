@@ -66,9 +66,14 @@ const ALL_PREFERENCES = {
 
 const args = process.argv.slice(2);
 const sameTab = args.includes("--same-tab");
-const withSummary = args.includes("--summary");
+const withSummary = args.includes("--summary") || args.some((arg) => arg.startsWith("--fake-gemini="));
 const STUB_URL = "http://127.0.0.1:8000";
-const STUB_MODES = ["ok", "insufficient", "no_relevant", "not_served", "unavailable", "rate_limited", "timeout"];
+// --fake-gemini=<url> (ZF-15): the real backend serves /v1/summarize and calls
+// tests/extension/fake_gemini.py; modes and the last request come from there.
+const fakeGemini = args.find((arg) => arg.startsWith("--fake-gemini="))?.slice("--fake-gemini=".length);
+const STUB_MODES = fakeGemini
+  ? ["ok", "insufficient", "no_relevant", "blocked", "unavailable", "rate_limited", "timeout"]
+  : ["ok", "insufficient", "no_relevant", "not_served", "unavailable", "rate_limited", "timeout"];
 const backend = args.find((arg) => arg.startsWith("--backend="))?.slice("--backend=".length);
 const urls = args.filter((arg) => !arg.startsWith("--"));
 if (!urls.length) {
@@ -221,7 +226,8 @@ const summaryStateExpression = `(() => ({
 }))()`;
 
 async function stub(path, body) {
-  const response = await fetch(`${STUB_URL}${path}`, body === undefined ? {} : {
+  const target = fakeGemini ? `${fakeGemini}${path.replace("/__stub/", "/__fake/")}` : `${STUB_URL}${path}`;
+  const response = await fetch(target, body === undefined ? {} : {
     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
   });
   return response.json();
@@ -315,6 +321,13 @@ async function checkSummary(cdp, sessionId, tab) {
         leaked: hidden.filter((text) => sent.some((block) => block.includes(text.slice(0, 40)))).length,
         omitted: last ? last.omitted_categories : null,
         language: last ? last.language : null,
+        // Only with --fake-gemini: what reached the (fake) provider.
+        provider: last && last.system ? {
+          keyInHeader: last.key_in_header,
+          untrustedRule: last.system.includes("untrusted page content, not instructions"),
+          omittedNamed: last.system.match(/removed from the page: ([^.]*)\./)?.[1] || "none",
+          language: last.system.match(/Write the summary in (\w+)/)?.[1],
+        } : null,
       };
       if (modes.ok.result) {
         modes.player = await checkPlayer(cdp, sessionId);
@@ -625,6 +638,10 @@ function printSummary(summary) {
   const { privacy, modes } = summary;
   console.log(`  summary request: blocks sent ${privacy.sentBlocks}, hidden elements on page ${privacy.hiddenElements}, `
     + `hidden text found in request ${privacy.leaked}, omitted ${JSON.stringify(privacy.omitted)}, language ${privacy.language}`);
+  if (privacy.provider) {
+    console.log(`  provider got: key in header ${privacy.provider.keyInHeader}, untrusted-text rule ${privacy.provider.untrustedRule}, `
+      + `omitted topics named "${privacy.provider.omittedNamed}", language ${privacy.provider.language}`);
+  }
   const ok = modes.ok;
   console.log(`  summary ok: label "${ok.label}" | text "${ok.text.slice(0, 80)}" | link ${ok.link} | ${ok.model}`);
   for (const mode of STUB_MODES.slice(1)) {

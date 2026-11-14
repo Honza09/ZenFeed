@@ -59,7 +59,7 @@ Start the API from the repository root:
 uvicorn app.main:app --app-dir backend --reload
 ```
 
-`GET http://127.0.0.1:8000/health` returns `{"status":"ok"}`. The extension popup calls this address (port 8000), so keep the default port when using the extension ([`popup.md`](popup.md)). Generated docs are at `http://127.0.0.1:8000/docs`. Copy `.env.example` to `.env` only when you need to override the timeout, log level, or the future AI key. The server starts without a key.
+`GET http://127.0.0.1:8000/health` returns `{"status":"ok"}`. The extension popup calls this address (port 8000), so keep the default port when using the extension ([`popup.md`](popup.md)). Generated docs are at `http://127.0.0.1:8000/docs`. The server starts without a key; then `/v1/summarize` answers `503 summary_unavailable` and everything else works. For summaries, put a Gemini free-tier key (no billing account, ZF-25) into `.env` as `ZENFEED_AI_API_KEY` (copy `.env.example`, never commit `.env`) and start with `uvicorn app.main:app --app-dir backend --env-file .env`; the variables are described in [`summarize.md`](summarize.md).
 
 ## Running the checks locally
 
