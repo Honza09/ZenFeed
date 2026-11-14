@@ -52,6 +52,7 @@ Adapt this structure to match the actual repository as development progresses.
 - [API Reference](API.md)
 - [Testing](TESTING.md)
 - [Regression checklist M2 (ZF-13)](testing/checklist-m2.md) and [bug log](testing/evidence-chyb.md)
+- [End-to-end regrese M3 (ZF-18)](testing/regrese-m3.md)
 - [Block segmentation (ZF-03 PoC)](segmentation.md)
 - [Extension bootstrap and permissions (ZF-08)](extension-bootstrap.md)
 - [Block ID mapping (ZF-09)](block-mapping.md)

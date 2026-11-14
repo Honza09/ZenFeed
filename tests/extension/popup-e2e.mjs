@@ -17,6 +17,13 @@
 //   BROWSER_PATH=/path/to/chromium node tests/extension/popup-e2e.mjs <url>
 //   ZENFEED_PROFILE=/tmp/zf-profile node tests/extension/popup-e2e.mjs <url>   # keep the browser profile
 //   node tests/extension/popup-e2e.mjs --summary <url> ...   # summary panel, needs the stub
+//   node tests/extension/popup-e2e.mjs --check ... <url> ...   # verdict per page, exit code 1 on failure
+//
+// --check (ZF-18) turns the printed values into checks of the fixed rules
+// (reversibility, nothing read before a click, no hidden text in the summary,
+// summary readable without a voice, …), prints PASS or FAIL per page and ends
+// with exit code 1 if any check failed. tests/extension/run-e2e.sh starts the
+// servers and runs the whole set this way.
 //
 // --summary (ZF-30) needs tests/extension/summary_stub.py on port 8000 instead
 // of the plain backend. Right after the first analysis it clicks "Shrnout" once
@@ -66,6 +73,7 @@ const ALL_PREFERENCES = {
 
 const args = process.argv.slice(2);
 const sameTab = args.includes("--same-tab");
+const checkMode = args.includes("--check");
 const withSummary = args.includes("--summary") || args.some((arg) => arg.startsWith("--fake-gemini="));
 const STUB_URL = "http://127.0.0.1:8000";
 // --fake-gemini=<url> (ZF-15): the real backend serves /v1/summarize and calls
@@ -341,9 +349,12 @@ async function checkSummary(cdp, sessionId, tab) {
 }
 
 async function runPopupFlow(cdp, sessionId, tab) {
+  // Privacy (ZF-29, proposal §4.2): opening the popup must not read the page.
+  const beforeClick = await evaluate(cdp, sessionId,
+    "ZenFeedBootstrap.activeTabId(chrome).then((id) => ZenFeedBootstrap.getStatus(chrome, id))");
   const preferencesAtOpen = await turnPreferencesOn(cdp, sessionId);
   const first = await clickAndRead(cdp, sessionId);
-  const steps = { preferencesAtOpen, first };
+  const steps = { preferencesAtOpen, first, injectedBeforeClick: Boolean(beforeClick && beforeClick.ok) };
   if (withSummary && !first.error) {
     steps.summary = await checkSummary(cdp, sessionId, tab);
   }
@@ -637,7 +648,8 @@ function printSummary(summary) {
   }
   const { privacy, modes } = summary;
   console.log(`  summary request: blocks sent ${privacy.sentBlocks}, hidden elements on page ${privacy.hiddenElements}, `
-    + `hidden text found in request ${privacy.leaked}, omitted ${JSON.stringify(privacy.omitted)}, language ${privacy.language}`);
+    + `hidden text found in request ${privacy.leaked}`
+    + (privacy.omitted === undefined ? "" : `, omitted ${JSON.stringify(privacy.omitted)}, language ${privacy.language}`));
   if (privacy.provider) {
     console.log(`  provider got: key in header ${privacy.provider.keyInHeader}, untrusted-text rule ${privacy.provider.untrustedRule}, `
       + `omitted topics named "${privacy.provider.omittedNamed}", language ${privacy.provider.language}`);
@@ -685,8 +697,103 @@ function printResult(url, { first, steps, secondMatches, roundTrip }) {
   }
 }
 
+const RESTRICTED = /^(chrome|about|file|view-source):|chromewebstore\.google\.com|chrome\.google\.com\/webstore/;
+const NO_ACCESS = "nemá přístup";
+
+// --check: the rules every page must keep. Returns the list of broken ones.
+function verify(url, { first, steps, secondMatches, roundTrip }) {
+  const failures = [];
+  const notes = [];
+  const expect = (ok, message) => {
+    if (!ok) {
+      failures.push(message);
+    }
+  };
+  expect(!steps.injectedBeforeClick, "content script was in the page before the first click");
+  if (RESTRICTED.test(url)) {
+    expect(first.error, "restricted page did not show an error");
+    return { failures, notes };
+  }
+  expect(!first.error, `analysis failed: ${first.status}`);
+  // A dynamic page can change between the analyses (P01 lazy-loads a chart
+  // after the layout moves); then the counts differ and that is not a bug.
+  const second = steps.second;
+  if (second && second.blocks !== first.blocks) {
+    notes.push(`the page changed between the analyses (blocks ${first.blocks} → ${second.blocks})`);
+  } else {
+    expect(secondMatches, "second analysis of the same page gave a different result");
+  }
+  expect(first.elementsInSummary === 0, "page text was parsed as HTML in the popup");
+  for (const name of ["shown", "shownAgain", "final"]) {
+    if (steps[name]) {
+      expect(steps[name].hidden === "0", `Zobrazit vše (${name}) left ${steps[name].hidden} hidden`);
+    }
+  }
+  if (steps.rehidden) {
+    // In review mode (ZF-28) the blocks were hidden by "Přesto skrýt", not by the analysis.
+    const before = steps.hiddenAnyway ? steps.hiddenAnyway.hidden : first.hidden;
+    expect(steps.rehidden.hidden === before, `Znovu skrýt hid ${steps.rehidden.hidden}, before it was ${before}`);
+  }
+  if (roundTrip) {
+    const { applied, registry, hiding } = roundTrip;
+    expect(applied.ok && applied.matched === roundTrip.blocks, "not every result matched its block");
+    expect(registry.missing.length === 0 && registry.detached.length === 0 && registry.textMismatch.length === 0,
+      "registry check found missing, detached or mismatched blocks");
+    expect(roundTrip.stale === "stale_extraction", "results of an old extraction were accepted");
+    if (hiding && !hiding.error) {
+      const { counts } = hiding;
+      expect(counts.failed === 0, `${counts.failed} blocks failed to hide`);
+      expect(counts.hidden === hiding.reallyHidden && counts.hidden === hiding.boxes && counts.hidden === hiding.statusHidden,
+        "hidden count, hidden elements, boxes and status disagree");
+      expect(hiding.traces === 0, `${hiding.traces} ZenFeed traces left after Zobrazit vše`);
+      expect(hiding.blockElementsChanged === 0, `${hiding.blockElementsChanged} block elements changed after Zobrazit vše`);
+    }
+    if (roundTrip.removed) {
+      expect(roundTrip.removed.includes("result null"), "a block removed from the page got a result");
+    }
+  }
+  const summary = steps.summary;
+  if (summary && summary.panel) {
+    const { privacy, modes } = summary;
+    expect(privacy.leaked === 0, `${privacy.leaked} hidden elements' text was sent for the summary`);
+    if (privacy.provider) {
+      expect(privacy.provider.keyInHeader, "the API key did not reach the provider in the header");
+      expect(privacy.provider.untrustedRule, "the prompt lacks the untrusted-text rule");
+    }
+    if (privacy.sentBlocks > 0) {
+      expect(modes.ok.result && modes.ok.text.length > 0, "no summary shown for the ok answer");
+      expect(modes.ok.label.includes("Použité nastavení"), "summary shown without the preference label");
+      for (const mode of ["insufficient", "no_relevant"]) {
+        expect(modes[mode].result && !modes[mode].error, `flag ${mode} not shown as a result`);
+      }
+      for (const mode of ["not_served", "blocked", "unavailable", "rate_limited", "timeout"]) {
+        if (modes[mode]) {
+          expect(modes[mode].error && !modes[mode].result, `error ${mode} not shown as an error`);
+        }
+      }
+      expect(modes.retry.result, "Zkusit znovu did not bring the summary back");
+    } else {
+      expect(!modes.ok.result && modes.ok.status.includes("není co shrnout"), "nothing visible, but a summary was asked for");
+    }
+    const player = modes.player;
+    if (player && player.ready.shown) {
+      expect(/Syntetický hlas|Synthetic voice/.test(player.ready.label), "player without the synthetic-voice label");
+      expect(player.ready.before.length > 0, "no notice before the first playback");
+      expect(player.playing && player.playing.pause, `player did not start: ${player.playing && player.playing.status}`);
+      if (player.end) {
+        expect(player.end.status === "Dočteno.", `player did not finish: ${player.end.status}`);
+      }
+      if (player.noVoice) {
+        expect(player.noVoice.error && player.noVoice.summaryStillShown, "without a voice the summary was not kept");
+      }
+    }
+  }
+  return { failures, notes };
+}
+
 async function run(cdp) {
   let tab = null;
+  const verdicts = [];
   for (const url of urls) {
     try {
       if (sameTab && tab) {
@@ -694,15 +801,39 @@ async function run(cdp) {
       } else {
         tab = await openTab(cdp, url);
       }
-      printResult(url, await openPopupAndCheck(cdp, tab));
+      let result = await openPopupAndCheck(cdp, tab);
+      // Known timing (ZF-08): a click before the page committed loses access. Try once more.
+      if (checkMode && !RESTRICTED.test(url) && result.first.status.includes(NO_ACCESS)) {
+        console.log(`\n(${url}: no access, page still loading; clicking the icon again)`);
+        await sleep(LOAD_MS);
+        result = await openPopupAndCheck(cdp, tab);
+      }
+      printResult(url, result);
+      if (checkMode) {
+        const { failures, notes } = verify(url, result);
+        verdicts.push({ url, failures });
+        for (const note of notes) {
+          console.log(`  note: ${note}`);
+        }
+        console.log(failures.length ? `FAIL\n  - ${failures.join("\n  - ")}` : "PASS");
+      }
     } catch (error) {
       console.log(`\n=== ${url}\nFAILED: ${error.message}`);
+      verdicts.push({ url, failures: [`run failed: ${error.message}`] });
     } finally {
       if (!sameTab && tab) {
         await cdp.send("Target.closeTarget", { targetId: tab.tabId });
         tab = null;
       }
     }
+  }
+  if (checkMode) {
+    const failed = verdicts.filter((verdict) => verdict.failures.length);
+    console.log(`\n${verdicts.length - failed.length} of ${verdicts.length} pages passed`);
+    for (const verdict of failed) {
+      console.log(`FAIL ${verdict.url}: ${verdict.failures.join("; ")}`);
+    }
+    process.exitCode = failed.length ? 1 : 0;
   }
 }
 
