@@ -302,6 +302,11 @@ def test_gemini_error_logs_hide_the_response_body(caplog) -> None:
     assert KEY not in caplog.text
 
 
+def test_gemini_client_repr_hides_the_key() -> None:
+    """A traceback, a log line or a failed assert that prints the client must not show the key (ZF-18)."""
+    assert KEY not in repr(_gemini(lambda request: httpx.Response(200)))
+
+
 # --- Settings ---
 
 

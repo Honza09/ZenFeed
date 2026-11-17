@@ -79,6 +79,14 @@ Celý scénář preference → skrytí → shrnutí → přehrání tedy proběh
 
 Ostatní automatické kontroly ve stejný den: `ruff` OK, `pytest backend` 88 prošlo, `node --test tests/extension/*.test.mjs` 98 z 98 na Node 25.9 i 22.23, `hider-browser.mjs` OK.
 
+## Opakování a uzavření ZF-18 (17. 11. 2026)
+
+- **Automatický běh:** `bash tests/extension/run-e2e.sh` na Macu autorky doběhl v pořádku (falešný Gemini, skutečný backend). Údaj je z hlášení Libuše; výpis a počet stránek se do repozitáře nevkládaly, takže tu nejsou čísla.
+- **Ruční scénář:** celý řetězec preference → skrytí → shrnutí → přehrání provedla Libuše v prohlížeči a všechno dopadlo dobře (podle jejího hlášení). Podrobné výsledky po jednotlivých scénářích v [`checklist-m3.md`](checklist-m3.md) nejsou vyplněné.
+- **Co přibylo oproti 14. 11.:** kontrola přehrávání v `popup-e2e.mjs` (co jde do `speak()` je text shrnutí; stav po Pozastavit a Zastavit), [`audit-soukromi.md`](audit-soukromi.md), oprava B-003 (upozornění na Google Gemini v popupu, `privacy.md`) a B-004 (klíč ve výpisu `GeminiClient`). Stav a ověření chyb jsou v [`evidence-chyb.md`](evidence-chyb.md).
+- **Jen v cloudu, ne na Macu:** ruff, `pytest backend` (89 passed), `node --test` (98 z 98) a `hider-browser.mjs` prošly na kopii repozitáře (17. 11. 2026).
+- **Stále neověřeno:** skutečný model Gemini (běh s klíčem se nedělal), kvalita a poslechová kvalita hlasu, Windows a Linux.
+
 ## Co tento běh nepokrývá (ručně, nebo později)
 
 - Skutečný Google Chrome se skutečným kliknutím; běh je v headless Brave přes CDP.

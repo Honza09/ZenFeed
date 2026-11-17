@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import json
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import httpx
 from pydantic import BaseModel, ConfigDict, StrictBool, ValidationError
@@ -53,7 +53,8 @@ RESPONSE_SCHEMA = {
 
 @dataclass(frozen=True)
 class GeminiClient:
-    api_key: str
+    # repr=False: the key must not appear if the client is ever printed or logged.
+    api_key: str = field(repr=False)
     model: str
     api_base: str
     timeout_seconds: float
