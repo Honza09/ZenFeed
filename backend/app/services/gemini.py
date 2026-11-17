@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import logging
+import time
 from dataclasses import dataclass, field
 
 import httpx
@@ -19,6 +20,10 @@ logger = logging.getLogger("zenfeed")
 # Long enough for a summary of at most ~1500 characters (the prompt asks for
 # that); the contract allows 4000.
 MAX_OUTPUT_TOKENS = 800
+# The free tier often answers 503 on the next call (a second language). Two
+# short retries usually get a summary; other errors are not retried.
+_BUSY_ATTEMPTS = 3
+_BUSY_DELAYS_SECONDS = (0.4, 0.8)
 
 
 class ProviderError(Exception):
@@ -72,9 +77,20 @@ class GeminiClient:
             },
         }
         url = f"{self.api_base}/models/{self.model}:generateContent"
+        for attempt in range(_BUSY_ATTEMPTS):
+            response = self._post(url, body)
+            if response.status_code != 503:
+                return _interpret(response)
+            logger.warning("summary provider busy status=503 attempt=%s", attempt + 1)
+            if attempt == _BUSY_ATTEMPTS - 1:
+                raise ProviderError("unavailable")
+            time.sleep(_BUSY_DELAYS_SECONDS[attempt])
+        raise ProviderError("unavailable")
+
+    def _post(self, url: str, body: dict[str, object]) -> httpx.Response:
         try:
             with httpx.Client(timeout=self.timeout_seconds, transport=self.transport) as client:
-                response = client.post(url, json=body, headers={"x-goog-api-key": self.api_key})
+                return client.post(url, json=body, headers={"x-goog-api-key": self.api_key})
         except httpx.TimeoutException as exc:
             logger.warning("summary provider timed out")
             raise ProviderError("timeout") from exc
@@ -82,16 +98,18 @@ class GeminiClient:
             logger.warning("summary provider unreachable error_type=%s", type(exc).__name__)
             raise ProviderError("unavailable") from exc
 
-        if response.status_code == 429:
-            logger.warning("summary provider rate limited")
-            raise ProviderError("rate_limited")
-        if response.status_code in (408, 504):
-            raise ProviderError("timeout")
-        if response.status_code != 200:
-            # The body can echo the request; only the status is logged.
-            logger.warning("summary provider error status=%s", response.status_code)
-            raise ProviderError("unavailable")
-        return _parse(response)
+
+def _interpret(response: httpx.Response) -> ModelSummary:
+    if response.status_code == 429:
+        logger.warning("summary provider rate limited")
+        raise ProviderError("rate_limited")
+    if response.status_code in (408, 504):
+        raise ProviderError("timeout")
+    if response.status_code != 200:
+        # The body can echo the request; only the status is logged.
+        logger.warning("summary provider error status=%s", response.status_code)
+        raise ProviderError("unavailable")
+    return _parse(response)
 
 
 def _parse(response: httpx.Response) -> ModelSummary:

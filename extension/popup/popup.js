@@ -113,6 +113,10 @@
   // The analysed page as it is now: its blocks, results and which are hidden.
   // The summary is built from it. Kept only while the popup is open.
   let current = null;
+  // True after the user has asked for a summary of this analysis. Changing
+  // the language then asks again, so English and then Czech is a new summary.
+  let summaryAttempted = false;
+  let summaryLanguageDirty = false;
 
   // A message below the fold must not go unnoticed: scroll it into view.
   function bringIntoView(element) {
@@ -296,6 +300,8 @@
   function setCurrent(state) {
     stopPlayer();
     current = state;
+    summaryAttempted = false;
+    summaryLanguageDirty = false;
     elements.summaryPanel.hidden = state === null;
     elements.summaryResult.hidden = true;
     elements.summarize.textContent = "Shrnout viditelný obsah";
@@ -392,6 +398,8 @@
     if (!current) {
       return;
     }
+    summaryAttempted = true;
+    summaryLanguageDirty = false;
     const language = elements.summaryLanguage.value;
     const built = Summary.buildRequest({ ...current, preferences, language });
     stopPlayer();
@@ -435,6 +443,10 @@
       elements.summarize.textContent = "Zkusit znovu";
     } finally {
       setBusy(false);
+      if (summaryLanguageDirty && current) {
+        summaryLanguageDirty = false;
+        handleSummarize();
+      }
     }
   }
 
@@ -679,6 +691,16 @@
     elements.hideAnyway.addEventListener("click", () => !busy && handleHideAnyway());
     elements.retryFailed.addEventListener("click", () => !busy && handleRetryFailed());
     elements.summarize.addEventListener("click", () => !busy && handleSummarize());
+    elements.summaryLanguage.addEventListener("change", () => {
+      if (!summaryAttempted || !current) {
+        return;
+      }
+      if (busy) {
+        summaryLanguageDirty = true;
+        return;
+      }
+      handleSummarize();
+    });
     elements.play.addEventListener("click", () => player && player.play());
     elements.pause.addEventListener("click", () => player && player.pause());
     elements.stop.addEventListener("click", () => player && player.stop());

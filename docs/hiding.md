@@ -20,14 +20,15 @@ If hiding one block fails (an exception), everything done for that block is undo
 
 ## How it hides
 
-- A hidden element gets the attribute `data-zenfeed-hidden`. A stylesheet that ZenFeed adds to the document (`document.adoptedStyleSheets`) turns it into `display: none !important`. Restoring removes the attribute, so the element is exactly as before. The stylesheet is removed again when nothing is hidden.
-- If the page forces `display` with inline `!important`, the attribute rule loses. Only then is `display: none !important` set in the element's inline style, and the original value and priority are put back on restore. In that case the browser may re-serialize the style attribute (a trailing `;`); the declarations are the same.
-- Every hide is checked with `getComputedStyle(element).display === "none"`. A block that cannot be hidden is not hidden at all.
+- A hidden element gets the attribute `data-zenfeed-hidden`. The element stays in the layout, so a grid or flex sibling (the Related topics column on Our World in Data) keeps its width. A stylesheet ZenFeed adds to the document (`document.adoptedStyleSheets`) conceals the element's children (`display: none !important`) and its own text (`font-size: 0`). Restoring removes the attribute, so the element is exactly as before. The stylesheet is removed again when nothing is hidden.
+- Table rows, list items and replaced elements (`img`, `svg`, `video`, `iframe`, …) cannot hold that box. Those are `display: none !important`, and the box is inserted in front of them.
+- If concealment loses to an inline `!important` on a child, `display: none !important` is set on the element's own inline style, and the original value and priority are put back on restore. In that case the browser may re-serialize the style attribute (a trailing `;`); the declarations are the same.
+- A block that cannot be concealed is not hidden at all.
 - Styles are set through CSSOM (constructed stylesheets, `style.setProperty`), which a page Content-Security-Policy does not block. Tested with `style-src 'none'`.
 
 ## The box
 
-- Inserted right before the block's first element: a `<div>`, an `<li>` inside lists, a `<tr>` with one cell spanning the row inside tables.
+- For an ordinary block the box is the first child of the block's first element, so the element keeps its grid or flex cell. In a list the box is an `<li>` in front of the item. In a table it is a `<tr>` with one cell spanning the row, in front of the row.
 - Its content is in a shadow root, so page CSS does not reach it (the test page forces red 40 px text with `!important`; the box stays 13 px) and the segmenter does not read its text. All text is set with `textContent`.
 - Label: "Skryto: válka", "Skryto: toxický/vyhrocený tón" or both ("Skryto: násilí · toxický/vyhrocený tón"). Names from `docs/kategorie-mvp.md`.
 - "Proč byl tento obsah skryt?" toggles an explanation (`aria-expanded`), naming only what caused the hiding: "Téma: válka (jistota 83 %). Tón: toxický/vyhrocený (skóre 90 %). Blok odpovídá tématu nebo tónu, které jste zvolili ke skrytí. Klasifikace je automatická a může se mýlit; text bloku nebyl změněn."
@@ -55,7 +56,7 @@ await ZenFeedBootstrap.showAll(chrome, extraction.tabId);    // "Zobrazit vše"
 
 Each returns `{ ok: false, error: "tab_unavailable" }` if the tab was closed, navigated or reloaded, or if the reply has an unexpected shape.
 
-Hiding twice is safe: a block that is already hidden is counted as `alreadyHidden` and gets no second box. Hidden blocks are tracked by element, not by block ID, so "Zobrazit vše" also restores blocks hidden before a later extraction. A new extraction does not see hidden blocks (they are `display: none`), and it resets the "Zobrazit" clicks.
+Hiding twice is safe: a block that is already hidden is counted as `alreadyHidden` and gets no second box. Hidden blocks are tracked by element, not by block ID, so "Zobrazit vše" also restores blocks hidden before a later extraction. A new extraction skips elements marked `data-zenfeed-hidden` (the segmenter rejects them), and it resets the "Zobrazit" clicks.
 
 ## Files
 
@@ -90,8 +91,8 @@ Automated: `ruff check backend` passed, `pytest backend` 42 passed, manifest OK,
 
 `hider-browser.mjs` checks, on `hider.html` and on the same page with `style-src 'none'`:
 
-- the war and toxic blocks are hidden, also one with its own inline `display: flex !important`; `review` and `show` blocks stay visible; the text inside hidden blocks is unchanged;
-- one box per hidden block, right before it, with the right label; `li` box in a list, `tr` box spanning the row in a table;
+- the war and toxic blocks stay in place and their content is hidden, including one with its own inline `display: flex !important`; `review` and `show` blocks stay visible; the text inside hidden blocks is unchanged;
+- one box per hidden block, inside it, with the right label; `li` box in a list, `tr` box spanning the row in a table;
 - page CSS does not reach the box; the box theme follows the background behind it;
 - a stale `extractionId` is refused; hiding twice adds nothing; the segmenter neither reads box text nor returns hidden blocks;
 - "Proč?" toggles the explanation; "Zobrazit" restores one block, removes its box, and the block is not hidden again until the next extraction;
@@ -124,6 +125,6 @@ Not tested: desktop Google Chrome with a real click; pages whose background is a
 
 - Table cells are never hidden, so a block that the segmenter made from a cell stays visible.
 - Wrapper blocks are not hidden even when the result says `hide`; their content stays visible until the segmenter handles wrappers (ZF-07 option B, waiting for the team decision).
-- Hiding changes the layout, and pages may react to it (lazy loading, sticky elements). ZenFeed restores its own changes, not what the page does in response.
+- An ordinary hidden block stays in the layout, so a sibling column does not collapse. A table row or list item is still taken out of the layout. Pages may still react to hiding (lazy loading, sticky elements). ZenFeed restores its own changes, not what the page does in response.
 - The observer counts only added elements; text changed inside existing elements is not counted.
 - After navigation or reload the hidden state is gone together with the content script, and the page shows everything again.

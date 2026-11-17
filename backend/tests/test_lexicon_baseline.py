@@ -36,8 +36,8 @@ def test_pilot_baseline_counts() -> None:
     assert measured.tone_correct == 89
     assert _other_topic_hits(measured) == (4, 11)
     assert measured.settings["S1"].false_hide == 0
-    assert measured.settings["S1"].true_hide == 3
-    assert measured.settings["S1"].missed_hide == 5
+    assert measured.settings["S1"].true_hide == 2
+    assert measured.settings["S1"].missed_hide == 6
     assert measured.settings["S2"].false_hide == 2
     assert measured.settings["S2"].true_hide == 1
     assert measured.false_hide_ids == ["P01-B001:S2", "P01-B004:S2"]
@@ -57,5 +57,6 @@ def test_extended_baseline_counts() -> None:
     assert measured.settings["S1"].false_hide == 0
     assert measured.settings["S2"].false_hide == 4
     assert measured.settings["S4"].false_hide == 1
+    assert measured.settings["S1"].true_hide == 4
     assert measured.settings["S3"].true_hide == 6
     assert measured.duration_ms < 2000

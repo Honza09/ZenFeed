@@ -69,6 +69,7 @@ const scenario = `(async () => {
   };
   const a1PlaceBefore = placeOf(document.getElementById("a1"));
   const a2PlaceBefore = placeOf(document.getElementById("a2"));
+  const a2DisplayBeforeHide = getComputedStyle(document.getElementById("a2")).display;
   const elementsBefore = [...document.body.querySelectorAll("*")];
 
   // 1. Extract and fake classifier results by the marker words in the text.
@@ -101,20 +102,32 @@ const scenario = `(async () => {
 
   const a1 = document.getElementById("a1");
   const a2 = document.getElementById("a2");
-  const hiddenNow = (element) => getComputedStyle(element).display === "none";
-  check("war article hidden", hiddenNow(a1));
-  check("toxic article hidden despite its own display:flex !important", hiddenNow(a2));
-  check("review article stays visible", !hiddenNow(document.getElementById("a3")));
-  check("show article stays visible", !hiddenNow(document.getElementById("a4")));
+  const contentIsHidden = (element) => {
+    if (!element.hasAttribute("data-zenfeed-hidden")) {
+      return false;
+    }
+    const tag = element.tagName;
+    if (tag === "TR" || tag === "LI") {
+      return getComputedStyle(element).display === "none";
+    }
+    const children = [...element.children].filter((child) => !child.hasAttribute("data-zenfeed-box"));
+    return children.length === 0 || children.every((child) => getComputedStyle(child).display === "none");
+  };
+  check("war article stays in place and its content is hidden",
+    contentIsHidden(a1) && getComputedStyle(a1).display !== "none" && placeOf(a1) === a1PlaceBefore,
+    placeOf(a1) + " / " + a1PlaceBefore + " display " + getComputedStyle(a1).display);
+  check("toxic article stays in place despite display:flex !important",
+    contentIsHidden(a2) && getComputedStyle(a2).display === a2DisplayBeforeHide && placeOf(a2) === a2PlaceBefore,
+    getComputedStyle(a2).display + " " + placeOf(a2) + " / " + a2PlaceBefore);
+  check("review article stays visible", !contentIsHidden(document.getElementById("a3")));
+  check("show article stays visible", !contentIsHidden(document.getElementById("a4")));
   check("text inside hidden block unchanged", a1.textContent.includes("This paragraph reports on fighting"));
 
-  const a1Box = a1.previousElementSibling;
-  check("box sits right before the hidden block", a1Box && a1Box.hasAttribute("data-zenfeed-box"));
-  check("box has the same left edge and width as its block",
-    placeOf(a1Box) === a1PlaceBefore && placeOf(a2.previousElementSibling) === a2PlaceBefore,
-    placeOf(a1Box) + " / " + a1PlaceBefore + ", " + placeOf(a2.previousElementSibling) + " / " + a2PlaceBefore);
+  const a1Box = a1.querySelector(":scope > [data-zenfeed-box]");
+  const a2Box = a2.querySelector(":scope > [data-zenfeed-box]");
+  check("box sits inside the hidden block", Boolean(a1Box && a2Box));
   check("box label names the topic", a1Box && boxText(a1Box).includes("Skryto: válka"), a1Box && boxText(a1Box));
-  check("toxic box names the tone", boxText(a2.previousElementSibling).includes("Skryto: toxický/vyhrocený tón"));
+  check("toxic box names the tone", a2Box && boxText(a2Box).includes("Skryto: toxický/vyhrocený tón"));
   const boxStyle = getComputedStyle(boxRoot(a1Box).querySelector(".box"));
   check("page CSS does not reach the box", boxStyle.fontSize === "13px" && boxStyle.color !== "rgb(255, 0, 0)",
     boxStyle.fontSize + " " + boxStyle.color);
@@ -160,7 +173,7 @@ const scenario = `(async () => {
 
   // 7. "Zobrazit" restores one block and removes its box; it is not hidden again.
   boxRoot(a1Box).querySelector("button").click();
-  check("Zobrazit restores the block", !hiddenNow(a1));
+  check("Zobrazit restores the block", !a1.hasAttribute("data-zenfeed-hidden") && getComputedStyle(a1).display !== "none");
   check("Zobrazit removes the box", !a1Box.isConnected);
   const afterReveal = await send({ type: "zenfeed/apply-hiding", extractionId: extraction.extractionId });
   check("revealed block is not hidden again", afterReveal.revealed === 1 && afterReveal.hidden === 0, JSON.stringify(afterReveal));
