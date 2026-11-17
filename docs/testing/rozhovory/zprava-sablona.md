@@ -18,7 +18,7 @@
 
 ## 2. Hypotézy a respondenti
 
-Do každé buňky: **podporuje** / **vyvrací** / **bez důkazu** a odkaz na důkaz ve tvaru „R03, F6“. Prázdná buňka znamená, že se zatím nevyhodnotila.
+Do každé buňky: **podporuje** / **vyvrací** / **bez důkazu** a odkaz na důkaz ve tvaru „R03, B2“. Prázdná buňka znamená, že se zatím nevyhodnotila.
 
 | Hypotéza | R01 | R02 | R03 | R04 | R05 | R06 |
 |---|---|---|---|---|---|---|
@@ -56,7 +56,7 @@ Doplnit konkrétně po sběru odpovědí:
 | Omezení | Popis |
 |---|---|
 | Vzorek | Počet a velikost, nereprezentativnost. |
-| Forma | Písemný dotazník místo rozhovorů (odchylka od proposalu §5): bez doptávání, stručnější odpovědi. |
+| Forma | Krátký písemný dotazník místo rozhovorů o poslední konkrétní situaci (odchylka od proposalu §5): bez doptávání, převážně uzavřené otázky, stručné odpovědi. |
 | Výběr | Odkud respondenti pocházejí; kdo se neozval; sebevýběr (odpovídají ti, kteří chtějí). |
 | Zkreslení autora otázek | Co mohlo ovlivnit otázky a výklad; jak bylo omezeno. |
 | Jiné | |
