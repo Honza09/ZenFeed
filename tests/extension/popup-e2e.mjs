@@ -272,6 +272,18 @@ const muteExpression = `(() => {
     };
     globalThis.SpeechSynthesisUtterance.zenfeedMuted = true;
   }
+  // The player keeps the utterance class it got when it was created, so the
+  // mute and the record of what was spoken (ZF-18) hook speak() itself.
+  const synth = globalThis.speechSynthesis;
+  if (synth && !synth.zenfeedRecording) {
+    const speak = synth.speak.bind(synth);
+    synth.speak = (utterance) => {
+      utterance.volume = 0;
+      (globalThis.__zfSpoken ||= []).push(utterance.text);
+      speak(utterance);
+    };
+    synth.zenfeedRecording = true;
+  }
 })()`;
 
 async function clickPlayer(cdp, sessionId, buttonId, waitMs = 1500) {
@@ -288,9 +300,11 @@ async function checkPlayer(cdp, sessionId) {
   }
   steps.playing = await clickPlayer(cdp, sessionId, "play");
   if (steps.playing.pause) {
+    steps.firstSpoken = await evaluate(cdp, sessionId, "(globalThis.__zfSpoken || []).slice()");
     steps.paused = await clickPlayer(cdp, sessionId, "pause", 500);
     steps.resumed = await clickPlayer(cdp, sessionId, "play", 500);
     steps.stopped = await clickPlayer(cdp, sessionId, "stop", 500);
+    await evaluate(cdp, sessionId, "globalThis.__zfSpoken = []");
     await clickPlayer(cdp, sessionId, "play", 300);
     for (let waited = 0; waited < 60000; waited += 500) {
       const state = await evaluate(cdp, sessionId, playerStateExpression);
@@ -300,6 +314,9 @@ async function checkPlayer(cdp, sessionId) {
       await sleep(500);
     }
     steps.end = await evaluate(cdp, sessionId, playerStateExpression);
+    // speechSynthesis contract: what was spoken is the summary text, nothing else.
+    steps.spoken = await evaluate(cdp, sessionId, "(globalThis.__zfSpoken || []).join(' ')");
+    steps.summaryText = await evaluate(cdp, sessionId, "document.getElementById('summary-text').textContent");
     // A computer without a local voice: the player reports it, the summary stays.
     await evaluate(cdp, sessionId, "speechSynthesis.getVoices = () => []");
     steps.noVoice = await clickPlayer(cdp, sessionId, "play", 2600);
@@ -780,8 +797,22 @@ function verify(url, { first, steps, secondMatches, roundTrip }) {
       expect(/Syntetický hlas|Synthetic voice/.test(player.ready.label), "player without the synthetic-voice label");
       expect(player.ready.before.length > 0, "no notice before the first playback");
       expect(player.playing && player.playing.pause, `player did not start: ${player.playing && player.playing.status}`);
+      const squash = (text) => String(text).replace(/\s+/g, " ").trim();
+      if (player.paused) {
+        expect(player.paused.status === "Pozastaveno." && !player.paused.pause && player.paused.play === "Pokračovat",
+          `pause did not show the paused state: ${player.paused.status}`);
+      }
+      if (player.stopped) {
+        expect(player.stopped.status === "Zastaveno." && !player.stopped.pause && !player.stopped.stop && player.stopped.play !== "",
+          `stop did not show the stopped state: ${player.stopped.status}`);
+      }
+      if (player.firstSpoken && player.summaryText) {
+        expect(player.firstSpoken.length > 0 && squash(player.summaryText).startsWith(squash(player.firstSpoken[0])),
+          "the first spoken chunk is not the start of the summary text");
+      }
       if (player.end) {
         expect(player.end.status === "Dočteno.", `player did not finish: ${player.end.status}`);
+        expect(squash(player.spoken) === squash(player.summaryText), "what was spoken differs from the summary text");
       }
       if (player.noVoice) {
         expect(player.noVoice.error && player.noVoice.summaryStillShown, "without a voice the summary was not kept");
