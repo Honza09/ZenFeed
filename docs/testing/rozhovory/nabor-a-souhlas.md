@@ -21,7 +21,7 @@ Nastavte před rozesláním a po každé změně ověřte v náhledu:
 | Otázky s nahráním souboru | **Nepoužívat** (vyžadují přihlášení) |
 | Zobrazit odkaz na odeslání další odpovědi | podle potřeby |
 | Úvodní text a otázky | z [`scenar.md`](scenar.md), část 3 a 4 |
-| Otázky S1, S2, S3, S9 | podmíněné přesměrování na závěrečnou stránku při vyřazující odpovědi |
+| Vyřazující odpovědi (věk pod 18, nepravidelné používání prohlížeče) | přesměrování na závěrečnou stránku |
 
 Odpovědi se uloží v tabulce, kterou vlastní autor formuláře. Tabulku nesdílejte veřejně a do repozitáře ji nedávejte. Do repozitáře jdou jen anonymní zápisy podle části 5.
 
@@ -29,17 +29,17 @@ Prohlédněte nastavení z účtu, kterým formulář vytváříte. Pokud formul
 
 ## 3. Kvóty
 
-Cílem je 6 odpovědí, které splňují výběr. Jde o orientační kvóty; protože je formulář anonymní, vyhodnocují se až ze sloupců S4–S8 v tabulce odpovědí. Pokud se nenaplní, ve zprávě to uvedeme.
+Cílem je 6 odpovědí, které splňují výběr. Jde o orientační kvóty; protože je formulář anonymní, vyhodnocují se až ze sloupců Q2–Q7 v tabulce odpovědí. Pokud se nenaplní, ve zprávě to uvedeme.
 
 | Znak | Kvóta | Otázka |
 |---|---|---|
-| Jazyk čtení | Aspoň 2 odpovědi „hlavně česky“ a aspoň 2 pravidelně anglicky (anglicky a obojí se počítá). | S4 |
-| Druhy stránek | Aspoň 2 lidé čtou diskuze, aspoň 2 odborné texty, aspoň 2 zprávy. | S5 |
-| Spokojení uživatelé alternativ | Aspoň 1–2. | S6 a S7 |
-| Studenti | Nejvýše asi polovina (nejvýš 3 ze 6). | S8 |
+| Jazyk čtení | Aspoň 2 odpovědi „spíš česky“ a aspoň 2 pravidelně anglicky („hlavně anglicky“ se počítá). | Q5 |
+| Druhy stránek | Aspoň 2 lidé čtou diskuze, aspoň 2 odborné texty, aspoň 2 zprávy. | Q6 |
+| Spokojení uživatelé alternativ | Aspoň 1–2 (Q7 jiné než „Ne“ a spokojenost s dnešním postupem). Spokojenost se ve formuláři nakonec nezjišťovala. | Q7 |
+| Studenti | Nejvýše asi polovina (nejvýš 3 ze 6). Ve formuláři se nezjišťovalo. | – |
 | Zdroj | Ne všichni z jedné komunity ani z okruhu jednoho člena týmu. | při šíření |
 
-Odpovědi s vyřazující odpovědí (S1, S2, S3, S9) se nepočítají. Pokud přijde odpověď po naplnění kvóty, může se použít jako šestá až osmá, ale nesmí vytlačit kvótu, která se ještě nenaplnila. Do zpráv se uvádí vždy skutečný počet.
+Odpovědi s vyřazující odpovědí (věk pod 18, nepravidelné používání prohlížeče) se nepočítají. Pokud přijde odpověď po naplnění kvóty, může se použít jako šestá až osmá, ale nesmí vytlačit kvótu, která se ještě nenaplnila. Do zpráv se uvádí vždy skutečný počet.
 
 ## 4. Kde formulář šířit a pozvánka
 
@@ -49,7 +49,7 @@ Osobní kontakty a komunity čtenářů a produktivity. Neposílejte lidem, kter
 >
 > jsme studentský tým z univerzity a zkoumáme, jak lidé čtou web a jak si dělají přehled o stránkách. Hledáme dospělé uživatele Chromu, kteří čtou weby pravidelně v češtině nebo angličtině.
 >
-> Nabízíme anonymní dotazník (15–20 minut). Neptáme se na to, zda se vám něco líbí, ale na to, jak jste postupoval/a při konkrétní situaci, kterou jste nedávno zažil/a. Nic neprodáváme ani netestujeme na vás hotový produkt. Formulář nesbírá e-mail ani jméno a odpovědi jsou dobrovolné.
+> Nabízíme anonymní dotazník (asi 5 minut) o tom, jak konzumujete informace na webu. Nic neprodáváme ani netestujeme na vás hotový produkt. Formulář nesbírá e-mail ani jméno a odpovědi jsou dobrovolné.
 >
 > Odkaz: [doplnit při odeslání]
 >
@@ -59,7 +59,7 @@ Osobní kontakty a komunity čtenářů a produktivity. Neposílejte lidem, kter
 
 Pro každou kvalifikovanou odpověď vznikne soubor `docs/testing/rozhovory/zapisy/R01.md` až `R06.md` podle [`zapis-sablona.md`](zapis-sablona.md). Číslo R se přiděluje v pořadí, v jakém odpovědi z tabulky přepisujete.
 
-**Co se kopíruje:** odpovědi na S4–S8 a na F, K, V a Z. Časové razítko formuláře se **nekopíruje** (podle něj by šlo odpověď spojit s konkrétní osobou).
+**Co se kopíruje:** odpovědi na Q2–Q10. Časové razítko formuláře se **nekopíruje** (podle něj by šlo odpověď spojit s konkrétní osobou).
 
 **Před kopírováním přečtěte každou volnou odpověď.** Lidé občas napíšou jméno, zaměstnavatele, přesné místo nebo adresu stránky i přes prosbu. Takový údaj nahraďte obecným popisem nebo `[vynecháno]`; do repozitáře nepatří ani dočasně.
 
@@ -73,7 +73,7 @@ Pro každou kvalifikovanou odpověď vznikne soubor `docs/testing/rozhovory/zapi
 | Osobní nebo citlivé příběhy (zdraví, ztráta blízkého, náboženství, politické postoje) | Nezapisovat; stačí „osobní důvod“. |
 | Jména třetích osob | Vynechat. |
 
-Citace: nejvýš jedna až dvě věty, označené uvozovkami a ID otázky (např. „R03, F6“). Identifikující část nahradit `[vynecháno]`.
+Citace: nejvýš jedna až dvě věty, označené uvozovkami a ID otázky (např. „R03, Q9“). Identifikující část nahradit `[vynecháno]`.
 
 **Kontrola před commitem:** druhý člen týmu zápisy přečte a vyhledá v nich e-mailové adresy, adresy stránek a jména.
 
