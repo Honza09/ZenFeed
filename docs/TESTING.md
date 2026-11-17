@@ -29,6 +29,8 @@ Regression checklist for milestone M2 (ZF-13): [`testing/checklist-m2.md`](testi
 
 User survey (ZF-32): anonymous questionnaire, form text and questions in [`testing/rozhovory/scenar.md`](testing/rozhovory/scenar.md).
 
+Manual pass of twelve pages and the summary on P01 (ZF-31): [`testing/zf-31-vernost.md`](testing/zf-31-vernost.md).
+
 ## Backend Testing
 
 Use pytest and, where appropriate, HTTPX or FastAPI's test client.
