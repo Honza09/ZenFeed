@@ -293,6 +293,38 @@ def test_gemini_network_errors(exception: Exception, kind: str) -> None:
     assert raised.value.kind == kind
 
 
+def test_gemini_retries_a_busy_503_then_returns_the_summary(monkeypatch) -> None:
+    monkeypatch.setattr("app.services.gemini.time.sleep", lambda _seconds: None)
+    calls = {"n": 0}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        calls["n"] += 1
+        if calls["n"] < 3:
+            return httpx.Response(503)
+        return httpx.Response(
+            200,
+            json=_answer({"summary": "Česky.", "insufficient_input": False, "no_relevant_content": False}),
+        )
+
+    result = _gemini(handler).generate("SYSTEM", "[]")
+    assert result.summary == "Česky."
+    assert calls["n"] == 3
+
+
+def test_gemini_gives_up_after_three_503s(monkeypatch) -> None:
+    monkeypatch.setattr("app.services.gemini.time.sleep", lambda _seconds: None)
+    calls = {"n": 0}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        calls["n"] += 1
+        return httpx.Response(503)
+
+    with pytest.raises(ProviderError) as raised:
+        _gemini(handler).generate("SYSTEM", "[]")
+    assert raised.value.kind == "unavailable"
+    assert calls["n"] == 3
+
+
 def test_gemini_error_logs_hide_the_response_body(caplog) -> None:
     caplog.set_level("DEBUG", logger="zenfeed")
     echo = httpx.Response(400, json={"error": {"message": "bad request harvest festival"}})

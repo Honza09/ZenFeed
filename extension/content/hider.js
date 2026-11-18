@@ -1,13 +1,15 @@
 // ZenFeed hider (ZF-10).
 // Hides blocks the classifier marked "hide" and puts a small "Skryto: … —
-// Zobrazit" box in front of them. The page text is never changed and no page
-// element is removed or moved. A hidden element gets the data-zenfeed-hidden
-// attribute, which a stylesheet ZenFeed adds to the document turns into
-// `display: none`; removing the attribute restores the element exactly. Only
-// if the page forces `display` harder than that (inline !important) is the
-// element's inline style used instead. Styles are added through CSSOM, which
-// page Content-Security-Policy does not block. The box lives in a shadow root,
-// so page CSS does not reach it and the segmenter does not read its text.
+// Zobrazit" box in front of their content. The page text is never changed and
+// no page element is removed or moved. A hidden element gets the
+// data-zenfeed-hidden attribute. The element itself stays in the page layout
+// (so a grid or flex sibling does not collapse) and its content is concealed.
+// Table rows, list items and replaced elements are the exception: they are
+// display:none, with a same-tag box in their place. Only if that concealment
+// loses to an inline !important is the element's own inline style used.
+// Styles are added through CSSOM, which page Content-Security-Policy does not
+// block. The box lives in a shadow root, so page CSS does not reach it and
+// the segmenter does not read its text.
 
 (() => {
   if (globalThis.ZenFeedHider) {
@@ -31,7 +33,24 @@
 
   const BOX_MARKER = "data-zenfeed-box";
   const HIDDEN_MARKER = "data-zenfeed-hidden";
-  const HIDE_CSS = `[${HIDDEN_MARKER}] { display: none !important; }`;
+  // These cannot keep a box inside them, so the element leaves the layout.
+  const COLLAPSE_TAGS = new Set([
+    "TR", "LI", "IMG", "VIDEO", "SVG", "CANVAS", "IFRAME", "PICTURE",
+    "INPUT", "AUDIO", "EMBED", "OBJECT", "SOURCE",
+  ]);
+  const COLLAPSE_CSS = [...COLLAPSE_TAGS]
+    .map((tag) => `${tag.toLowerCase()}[${HIDDEN_MARKER}]`)
+    .join(", ");
+  // Ordinary blocks stay grid/flex items. Their content is concealed and the
+  // box is placed inside, so a sibling column keeps its width.
+  const HIDE_CSS = `
+    ${COLLAPSE_CSS} { display: none !important; }
+    [${HIDDEN_MARKER}]:not(${[...COLLAPSE_TAGS].map((tag) => tag.toLowerCase()).join("):not(")}) {
+      font-size: 0 !important; line-height: 0 !important; min-height: 0 !important;
+      user-select: none !important;
+    }
+    [${HIDDEN_MARKER}] > :not([${BOX_MARKER}]) { display: none !important; }
+  `;
 
   // "válka", "toxický/vyhrocený tón" or both; null if nothing to name.
   function describeReason(result) {
@@ -186,8 +205,27 @@
       }
     }
 
-    function isHidden(element) {
+    function isDisplayNone(element) {
       return doc.defaultView.getComputedStyle(element).display === "none";
+    }
+
+    function keepsItsPlace(element) {
+      return !COLLAPSE_TAGS.has(element.tagName.toUpperCase());
+    }
+
+    // Content is concealed when the element itself left the layout, or when
+    // it stayed and every child except the ZenFeed box is display:none.
+    // A text-only element has no such child; the marker's font-size rule
+    // conceals its text while the element keeps its grid or flex cell.
+    function contentConcealed(element) {
+      if (!keepsItsPlace(element)) {
+        return isDisplayNone(element);
+      }
+      const children = [...element.children].filter((child) => !child.hasAttribute(BOX_MARKER));
+      if (!children.length) {
+        return element.hasAttribute(HIDDEN_MARKER);
+      }
+      return children.every((child) => isDisplayNone(child));
     }
 
     // Returns what is needed to restore the element. Throws if the element
@@ -195,16 +233,17 @@
     function hideElement(element) {
       const saved = { element, inline: false };
       element.setAttribute(HIDDEN_MARKER, "");
-      if (isHidden(element)) {
+      if (contentConcealed(element)) {
         return saved;
       }
-      // The page sets display with inline !important; only inline wins.
+      // A child forces its own display, or a replaced element ignored the
+      // stylesheet. Only an inline !important wins over that.
       saved.inline = true;
       saved.display = element.style.getPropertyValue("display");
       saved.priority = element.style.getPropertyPriority("display");
       saved.hadStyle = element.hasAttribute("style");
       element.style.setProperty("display", "none", "important");
-      if (!isHidden(element)) {
+      if (!isDisplayNone(element)) {
         restoreElement(saved);
         throw new Error("element could not be hidden");
       }
@@ -273,9 +312,6 @@
         outer = host;
       }
       outer.setAttribute(BOX_MARKER, "");
-      if (outer === host) {
-        matchBlockSize(host, firstElement);
-      }
       if (hasDarkBackground(firstElement.parentElement || firstElement)) {
         host.setAttribute("data-zenfeed-theme", "dark");
       }
@@ -333,7 +369,11 @@
         for (const element of elements) {
           record.elements.push(hideElement(element));
         }
-        first.before(record.box);
+        if (keepsItsPlace(first)) {
+          first.prepend(record.box);
+        } else {
+          first.before(record.box);
+        }
       } catch (error) {
         restoreRecord(record);
         if (!hidden.size) {
@@ -413,6 +453,10 @@
       for (const record of hidden.values()) {
         const saved = record.elements[0];
         if (!saved || saved.inline || !record.box.shadowRoot) {
+          continue;
+        }
+        // An inner box is 100% of a block that stayed in the layout.
+        if (record.box.parentElement === saved.element) {
           continue;
         }
         saved.element.removeAttribute(HIDDEN_MARKER);

@@ -74,6 +74,13 @@
     if (element.hidden || element.getAttribute("aria-hidden") === "true") {
       return true;
     }
+    // A hidden block stays in the layout, so visibility alone would still read it.
+    if (
+      element.hasAttribute("data-zenfeed-hidden")
+      || element.hasAttribute("data-zenfeed-box")
+    ) {
+      return true;
+    }
     // Text the user is writing (comment boxes, rich-text editors) is not page content (ZF-09).
     if (element.isContentEditable) {
       return true;

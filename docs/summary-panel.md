@@ -13,7 +13,7 @@ The backend side, `POST /v1/summarize`, is served since ZF-15 ([`summarize.md`](
   - A visible block that **wraps or shares an element with a hidden block** is not sent either, because its text was read before hiding and includes the hidden text. The panel says how many such blocks were left out.
 - `preferences`: the switches that were applied.
 - `omitted_categories`: the topics of the hidden blocks, only those switched on. A block hidden only for its tone adds no topic (it is covered by `preferences.toxicky`).
-- `language`: `cs` or `en`; the default follows the page language (`<html lang="en…">` → English, otherwise Czech), and the user can change it.
+- `language`: `cs` or `en`; the default follows the page language (`<html lang="en…">` → English, otherwise Czech). After a summary has been requested, changing the language asks for a new one in that language.
 
 No page URL, title, cookies or credentials are sent (`credentials: "omit"`). If nothing is visible after hiding, nothing is sent and the panel says there is nothing to summarize; ZenFeed adds nothing in its place.
 
