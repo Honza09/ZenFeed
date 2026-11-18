@@ -4,6 +4,8 @@ This is a local lexicon over the frozen categories in ``docs/kategorie-mvp.md``.
 It is not a zero-shot model. Topic and tone are scored separately. A block is
 hidden only when a selected preference matches and the score is high enough.
 A weak match is ``review``. Uncertain output never hides.
+One bare ``war`` or ``wars`` is only a mention (``review``). Two or more,
+or any stronger war cue, can hide.
 """
 
 from __future__ import annotations
@@ -46,7 +48,6 @@ _TOPICS: dict[TopicId, _Cues] = {
         strong=_patterns(
             r"\bválk",
             r"\bváleč",
-            r"\bwar\b",
             r"\bwarfare\b",
             r"\bairstrike",
             r"\bmissile",
@@ -175,11 +176,24 @@ def _tone(text: str, original: str) -> tuple[ToneLabel, float]:
     return "neutralni", 0.8
 
 
+# One "war" or "wars" is a mention, not proof the block is about war.
+# Two or more reach the hide threshold. Stronger war cues are unchanged.
+_BARE_WAR = _patterns(r"\bwars?\b")
+
+
 def _topic(text: str) -> tuple[TopicId, float]:
     scored = {
         topic: _cue_confidence(_TOPICS[topic], text)
         for topic in _TOPIC_PRIORITY
     }
+    bare_war = _hits(text, _BARE_WAR)
+    if bare_war and scored["valka"] < HIDE_MIN_CONFIDENCE:
+        scored["valka"] = 0.8 if bare_war >= 2 else 0.5
+    # Válka has priority even when the only cue is one "war"/"wars". That
+    # mention is below the hide threshold, so the block stays visible
+    # (review) instead of being taken over by a stronger cue such as "death".
+    if scored["valka"] > 0:
+        return "valka", scored["valka"]
     for topic in _TOPIC_PRIORITY:
         if scored[topic] >= HIDE_MIN_CONFIDENCE:
             return topic, scored[topic]

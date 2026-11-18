@@ -37,6 +37,39 @@ def test_war_hides_only_when_selected_and_confident() -> None:
     assert shown["recommended_action"] == "show"
 
 
+def test_one_bare_war_does_not_hide_the_block() -> None:
+    result = _analyze(
+        "Global fossil CO2 emissions are projected to fall by around 0.4% in 2026. "
+        "The war in Iran and its impact on oil prices led to reduced demand.",
+        {"valka": True},
+    )
+
+    assert result["topic"] == "valka"
+    assert result["confidence"] == 0.5
+    assert result["recommended_action"] == "review"
+
+
+def test_one_war_mention_stays_war_even_when_deaths_are_named() -> None:
+    result = _analyze(
+        "The Pentagon raises the U.S. military death toll in the Iran war.",
+        {"umrti": True},
+    )
+
+    assert result["topic"] == "valka"
+    assert result["confidence"] == 0.5
+    assert result["recommended_action"] == "show"
+
+
+def test_repeated_war_hides_when_selected() -> None:
+    result = _analyze(
+        "The war continued through the winter. A second war started in the spring.",
+        {"valka": True},
+    )
+
+    assert result["topic"] == "valka"
+    assert result["recommended_action"] == "hide"
+
+
 def test_war_deaths_stay_war() -> None:
     result = classify_block(
         _block("Soldiers were killed in the invasion after the airstrike."),

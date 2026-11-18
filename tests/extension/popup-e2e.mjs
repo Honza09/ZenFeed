@@ -557,8 +557,14 @@ async function checkHiding(cdp, sessionId, tab, extraction) {
     let hiddenOk = 0;
     for (const id of ${JSON.stringify(extraction.blocks.map((block) => block.id))}) {
       const entry = globalThis.zenFeedGetBlock(id);
+      const concealed = (element) => {
+        if (!element.hasAttribute("data-zenfeed-hidden")) return false;
+        if (getComputedStyle(element).display === "none") return true;
+        const children = [...element.children].filter((child) => !child.hasAttribute("data-zenfeed-box"));
+        return children.length === 0 || children.every((child) => getComputedStyle(child).display === "none");
+      };
       if (entry && entry.result && entry.result.recommended_action === "hide"
-        && entry.block.elements.every((element) => getComputedStyle(element).display === "none")) {
+        && entry.block.elements.every(concealed)) {
         hiddenOk += 1;
       }
     }
