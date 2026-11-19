@@ -43,6 +43,7 @@ ZenFeed/
 - [Ruční průchod a věrnost shrnutí (ZF-31)](testing/zf-31-vernost.md)
 - [Měření latence a kompresního poměru (ZF-20)](testing/mereni-latence.md)
 - [Výpočet metrik ZF-20 z anotací](testing/metriky-zf-20.md)
+- [Test s uživateli a evaluace dabingu (ZF-33, ZF-34)](testing/test-uzivatelu/README.md)
 - [Metodika hodnocení (ZF-27)](testing/metodika-hodnoceni.md)
 - [Slovník lexicon-2 a jeho měření](testing/pilot/lexicon-2.md)
 - [Block segmentation (ZF-03 PoC)](segmentation.md)
