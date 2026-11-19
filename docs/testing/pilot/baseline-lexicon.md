@@ -1,5 +1,7 @@
 # Baseline slovníku lexicon-1
 
+> Nahrazeno slovníkem `lexicon-2` (19. 11. 2026). Srovnání obou a postup ladění je v [`lexicon-2.md`](lexicon-2.md); čísla níže zůstávají jako výchozí stav.
+
 Měřeno 17. 11. 2026 skriptem `backend/scripts/measure_lexicon.py` na úryvcích v repozitáři. Úryvek je sloupec `úryvek_pro_identifikaci`, ne celý text bloku ze stránky. Model je `lexicon-1` z ZF-06. Čísla níže jsou výstup toho běhu a hlídá je `backend/tests/test_lexicon_baseline.py`. Samotné slovo `war` nebo `wars` jednou je zmínka (jistota 0,5, `review`, téma pořád válka). Dvakrát a víc, nebo silnější slovo (válka, airstrike, invasion), může skrýt.
 
 Skrytí: `hide` je zásah. `review` a `show` se počítají jako neskryto, protože nejistota nesmí skrývat. `H` v anotaci znamená „má se skrýt“, `K` „má zůstat“.

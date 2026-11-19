@@ -32,9 +32,9 @@ The popup also holds the summary panel ([`summary-panel.md`](summary-panel.md), 
 | `schemas.py` | Pydantic models for every request and response |
 | `middleware.py` | Rejects bodies larger than 1 MiB |
 | `config.py` | Settings from the environment, including the optional AI key |
-| `services/analyze.py`, `services/classify.py` | Classification; today the local lexicon `lexicon-1` |
+| `services/analyze.py`, `services/classify.py` | Classification; today the local lexicon `lexicon-2` ([`testing/pilot/lexicon-2.md`](testing/pilot/lexicon-2.md)) |
 
-`/v1/summarize` (ZF-15) calls Gemini through `services/gemini.py`, behind `services/summarize.py`, so the route does not depend on the provider ([`summarize.md`](summarize.md)). Gemini is not used for `/v1/analyze`; classification stays on `lexicon-1`. The backend keeps no state between requests and stores no page content.
+`/v1/summarize` (ZF-15) calls Gemini through `services/gemini.py`, behind `services/summarize.py`, so the route does not depend on the provider ([`summarize.md`](summarize.md)). Gemini is not used for `/v1/analyze`; classification stays on the local lexicon (`lexicon-2`). The backend keeps no state between requests and stores no page content.
 
 ## Data flow
 
@@ -85,7 +85,7 @@ Gemini's free tier is used without billing. Its terms have special rules for the
 A failure never hides content and never breaks the page.
 
 - Backend not running, timeout or error during analysis: each request is tried once more. Blocks without a result stay visible, the results that arrived are used, and the popup offers to send the rest again (ZF-12).
-- Hosted classifier fails or hits its limit: the backend falls back to `lexicon-1`.
+- Hosted classifier fails or hits its limit: the backend falls back to the local lexicon.
 - Summary fails: an error message instead of the summary; filtering keeps working.
 - No voice: the summary stays readable.
 

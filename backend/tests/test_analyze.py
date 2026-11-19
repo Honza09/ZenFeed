@@ -41,7 +41,7 @@ def test_analyze_returns_review_for_each_block(client) -> None:
 
     assert response.status_code == 200
     body = response.json()
-    assert body["model_version"] == "lexicon-1"
+    assert body["model_version"] == "lexicon-2"
     assert [item["id"] for item in body["results"]] == ["zf-0", "zf-1"]
     assert body["results"] == [
         {

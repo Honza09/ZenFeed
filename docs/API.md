@@ -19,7 +19,7 @@ The extension sends blocks produced by the content script (`id`, `kind`, `title`
 | Method | Path | Purpose | Status |
 |---|---|---|---|
 | GET | `/health` | Check backend availability | Implemented |
-| POST | `/v1/analyze` | Classify topic and tone, then recommend show, hide, or review | Implemented (`lexicon-1`) |
+| POST | `/v1/analyze` | Classify topic and tone, then recommend show, hide, or review | Implemented (`lexicon-2`) |
 | POST | `/v1/summarize` | Summarize the kept blocks | Implemented (Gemini free tier; 503 without a key) |
 
 The backend listens on `http://127.0.0.1:8000` on the demo machine. The extension reaches it through `host_permissions` for that address only. The backend sets no CORS headers, so ordinary web pages cannot read its responses.
@@ -73,7 +73,7 @@ Response `200`:
       "recommended_action": "hide"
     }
   ],
-  "model_version": "lexicon-1"
+  "model_version": "lexicon-2"
 }
 ```
 
@@ -83,7 +83,7 @@ If the classifier builds a result that does not match this schema, it is replace
 
 `toxicity_score` is 0 for a neutral tone and the tone score otherwise. `confidence` is the topic score. Both are 0 to 1. `recommended_action` is `hide` only when a selected preference matches and the score is at least 0.7. A weaker match is `review`. Otherwise the action is `show`. A factual report about war can be hidden for the topic while its tone stays `neutralni`.
 
-`model_version` names the classifier that produced the whole response. When a hosted model is connected (Gemini, `docs/rozhodnuti-zf-25.md`) and it fails or hits its limit, the request falls back to `lexicon-1` as a whole and `model_version` says so. `/v1/analyze` therefore has no `429` or `503`.
+`model_version` names the classifier that produced the whole response. When a hosted model is connected (Gemini, `docs/rozhodnuti-zf-25.md`) and it fails or hits its limit, the request falls back to the local lexicon (`lexicon-2`) as a whole and `model_version` says so. `/v1/analyze` therefore has no `429` or `503`.
 
 ## Errors
 
