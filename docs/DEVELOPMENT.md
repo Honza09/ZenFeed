@@ -25,7 +25,7 @@ cd ZenFeed
 4. Select the `extension/` directory.
 5. Reload the extension after changes and test it again.
 
-If the directory or manifest does not exist yet, implement it first.
+How to use it and its known limitations: the repository [`README.md`](../README.md).
 
 ## Backend
 
