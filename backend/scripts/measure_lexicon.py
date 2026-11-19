@@ -1,4 +1,4 @@
-"""Measure lexicon-1 against pilot annotation excerpts.
+"""Measure the lexicon (lexicon-2) against the annotation excerpts.
 
 The text is the identification snippet in the CSV, not the full block on the
 page. Numbers from this script are a baseline for that input only.

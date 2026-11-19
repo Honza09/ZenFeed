@@ -5,7 +5,14 @@ It is not a zero-shot model. Topic and tone are scored separately. A block is
 hidden only when a selected preference matches and the score is high enough.
 A weak match is ``review``. Uncertain output never hides.
 One bare ``war`` or ``wars`` is only a mention (``review``). Two or more,
-or any stronger war cue, can hide.
+or any stronger war cue, can hide. Figurative wars ("trade war", "price war")
+are not counted.
+
+lexicon-2 adds common inflected forms and phrases for every topic (written
+from general language knowledge, not fitted to the annotated sets; see
+docs/testing/pilot/lexicon-2.md). Ambiguous words (attack, shooting,
+protest, opposition, military) are weak cues: they lead to ``review``, never
+to hiding on their own.
 """
 
 from __future__ import annotations
@@ -17,7 +24,7 @@ from pydantic import ValidationError
 
 from app.schemas import BlockAnalysis, ContentBlockInput, ToneLabel, TopicId
 
-MODEL_VERSION = "lexicon-1"
+MODEL_VERSION = "lexicon-2"
 HIDE_MIN_CONFIDENCE = 0.7
 BATCH_SIZE = 20
 MAX_REPAIR_ATTEMPTS = 1
@@ -64,6 +71,21 @@ _TOPICS: dict[TopicId, _Cues] = {
             r"\bvoják",
             r"\barmed conflict",
             r"\bartillery",
+            # lexicon-2
+            r"\bdrone strikes?\b",
+            r"\bwar crimes?\b",
+            r"\bbombard",
+            r"\boccupied territor",
+            r"\bcounteroffensive",
+            r"\bbelligerents?\b",
+            r"\bokupa(?:c|č|nt)",
+            r"\bbombardov",
+            r"\bvojsk",
+        ),
+        # Ambiguous: "front line workers", "Armáda spásy", "ofenzivní hra".
+        weak=_patterns(
+            r"\bmilitary\b", r"\boffensive\b", r"\bsoldiers?\b", r"\bfront ?lines?\b", r"\bconflicts?\b",
+            r"\bdrones?\b", r"\bvojensk", r"\barmád", r"\bofenziv",
         ),
     ),
     "nasili": _Cues(
@@ -82,7 +104,34 @@ _TOPICS: dict[TopicId, _Cues] = {
             r"\bnapaden",
             r"\bnásilí",
             r"\bnásiln",
+            # lexicon-2
+            r"\bshot dead\b",
+            r"\bshot and killed\b",
+            r"\bgunm(?:an|en)\b",
+            r"\bmass shooting",
+            r"\bstabbing",
+            r"\bhostages?\b",
+            r"\bkidnapp",
+            r"\babduct",
+            r"\bmassacre",
+            r"\bhomicide",
+            r"\bmanslaughter",
+            r"\blynch(?:ing|ed)\b|\blynch mob",
+            r"\bbomb(?:ing|ings|ed)\b",
+            r"\bterror(?:ist)? attack",
+            r"\bzastřel",
+            r"\bstřelb",
+            r"\bútočník",
+            r"\brukojm",
+            r"\bunesl",
+            r"\búnos(?:u|em|ce|ci)?\b",
+            r"\bmasakr",
+            r"\bzbil",
+            r"\bubodal",
+            r"\bubit",
+            r"\bzabil",
         ),
+        weak=_patterns(r"\battack(?:ed|er|ers)?\b", r"\bshooting\b", r"\bútok", r"\bbrutál"),
     ),
     "katastrofy": _Cues(
         strong=_patterns(
@@ -98,6 +147,32 @@ _TOPICS: dict[TopicId, _Cues] = {
             r"\bhurikán",
             r"\bsopeč",
             r"\bvolcan",
+            # lexicon-2
+            r"\blandslides?\b",
+            r"\bavalanche",
+            r"\btyphoon",
+            r"\bcyclone",
+            r"\btornado",
+            r"\bfamine",
+            r"\berupt(?:ion|ed|s)\b",
+            r"\bnatural disaster",
+            r"\bchemical (?:spill|leak|disaster)",
+            # The noun only; "katastrofální výkon" is figurative.
+            r"\bkatastrof(?:a|y|ě|u|ou|ám|ách)\b",
+            r"\bsesuv",
+            r"\blavin",
+            r"\btajfun",
+            r"\btornád",
+            r"\bhladomor",
+            r"\berupc",
+            r"\blesní požár",
+        ),
+        # "since the pandemic" is a mention, not a catastrophe report; a drought
+        # is often a slow trend ("dlouhodobý trend bez varování = jiné").
+        weak=_patterns(
+            r"\bdrought", r"\bsuch(?:o|a)\b",
+            r"\bdisaster", r"\boutbreak", r"\bevacuat", r"\bevakua",
+            r"\bepidemic", r"\bpandemic", r"\bepidemi", r"\bpandemi",
         ),
     ),
     "umrti": _Cues(
@@ -112,7 +187,25 @@ _TOPICS: dict[TopicId, _Cues] = {
             r"\búmrt",
             r"\bnekrolog",
             r"\bsmrteln",
+            # lexicon-2
+            r"\bdies\b",
+            r"\bdead\b",
+            r"\bdeath toll",
+            r"\bpassed away",
+            r"\blost their lives",
+            r"\bfuneral",
+            r"\bzemře",
+            r"\bzesnul",
+            r"\bpohřb|\bpohřeb",
+            r"\bmrtv",
+            r"\bpřišl[aio]? o život",
+            r"\bpočet obětí",
+            # Death statistics and trends belong here (docs/kategorie-mvp.md, decision D).
+            r"\bmortality\b",
+            r"\búmrtnost",
+            r"\bsmrt(?:i|í)?\b",
         ),
+        weak=_patterns(r"\bvictims?\b", r"\boběti?\b", r"\bfatal\b"),
     ),
     "politicke_konflikty": _Cues(
         strong=_patterns(
@@ -124,8 +217,19 @@ _TOPICS: dict[TopicId, _Cues] = {
             r"\bkoalic",
             r"\bdiplomatick",
             r"\bvolební spor",
+            # lexicon-2
+            r"\bno-confidence\b|\bno confidence vote",
+            r"\bpolitical crisis",
+            r"\bexpell?ed (?:the )?(?:ambassador|diplomats?)",
+            r"\bgovernment collapse",
+            r"\bcoup\b",
+            r"\bnedůvě[rř]",  # nedůvěra, o nedůvěře
+            r"\bpolitick(?:á|é|ou) kriz",
+            r"\bvyhoštěn",
+            r"\bpuč",
+            r"\bvládní kriz",
         ),
-        weak=_patterns(r"\bprotest"),
+        weak=_patterns(r"\bprotest", r"\bopposition\b", r"\bopozic", r"\bresign", r"\bdemis"),
     ),
 }
 
@@ -179,9 +283,16 @@ def _tone(text: str, original: str) -> tuple[ToneLabel, float]:
 # One "war" or "wars" is a mention, not proof the block is about war.
 # Two or more reach the hide threshold. Stronger war cues are unchanged.
 _BARE_WAR = _patterns(r"\bwars?\b")
+# Figurative uses are removed before counting (lexicon-2).
+_FIGURATIVE_WAR = re.compile(
+    r"\b(?:trade|price|culture|tariff|bidding|talent|format|console|browser|flame|star) wars?\b"
+    r"|\bwar on (?:drugs|poverty|terror)\b"
+    r"|\bobchodní válk|\bcenov(?:á|é|ou) válk|\bkulturní válk"
+)
 
 
 def _topic(text: str) -> tuple[TopicId, float]:
+    text = _FIGURATIVE_WAR.sub(" ", text)
     scored = {
         topic: _cue_confidence(_TOPICS[topic], text)
         for topic in _TOPIC_PRIORITY
@@ -192,8 +303,22 @@ def _topic(text: str) -> tuple[TopicId, float]:
     # Válka has priority even when the only cue is one "war"/"wars". That
     # mention is below the hide threshold, so the block stays visible
     # (review) instead of being taken over by a stronger cue such as "death".
-    if scored["valka"] > 0:
+    war_named = bare_war > 0 or _hits(text, _TOPICS["valka"].strong) > 0
+    if scored["valka"] > 0 and war_named:
         return "valka", scored["valka"]
+    # The weak war cues of lexicon-2 (conflict, military, soldiers, …) alone
+    # do not take over another topic. Deaths in a conflict are war deaths
+    # (docs/kategorie-mvp.md: cause before consequence), so a strong death
+    # cue next to a weak war cue makes a war block as sure as the death cue:
+    # hidden when war is selected, not when only death news is. Violence and
+    # catastrophes come before death in the priority, so they keep their block.
+    if (
+        scored["valka"] > 0
+        and scored["umrti"] >= HIDE_MIN_CONFIDENCE
+        and scored["nasili"] < HIDE_MIN_CONFIDENCE
+        and scored["katastrofy"] < HIDE_MIN_CONFIDENCE
+    ):
+        return "valka", scored["umrti"]
     for topic in _TOPIC_PRIORITY:
         if scored[topic] >= HIDE_MIN_CONFIDENCE:
             return topic, scored[topic]

@@ -11,6 +11,7 @@ Issue: ZF-04 (milník M1, týden 1). Spotřebitelé: ZF-03 (extraktor), ZF-07 (v
 | [`stranky.md`](stranky.md) | Karta každé pilotní stránky: URL, snapshot, selektory, prvky, které **nemají** být bloky, poznámky k reprodukci |
 | [`anotace.csv`](anotace.csv) | Referenční anotace: 89 bloků, jeden řádek = jeden očekávaný blok (zdroj pravdy pro ZF-07) |
 | [`baseline-lexicon.md`](baseline-lexicon.md) | Naměřená shoda `lexicon-1` s úryvky v `anotace.csv` a `anotace-rozsireni.csv` (4. 11. 2026) |
+| [`lexicon-2.md`](lexicon-2.md) | Slovník `lexicon-2`: nová vodítka, postup ladění bez finální sady a srovnání s `lexicon-1` (19. 11. 2026) |
 | [`sablona-mereni.csv`](sablona-mereni.csv), [`sablona-mereni.md`](sablona-mereni.md) | Šablona záznamu měření (předvyplněno 6 stránek × 4 nastavení, výsledky prázdné); stejná šablona pro 24 stránek v ZF-19 |
 | [`anotace-nahrazene.csv`](anotace-nahrazene.csv) | Global Voices (8 bloků): ověřené podmínky, anotace hotová, ale mimo pilot (limit 6 stránek); kandidát pro ZF-19 |
 | [`anotace-rozsireni.csv`](anotace-rozsireni.csv), [`rozsireni-zdroje.md`](rozsireni-zdroje.md) | Doplňkové příklady mimo 6 pilotních stránek (R01–R12, 143 bloků) pro vzácná témata a prověřené podmínky zdrojů; nejsou součástí pilotní měřené sady |

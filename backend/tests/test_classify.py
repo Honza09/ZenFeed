@@ -134,7 +134,7 @@ def test_every_block_gets_one_result() -> None:
 
     response = analyze_blocks(payload)
 
-    assert response.model_version == "lexicon-1"
+    assert response.model_version == "lexicon-2"
     assert [item.id for item in response.results] == [f"zf-{index}" for index in range(25)]
     assert all(item.recommended_action == "show" for item in response.results)
 
