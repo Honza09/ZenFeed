@@ -69,5 +69,6 @@ Status: frozen on 7 Nov 2026 by the team (per Libuše; chat record not seen). Fu
 - Raters (ZF-19): Libuše and Jakub annotate the final set blind and separately (team decision, 7 Nov); agreement as % and Cohen's κ per field (topic, tone, hide decision per setting), target κ ≥ 0.70 (team's proposal, not a proposal requirement). The classifier author does not annotate.
 - Language: 12 CS : 12 EN pages; per-language results with 95 % Wilson intervals (informational only).
 - Split: by page, stratified by type and language, fixed before results; same domain not in both parts; final part evaluated once; pilot is tuning only.
+- Metrics from the annotations (preference respect by case definition B, groups with/without target, per language with Wilson intervals, precision/recall/F1, rater agreement and kappa): `PYTHONPATH=backend python backend/scripts/evaluate_metrics.py <annotations.csv>`, see [`testing/metriky-zf-20.md`](testing/metriky-zf-20.md).
 - Time and latency: procedure in the Czech document (≥ 3 latency measurements per page). Tool for latency (hiding, summary, audio start; median and p95) and the summary compression ratio: `MEASURE=3 bash tests/extension/run-e2e.sh`, see [`testing/mereni-latence.md`](testing/mereni-latence.md).
 - Open items: see the checklist of the Czech document.
