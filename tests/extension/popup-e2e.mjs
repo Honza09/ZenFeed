@@ -46,15 +46,30 @@
 // it removes the zf-0 element from the page (the page changes the tab, so this
 // runs last) and checks that zf-0 then gets no result.
 //
+// --measure[=N] (ZF-20) replaces the flow above with N timed runs per page
+// (default 3): click "Analyzovat" and wait until the popup is idle (time to
+// hiding), click "Shrnout" and wait for the answer (time to summary), click
+// "Přehrát" and wait for the first utterance's start event (time to audio),
+// then "Zastavit" and "Zobrazit vše". Times are taken in the popup with
+// performance.now(). It also records the compression ratio: summary characters
+// per character of block text sent for the summary. Prints the median and the
+// 95th percentile (nearest rank) per page; --out=<file.json> saves every run.
+// Without a summary panel (error, nothing visible) only the hiding time is
+// measured. Uses whatever backend runs on port 8000: with the fake Gemini the
+// summary time does not include a model, with a real key each run spends one
+// free-tier request. docs/testing/mereni-latence.md describes the procedure.
+//
 // Chrome 137+ ignores --load-extension, so the default is Brave. The browser
 // needs CDP Extensions.triggerAction (--enable-unsafe-extension-debugging).
 
 import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+
+import { compressionRatio, describeRuns } from "./measure-stats.mjs";
 
 const DEFAULT_BROWSER = {
   darwin: "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser",
@@ -83,6 +98,13 @@ const STUB_MODES = fakeGemini
   ? ["ok", "insufficient", "no_relevant", "blocked", "unavailable", "rate_limited", "timeout"]
   : ["ok", "insufficient", "no_relevant", "not_served", "unavailable", "rate_limited", "timeout"];
 const backend = args.find((arg) => arg.startsWith("--backend="))?.slice("--backend=".length);
+const measureArg = args.find((arg) => arg === "--measure" || arg.startsWith("--measure="));
+const measureRuns = measureArg ? Number(measureArg.split("=")[1] || 3) : 0;
+if (measureArg && !(Number.isInteger(measureRuns) && measureRuns >= 1 && measureRuns <= 20)) {
+  console.error("--measure=N needs a whole number from 1 to 20");
+  process.exit(2);
+}
+const measureOut = args.find((arg) => arg.startsWith("--out="))?.slice("--out=".length);
 const urls = args.filter((arg) => !arg.startsWith("--"));
 if (!urls.length) {
   console.error("Usage: node tests/extension/popup-e2e.mjs [--same-tab] [--backend=<url>] <url> [<url> ...]");
@@ -394,6 +416,156 @@ async function runPopupFlow(cdp, sessionId, tab) {
     steps.final = await clickAndRead(cdp, sessionId, "show-all");
   }
   return steps;
+}
+
+// --measure (ZF-20). Clicks a popup button and waits, inside the popup, until
+// `done` is true; returns the milliseconds from the click, or null after 60 s.
+// `endStamp` (optional) is a performance.now() value set by a hook, used as the
+// end instead of the moment the poll saw `done`.
+async function timedClick(cdp, sessionId, buttonId, done, endStamp = "null") {
+  const { result } = await cdp.send("Runtime.evaluate", {
+    returnByValue: true,
+    awaitPromise: true,
+    userGesture: true,
+    expression: `(async () => {
+    const start = performance.now();
+    document.getElementById(${JSON.stringify(buttonId)}).click();
+    while (!(${done})) {
+      if (performance.now() - start > 60000) {
+        return null;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 5));
+    }
+    const end = ${endStamp};
+    return (typeof end === "number" ? end : performance.now()) - start;
+  })()`,
+  }, sessionId);
+  return result.value;
+}
+
+// Records, in the popup, the characters of block text sent to /v1/summarize
+// and the moment the first utterance starts speaking.
+const measureHooksExpression = `(() => {
+  if (!globalThis.__zfMeasureHooked) {
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = (url, init) => {
+      if (String(url).endsWith("/v1/analyze")) {
+        globalThis.__zfAnalyzeCalls = (globalThis.__zfAnalyzeCalls || 0) + 1;
+      }
+      if (String(url).endsWith("/v1/summarize") && init && typeof init.body === "string") {
+        try {
+          globalThis.__zfSentChars = JSON.parse(init.body).blocks.reduce((sum, block) => sum + block.text.length, 0);
+        } catch {
+          globalThis.__zfSentChars = null;
+        }
+      }
+      return originalFetch(url, init);
+    };
+    const synth = globalThis.speechSynthesis;
+    if (synth) {
+      const speak = synth.speak.bind(synth);
+      synth.speak = (utterance) => {
+        utterance.volume = 0;
+        utterance.addEventListener("start", () => {
+          globalThis.__zfAudioStart ??= performance.now();
+        });
+        speak(utterance);
+      };
+    }
+    globalThis.__zfMeasureHooked = true;
+  }
+})()`;
+
+const IDLE = "!document.getElementById('analyze').disabled";
+
+async function measureOnce(cdp, sessionId) {
+  const run = { hideMs: null, summaryMs: null, audioMs: null, compression: null };
+  await evaluate(cdp, sessionId, "globalThis.__zfAnalyzeCalls = 0");
+  run.hideMs = await timedClick(cdp, sessionId, "analyze", IDLE);
+  const state = await evaluate(cdp, sessionId, popupStateExpression);
+  Object.assign(run, { blocks: state.blocks, hidden: state.hidden, error: state.error ? state.status : null });
+  // Time to hiding counts only when the blocks went to the backend and came
+  // back without an error; an empty or restricted page answers at once.
+  if (state.error || !(await evaluate(cdp, sessionId, "globalThis.__zfAnalyzeCalls")) || !(await evaluate(cdp, sessionId, IDLE))) {
+    run.hideMs = null;
+    run.notAnalyzed = state.status;
+  }
+  const panel = await evaluate(cdp, sessionId, summaryStateExpression);
+  if (!state.error && panel.panel) {
+    await evaluate(cdp, sessionId, "globalThis.__zfSentChars = null; globalThis.__zfAudioStart = null");
+    run.summaryMs = await timedClick(cdp, sessionId, "summarize", IDLE);
+    const summary = await evaluate(cdp, sessionId, summaryStateExpression);
+    run.sentChars = await evaluate(cdp, sessionId, "globalThis.__zfSentChars");
+    run.summaryChars = summary.result ? summary.text.length : null;
+    run.compression = summary.result ? compressionRatio(run.summaryChars, run.sentChars) : null;
+    if (!summary.result) {
+      run.summaryMs = null;
+      run.summaryError = summary.status;
+    }
+    const player = await evaluate(cdp, sessionId, playerStateExpression);
+    if (summary.result && player.shown) {
+      run.audioMs = await timedClick(cdp, sessionId, "play",
+        "typeof globalThis.__zfAudioStart === 'number' || !!document.querySelector('#player-status.error')",
+        "globalThis.__zfAudioStart");
+      if (!(await evaluate(cdp, sessionId, "typeof globalThis.__zfAudioStart === 'number'"))) {
+        run.audioMs = null;
+        run.audioError = (await evaluate(cdp, sessionId, playerStateExpression)).status;
+      }
+      await clickPlayer(cdp, sessionId, "stop", 200);
+    }
+  }
+  if ((await evaluate(cdp, sessionId, popupStateExpression)).showAll) {
+    await clickAndRead(cdp, sessionId, "show-all");
+  }
+  return run;
+}
+
+async function measurePage(cdp, tab) {
+  const popupUrl = `chrome-extension://${extensionId}/popup/`;
+  const isPopup = (target) => target.url.startsWith(popupUrl);
+  const before = new Set((await cdp.send("Target.getTargets")).targetInfos.filter(isPopup).map((t) => t.targetId));
+  await cdp.send("Extensions.triggerAction", { id: extensionId, targetId: tab.tabId });
+  await sleep(POPUP_MS);
+  const popup = (await cdp.send("Target.getTargets")).targetInfos
+    .find((target) => isPopup(target) && !before.has(target.targetId));
+  if (!popup) {
+    throw new Error("popup did not open");
+  }
+  try {
+    const { sessionId } = await cdp.send("Target.attachToTarget", { targetId: popup.targetId, flatten: true });
+    await turnPreferencesOn(cdp, sessionId);
+    await evaluate(cdp, sessionId, measureHooksExpression);
+    if (fakeGemini) {
+      await stub("/__stub/mode", { mode: "ok" });
+    }
+    const runs = [];
+    for (let index = 0; index < measureRuns; index += 1) {
+      runs.push(await measureOnce(cdp, sessionId));
+    }
+    return runs;
+  } finally {
+    await cdp.send("Target.closeTarget", { targetId: popup.targetId });
+  }
+}
+
+const formatMs = (value) => (value === null ? "-" : `${Math.round(value)} ms`);
+const formatRatio = (value) => (value === null ? "-" : value.toFixed(3));
+
+function printMeasurement(url, runs, { eachRun = true } = {}) {
+  console.log(`\n=== ${url}`);
+  (eachRun ? runs : []).forEach((run, index) => {
+    const extra = [run.notAnalyzed, run.summaryError, run.audioError].filter(Boolean).join(" | ");
+    console.log(`  run ${index + 1}: hide ${formatMs(run.hideMs)}  summary ${formatMs(run.summaryMs)}  `
+      + `audio ${formatMs(run.audioMs)}  compression ${formatRatio(run.compression)}  `
+      + `blocks ${run.blocks || "-"} hidden ${run.hidden || "-"}${extra ? `  (${extra})` : ""}`);
+  });
+  const rows = describeRuns(runs);
+  for (const [metric, label, format] of [["hideMs", "hide", formatMs], ["summaryMs", "summary", formatMs],
+    ["audioMs", "audio start", formatMs], ["compression", "compression", formatRatio]]) {
+    const { n, median: middle, p95 } = rows[metric];
+    console.log(`  ${label}: median ${format(middle)}  p95 ${format(p95)}  (n=${n})`);
+  }
+  return rows;
 }
 
 async function openPopupAndCheck(cdp, tab) {
@@ -831,12 +1003,18 @@ function verify(url, { first, steps, secondMatches, roundTrip }) {
 async function run(cdp) {
   let tab = null;
   const verdicts = [];
+  const measurements = [];
   for (const url of urls) {
     try {
       if (sameTab && tab) {
         await navigate(cdp, tab, url);
       } else {
         tab = await openTab(cdp, url);
+      }
+      if (measureRuns) {
+        const runs = await measurePage(cdp, tab);
+        measurements.push({ url, runs, stats: printMeasurement(url, runs) });
+        continue;
       }
       let result = await openPopupAndCheck(cdp, tab);
       // Known timing (ZF-08): a click before the page committed loses access. Try once more.
@@ -857,11 +1035,32 @@ async function run(cdp) {
     } catch (error) {
       console.log(`\n=== ${url}\nFAILED: ${error.message}`);
       verdicts.push({ url, failures: [`run failed: ${error.message}`] });
+      if (measureRuns) {
+        measurements.push({ url, error: error.message, runs: [] });
+      }
     } finally {
       if (!sameTab && tab) {
         await cdp.send("Target.closeTarget", { targetId: tab.tabId });
         tab = null;
       }
+    }
+  }
+  if (measureRuns) {
+    // All runs of all pages together, as ZF-20 reports latency (median, p95).
+    const all = measurements.flatMap((measurement) => measurement.runs);
+    const overall = printMeasurement(`all pages (${measurements.length}), ${all.length} runs`, all, { eachRun: false });
+    if (measureOut) {
+      // Times, counts and lengths only: no page text, no summary text.
+      writeFileSync(measureOut, `${JSON.stringify({
+        measuredAt: new Date().toISOString(),
+        runsPerPage: measureRuns,
+        fakeGemini: Boolean(fakeGemini),
+        browser: process.env.BROWSER_PATH || DEFAULT_BROWSER[process.platform],
+        platform: process.platform,
+        pages: measurements,
+        overall,
+      }, null, 2)}\n`);
+      console.log(`saved to ${measureOut}`);
     }
   }
   if (checkMode) {

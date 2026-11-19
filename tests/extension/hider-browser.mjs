@@ -279,6 +279,22 @@ async function connect(webSocketUrl) {
   };
 }
 
+// Waits until the fixture itself is fully loaded. A fixed pause was not enough
+// on a slow CI runner: the scripts were then injected into about:blank or a
+// half-parsed page.
+async function waitForLoad(cdp, sessionId, url, limitMs = 15000) {
+  const expression = `location.href === ${JSON.stringify(url)} && document.readyState === "complete"`;
+  for (let waited = 0; waited < limitMs; waited += 100) {
+    const response = await cdp.send("Runtime.evaluate", { expression, returnByValue: true }, sessionId);
+    if (response.result?.result?.value === true) {
+      await sleep(200);
+      return;
+    }
+    await sleep(100);
+  }
+  throw new Error(`page did not load in ${limitMs / 1000} s: ${url}`);
+}
+
 async function runFixture(cdp, fixture, fixtureScenario) {
   const url = pathToFileURL(join(here, "fixtures", fixture)).href;
   const { result: { targetId } } = await cdp.send("Target.createTarget", { url: "about:blank" });
@@ -293,7 +309,7 @@ async function runFixture(cdp, fixture, fixtureScenario) {
     await cdp.send("Runtime.enable", {}, sessionId);
     await cdp.send("Page.enable", {}, sessionId);
     await cdp.send("Page.navigate", { url }, sessionId);
-    await sleep(1000);
+    await waitForLoad(cdp, sessionId, url);
     const injected = await cdp.send("Runtime.evaluate", { expression: contentScripts }, sessionId);
     if (injected.result?.exceptionDetails) {
       throw new Error(injected.result.exceptionDetails.exception?.description || "injection failed");

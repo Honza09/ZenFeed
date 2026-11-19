@@ -9,6 +9,7 @@
 #   bash tests/extension/run-e2e.sh                 # default page set
 #   bash tests/extension/run-e2e.sh <url> [<url>…]   # own pages
 #   PYTHON=.venv/bin/python bash tests/extension/run-e2e.sh
+#   MEASURE=3 MEASURE_OUT=latency.json bash tests/extension/run-e2e.sh   # ZF-20 timing instead of checks
 #
 # Ports: 8000 backend (the extension calls it), 8090 fake Gemini, 8765 fixtures.
 
@@ -86,8 +87,15 @@ else
 fi
 
 status=0
-node tests/extension/popup-e2e.mjs --check \
-  --backend=http://127.0.0.1:8000 --fake-gemini=http://127.0.0.1:8090 "${PAGES[@]}" || status=$?
+if [ -n "${MEASURE:-}" ]; then
+  # ZF-20 latency and compression (docs/testing/mereni-latence.md); the fake
+  # Gemini answers at once, so the summary time does not include a model.
+  node tests/extension/popup-e2e.mjs --measure="$MEASURE" ${MEASURE_OUT:+--out="$MEASURE_OUT"} \
+    --fake-gemini=http://127.0.0.1:8090 "${PAGES[@]}" || status=$?
+else
+  node tests/extension/popup-e2e.mjs --check \
+    --backend=http://127.0.0.1:8000 --fake-gemini=http://127.0.0.1:8090 "${PAGES[@]}" || status=$?
+fi
 
 # The backend log must not contain page text or the key (ZF-29).
 if grep -q -E "fake-key-for-e2e|HIDE-WAR|harvest" "$LOG_DIR/backend.log"; then
