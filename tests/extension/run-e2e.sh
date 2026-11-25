@@ -75,6 +75,7 @@ else
     "$FIXTURES/no-title.html"
     "$FIXTURES/empty.html"
     "$FIXTURES/editable.html"
+    "$FIXTURES/demo.html"
     "https://ourworldindata.org/war-and-peace"
     "https://forum.effectivealtruism.org/posts/KK6AE8HzPkR2KnqSg/new-forum-license-creative-commons"
     "https://www.nasa.gov/news/recently-published/"
