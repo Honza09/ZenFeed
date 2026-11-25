@@ -32,9 +32,10 @@ The popup also holds the summary panel ([`summary-panel.md`](summary-panel.md), 
 | `schemas.py` | Pydantic models for every request and response |
 | `middleware.py` | Rejects bodies larger than 1 MiB |
 | `config.py` | Settings from the environment, including the optional AI key |
-| `services/analyze.py`, `services/classify.py` | Classification; today the local lexicon `lexicon-2` ([`testing/pilot/lexicon-2.md`](testing/pilot/lexicon-2.md)) |
+| `services/analyze.py`, `services/classify.py` | Classification; by default the local lexicon `lexicon-2` ([`testing/pilot/lexicon-2.md`](testing/pilot/lexicon-2.md)) |
+| `services/model_classify.py` | Optional classification by Gemini with the lexicon as fallback, off by default ([`klasifikace-modelem.md`](klasifikace-modelem.md)) |
 
-`/v1/summarize` (ZF-15) calls Gemini through `services/gemini.py`, behind `services/summarize.py`, so the route does not depend on the provider ([`summarize.md`](summarize.md)). Gemini is not used for `/v1/analyze`; classification stays on the local lexicon (`lexicon-2`). The backend keeps no state between requests and stores no page content.
+`/v1/summarize` (ZF-15) calls Gemini through `services/gemini.py`, behind `services/summarize.py`, so the route does not depend on the provider ([`summarize.md`](summarize.md)). Gemini is used for `/v1/analyze` only when the team sets `ZENFEED_ANALYZE_PROVIDER=gemini`; by default classification stays on the local lexicon (`lexicon-2`). The backend keeps no state between requests and stores no page content.
 
 ## Data flow
 

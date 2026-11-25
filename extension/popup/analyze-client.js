@@ -24,6 +24,8 @@
   const RETRY_DELAY_MS = 500;
   // A retry can help only with these; 4xx and an invalid body would fail again.
   const RETRYABLE = new Set(["backend_unavailable", "timeout", "backend_error_5xx"]);
+  const HEALTH_TIMEOUT_MS = 1500;
+  const PROVIDERS = new Set(["lexicon", "gemini"]);
 
   // Only what the backend needs: no URL, page title, cookies or headers.
   function toRequestBlock({ id, kind, title, text }) {
@@ -140,7 +142,23 @@
     return { ok: true, results, modelVersion, failedIds, error: null };
   }
 
+  // Which classifier the backend uses ("lexicon" or "gemini"), from /health.
+  // Sends no page data. null when the backend does not answer or the answer is
+  // not one of the two, so the popup keeps its general privacy note.
+  async function analyzeProvider(fetchFn, { url = BACKEND_URL, timeoutMs = HEALTH_TIMEOUT_MS } = {}) {
+    try {
+      const response = await fetchFn(`${url}/health`, { signal: AbortSignal.timeout(timeoutMs) });
+      if (!response.ok) {
+        return null;
+      }
+      const body = await response.json();
+      return body && PROVIDERS.has(body.analyze_provider) ? body.analyze_provider : null;
+    } catch {
+      return null;
+    }
+  }
+
   globalThis.ZenFeedAnalyzeClient = {
-    BACKEND_URL, MAX_BLOCKS_PER_REQUEST, MAX_ATTEMPTS, buildRequests, analyzeBlocks,
+    BACKEND_URL, MAX_BLOCKS_PER_REQUEST, MAX_ATTEMPTS, buildRequests, analyzeBlocks, analyzeProvider,
   };
 })();

@@ -167,7 +167,7 @@ def test_request_body_over_limit_is_rejected() -> None:
 
 
 def test_analyze_timeout(monkeypatch) -> None:
-    def too_slow(payload):
+    def too_slow(payload, *_model_args):
         time.sleep(0.2)
         return analyze_blocks(payload)
 
@@ -181,7 +181,7 @@ def test_analyze_timeout(monkeypatch) -> None:
 
 
 def test_invalid_analysis_output_is_a_safe_error(monkeypatch) -> None:
-    def invalid_output(payload):
+    def invalid_output(payload, *_model_args):
         return AnalysisResponse.model_construct(
             results=[
                 BlockAnalysis.model_construct(

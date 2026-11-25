@@ -109,6 +109,9 @@ class AnalysisResponse(BaseModel):
 
 class HealthResponse(BaseModel):
     status: Literal["ok"]
+    # Which classifier /v1/analyze uses, so the popup can say before the click
+    # whether block text goes on to Google (docs/privacy.md). No page data.
+    analyze_provider: Literal["lexicon", "gemini"] = "lexicon"
 
 
 def _reject_duplicate_categories(value: list[str]) -> list[str]:

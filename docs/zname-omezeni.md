@@ -7,7 +7,7 @@ Souhrn omezení, která jsou zapsaná v jednotlivých dokumentech, na jednom mí
 - **Klasifikátor je slovník, ne model** (`lexicon-2`). Na anotovaných blocích skryje zhruba 38 % bloků, které se skrýt mají, a z jeho skrytí je zhruba 87 % správných. **Cíl 80 % respektování preferencí zatím splněný není.** Zdroj: [`testing/pilot/lexicon-2.md`](testing/pilot/lexicon-2.md).
 - Slovník nepozná zápor („nikdo nezemřel“), ironii ani kontext. Událost popsaná bez klíčového slova se nepozná vůbec. Zdroj: tamtéž.
 - Nejistá shoda (slabé vodítko) vede k `review`, tedy blok zůstane viditelný. Neskrytý nežádoucí blok je proto častější než neoprávněné skrytí. Zdroj: [`API.md`](API.md), [`kategorie-mvp.md`](kategorie-mvp.md).
-- Napojení modelu na `/v1/analyze` je týmové rozhodnutí (kvóta, odesílání textu Googlu i při analýze). Zdroj: [`rozhodnuti-zf-25.md`](rozhodnuti-zf-25.md).
+- Klasifikace modelem (Gemini) je připravená, ale **vypnutá**. Zapnutí je týmové rozhodnutí (kvóta, odesílání textu Googlu i při analýze) a kvalita skutečného modelu zatím není změřená. Zdroj: [`klasifikace-modelem.md`](klasifikace-modelem.md), [`rozhodnuti-zf-25.md`](rozhodnuti-zf-25.md).
 
 ## Dělení stránky a skrývání
 

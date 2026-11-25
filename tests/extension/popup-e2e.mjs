@@ -134,6 +134,8 @@ const popupStateExpression = `(() => {
     hideAnyway: !document.getElementById("hide-anyway").hidden,
     notes: [...document.querySelectorAll("#notes li")].map((item) => item.textContent),
     elementsInSummary: document.querySelectorAll("#summary dd *").length,
+    // Which classifier the privacy note names, from /health ("" = general note).
+    privacyProvider: document.getElementById("analyze-privacy").dataset.provider || "",
   };
 })()`;
 
@@ -919,6 +921,10 @@ function verify(url, { first, steps, secondMatches, roundTrip }) {
     expect(secondMatches, "second analysis of the same page gave a different result");
   }
   expect(first.elementsInSummary === 0, "page text was parsed as HTML in the popup");
+  if (backend) {
+    // run-e2e.sh starts the backend with the lexicon, so the note must say the text stays on this computer.
+    expect(first.privacyProvider === "lexicon", `privacy note names "${first.privacyProvider}", not the lexicon`);
+  }
   for (const name of ["shown", "shownAgain", "final"]) {
     if (steps[name]) {
       expect(steps[name].hidden === "0", `Zobrazit vše (${name}) left ${steps[name].hidden} hidden`);

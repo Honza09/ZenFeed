@@ -14,6 +14,7 @@ from scripts.evaluate_metrics import (
     load_gold,
     load_rater,
     main,
+    model_predictor,
     summarize,
     wilson,
 )
@@ -162,3 +163,31 @@ def test_cli_writes_json_and_needs_both_raters(tmp_path: Path, capsys: pytest.Ca
         main([str(PILOT / "anotace.csv"), "--rater-a", str(PILOT / "anotace-libuse.csv")])
     with pytest.raises(SystemExit):
         main([str(PILOT / "anotace.csv"), "--lang", "P06=de"])
+
+
+def test_model_predictor_labels_once_and_decides_per_setting() -> None:
+    blocks = [_block("b1", hide="S1"), _block("b2"), _block("b3", hide="S3")]
+    for block in blocks:
+        block.text = "The garden club planted tulips along the main street."
+    calls = []
+
+    class Model:
+        def generate_json(self, system, content, schema, tokens, *, timeout_seconds=None, busy_attempts=3):
+            calls.append(content)
+            return {"blocks": [
+                {"id": "b1", "topic": "valka", "topic_confidence": 0.9, "tone": "neutralni", "tone_confidence": 0.9},
+                {"id": "b3", "topic": "jine", "topic_confidence": 0.9, "tone": "toxicky", "tone_confidence": 0.8},
+            ]}
+
+    predict, fallback = model_predictor(blocks, Model())
+    assert len(calls) == 1 and fallback == 1  # b2 had no answer: the lexicon labelled it
+    report = evaluate(blocks, predict, "gemini/test")
+    assert report["model_version"] == "gemini/test"
+    assert report["groups"]["all"]["correct_cases"] == report["groups"]["all"]["cases"]
+
+
+def test_cli_model_provider_needs_a_key(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv("ZENFEED_AI_API_KEY", raising=False)
+    monkeypatch.delenv("ZENFEED_ANALYZE_PROVIDER", raising=False)
+    with pytest.raises(SystemExit):
+        main([str(PILOT / "anotace.csv"), "--provider", "gemini"])
