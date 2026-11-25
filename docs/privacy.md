@@ -10,12 +10,14 @@ Not legal advice. The audit below is of 11 Nov 2026, before the Gemini summary (
 |---|---|---|---|
 | Click **Analyzovat** | `id`, `kind`, `title` (max. 300 characters), `text` of each block, the hide switches | `POST http://127.0.0.1:8000/v1/analyze` | page URL, page title, cookies (`credentials: "omit"`), other headers |
 | Click **Shrnout viditelný obsah** | the same fields of the visible blocks only, the switches, the hidden topics, the language | `POST http://127.0.0.1:8000/v1/summarize` | hidden blocks, and visible blocks that wrap a hidden one |
+| Backend, after **Analyzovat**, **only with `ZENFEED_ANALYZE_PROVIDER=gemini`** (off by default) | `id`, `kind`, `title` and the first 1000 characters of `text` of each block, as a JSON array in the user message, plus the classification rules | **Google Gemini** (free tier); key only in the `x-goog-api-key` header | page URL, page title, cookies, the hide switches |
+| Popup, when it opens | nothing from the page | `GET http://127.0.0.1:8000/health` (to learn which classifier is used) | everything from the page |
 | Backend, after **Shrnout** | `kind`, `title` and `text` of the visible blocks (at most 30 000 characters), as a JSON array in the user message, plus the summary rules | **Google Gemini** (free tier, `generativelanguage.googleapis.com`); the key goes only in the `x-goog-api-key` header | block IDs, page URL, page title, cookies; hidden blocks never reach the backend for the summary |
 | Voice | nothing | – | the summary is read by a local Chrome voice (`localService`) |
 
 The extension talks only to `127.0.0.1:8000` (`host_permissions` in `manifest.json`). No other address, analytics or telemetry is in the code. Content scripts run only after a click (`activeTab`), and only in the top frame of the active tab.
 
-Classification (`/v1/analyze`) is the local `lexicon-1`, so after **Analyzovat** no page text leaves the computer. **After Shrnout the text of the visible blocks leaves the computer for Google** (see `docs/rozhodnuti-zf-25.md`: the free tier may use it to improve Google products). The summary panel says so before the click.
+Classification (`/v1/analyze`) is by default the local `lexicon-2`, so after **Analyzovat** no page text leaves the computer. If the team switches the model on (`ZENFEED_ANALYZE_PROVIDER=gemini`, [`klasifikace-modelem.md`](klasifikace-modelem.md)), the block text goes on to Google after **Analyzovat** as well, and the note above the button says so. **After Shrnout the text of the visible blocks leaves the computer for Google** (see `docs/rozhodnuti-zf-25.md`: the free tier may use it to improve Google products). The summary panel says so before the click.
 
 ## What is not read from the page
 
@@ -33,7 +35,7 @@ ZenFeed cannot recognise personal data inside ordinary page text (a name in a co
 
 ## What the user is told before sending
 
-- Above **Analyzovat**: which data are sent, where (the ZenFeed server on this computer), why (to find the topic and tone), what is not sent, that nothing is stored, and not to use it on pages with personal data.
+- Above **Analyzovat**: which data are sent, where, why (to find the topic and tone), what is not sent, and not to use it on pages with personal data. Until `/health` answers, the note is general and true in both cases (the server on this computer, and on to Google Gemini if the server classifies with the model). After the answer it names exactly one: with the lexicon, that the text stays on this computer and nothing is stored; with the model, that it goes on to Google Gemini, which may use it to improve its products.
 - In the summary panel (B-003, 17 Nov 2026): the text of the visible blocks goes to the ZenFeed server and on to Google Gemini (free tier, Google may use the text to improve its products); hidden content is not sent.
 - At the player: only the summary is read, not the page text.
 
@@ -50,12 +52,12 @@ No page text, page title or URL is stored. There is no `localStorage`, `sessionS
 
 ## Logs
 
-- Backend (`backend/app/main.py`, `services/analyze.py`, `services/summarize.py`, `services/gemini.py`): event names, block counts, `model_version` and the error type. Never page text, titles or keys. A `422` answer lists only the field and message, not the input. `Settings` prints the key only as `set` or `unset`.
+- Backend (`backend/app/main.py`, `services/analyze.py`, `services/model_classify.py`, `services/summarize.py`, `services/gemini.py`): event names, block counts, `model_version` and the error type. Never page text, titles or keys. A `422` answer lists only the field and message, not the input. `Settings` prints the key only as `set` or `unset`.
 - Extension: `console.error` with a fixed message and the error object (network or Chrome API errors), never block text.
 
 ## Keys
 
-- `ZENFEED_AI_API_KEY` is read from the environment on the backend only (`backend/app/config.py`). It is used only by `backend/app/services/gemini.py` (header `x-goog-api-key`, never in the URL) and is hidden from `repr` of both `Settings` and `GeminiClient`.
+- `ZENFEED_AI_API_KEY` is read from the environment on the backend only (`backend/app/config.py`). It is used only by `backend/app/services/gemini.py` (for the summary, and for classification only when the model is switched on) (header `x-goog-api-key`, never in the URL) and is hidden from `repr` of both `Settings` and `GeminiClient`.
 - `.env` and `.env.*` are in `.gitignore`; only `.env.example` with an empty value is tracked.
 - No key, token or password in `extension/`.
 

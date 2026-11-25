@@ -35,6 +35,7 @@ ZenFeed/
 
 - [Architecture](architecture.md)
 - [Known limitations and remaining risks (ZF-22)](zname-omezeni.md)
+- [Klasifikace modelem, volitelná (Gemini)](klasifikace-modelem.md)
 - [Development Setup](DEVELOPMENT.md)
 - [API Reference](API.md)
 - [Testing](TESTING.md)

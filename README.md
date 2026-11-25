@@ -60,7 +60,7 @@ Start the server from the repository root and leave it running. The extension ca
 uvicorn app.main:app --app-dir backend
 ```
 
-Check it: <http://127.0.0.1:8000/health> shows `{"status":"ok"}`.
+Check it: <http://127.0.0.1:8000/health> shows `{"status":"ok","analyze_provider":"lexicon"}`.
 
 Hiding works without any key. **For summaries** you need a Gemini API key from the free tier, without a billing account ([`docs/rozhodnuti-zf-25.md`](docs/rozhodnuti-zf-25.md)):
 
@@ -119,7 +119,7 @@ bash tests/extension/run-e2e.sh
 
 The full list with remaining risks is in [`docs/zname-omezeni.md`](docs/zname-omezeni.md). The main ones:
 
-- **Classification is a word list, not a model.** On the annotated blocks it hides about 38 % of what it should (with about 87 % of its hides correct), so the 80 % target is not met yet ([`docs/testing/pilot/lexicon-2.md`](docs/testing/pilot/lexicon-2.md)). It does not understand negation, irony or context.
+- **Classification is a word list, not a model.** On the annotated blocks it hides about 38 % of what it should (with about 87 % of its hides correct), so the 80 % target is not met yet ([`docs/testing/pilot/lexicon-2.md`](docs/testing/pilot/lexicon-2.md)). It does not understand negation, irony or context. Classification by Gemini is ready but off until the team decides ([`docs/klasifikace-modelem.md`](docs/klasifikace-modelem.md)).
 - **The summary goes to Google.** The visible text is sent to the Gemini free tier, which may use it to improve Google's products. The summary can contain mistakes and is not checked for content.
 - **The backend runs only locally** on `127.0.0.1:8000`. Another address needs a change in the extension.
 - Only content that is already loaded is analyzed, not iframes or shadow DOM. Large wrapper blocks and table cells are never hidden. After a reload the page shows everything again.

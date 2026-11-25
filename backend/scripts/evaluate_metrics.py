@@ -12,6 +12,11 @@ how many wanted hides ended as ``review`` is reported apart (§b.4).
 With two raters' files it also gives agreement and Cohen's kappa per field:
 topic, tone and the hide decision per setting derived from them (§e).
 
+``--provider gemini`` labels the blocks with the model instead of the lexicon
+(``services/model_classify.py``, needs ``ZENFEED_AI_API_KEY``), to see whether
+switching the model on is worth it. It sends the excerpts to Google; use it on
+the tuning set.
+
 The classifier input is the identification excerpt in the CSV, not the full
 block on the page, as in ``measure_lexicon.py``. Usage from the repository
 root::
@@ -30,14 +35,18 @@ import argparse
 import csv
 import json
 import math
+import sys
 from collections.abc import Callable, Iterable
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
 from scripts.measure_lexicon import SETTINGS, TONE_TO_ID, TOPIC_TO_ID
 
-from app.schemas import ContentBlockInput
-from app.services.classify import MODEL_VERSION, classify_block
+from app.config import Settings
+from app.schemas import MAX_BLOCKS, BlockAnalysis, ContentBlockInput
+from app.services.classify import MODEL_VERSION, classify_block, decide_action
+from app.services.gemini import GeminiClient, ProviderError
+from app.services.model_classify import ClassifyModel, classify_with_model
 
 TARGET = 0.8
 TONE_COLUMNS = ("tón_vyhrocený", "tón")
@@ -168,6 +177,30 @@ def lexicon_action(block: GoldBlock, preferences: dict[str, bool]) -> str:
     return judged.recommended_action
 
 
+def model_predictor(
+    blocks: list[GoldBlock], model: ClassifyModel, timeout_seconds: float = 60.0
+) -> tuple[Predict, int]:
+    """Labels every block once with the model (100 per call), then decides per setting.
+
+    Returns the predictor and how many blocks the lexicon labelled because the
+    model gave no usable answer for them. A provider failure stops the run.
+    """
+    labels: dict[str, BlockAnalysis] = {}
+    fallback = 0
+    for start in range(0, len(blocks), MAX_BLOCKS):
+        chunk = blocks[start : start + MAX_BLOCKS]
+        inputs = [ContentBlockInput(id=block.block_id, text=block.text, kind="article") for block in chunk]
+        results, missing = classify_with_model(inputs, {}, model, timeout_seconds)
+        fallback += missing
+        labels.update({result.id: result for result in results})
+
+    def predict(block: GoldBlock, preferences: dict[str, bool]) -> str:
+        label = labels[block.block_id]
+        return decide_action(label.topic, label.confidence, label.tone, label.toxicity_score, preferences)
+
+    return predict, fallback
+
+
 def build_cases(blocks: Iterable[GoldBlock], predict: Predict = lexicon_action) -> list[Case]:
     cases: dict[tuple[str, str], Case] = {}
     for block in blocks:
@@ -226,7 +259,9 @@ def summarize(cases: list[Case]) -> dict:
     }
 
 
-def evaluate(blocks: list[GoldBlock], predict: Predict = lexicon_action) -> dict:
+def evaluate(
+    blocks: list[GoldBlock], predict: Predict = lexicon_action, model_version: str = MODEL_VERSION
+) -> dict:
     cases = build_cases(blocks, predict)
     groups = {
         "all": cases,
@@ -244,7 +279,7 @@ def evaluate(blocks: list[GoldBlock], predict: Predict = lexicon_action) -> dict
         if block.expected[setting] != derived_hide(block.topic, block.tone, setting)
     ]
     return {
-        "model_version": MODEL_VERSION,
+        "model_version": model_version,
         "pages": len({block.page_id for block in blocks}),
         "blocks": len(blocks),
         "groups": {name: summarize(group) for name, group in groups.items()},
@@ -309,6 +344,8 @@ def render(report: dict, agreed: dict | None = None) -> str:
             f"| {_pct(group['recall'])} | {_pct(group['f1'])} | {group['false_hides']} "
             f"| {group['missed_hides']} ({group['missed_as_review']}) |"
         )
+    if report.get("model_fallback_blocks"):
+        lines += ["", f"Blocks the model did not answer (labelled by the lexicon): {report['model_fallback_blocks']}"]
     if report["wrong_cases"]:
         lines += ["", "Wrong cases:"]
         for case in report["wrong_cases"]:
@@ -347,6 +384,31 @@ def _languages(pairs: list[str]) -> dict[str, str]:
     return languages
 
 
+def _evaluate_with_gemini(parser: argparse.ArgumentParser, blocks: list[GoldBlock]) -> dict:
+    try:
+        settings = Settings.from_env()
+    except ValueError as error:
+        parser.error(str(error))
+    if not settings.ai_api_key:
+        parser.error("--provider gemini needs ZENFEED_AI_API_KEY")
+    print(
+        f"Sending {len(blocks)} excerpts to Google Gemini ({settings.analyze_model}). "
+        "Use the tuning set; the final set is evaluated once (ZF-27 §f).",
+        file=sys.stderr,
+    )
+    client = GeminiClient(
+        api_key=settings.ai_api_key, model=settings.analyze_model,
+        api_base=settings.summary_api_base, timeout_seconds=60.0,
+    )
+    try:
+        predict, fallback = model_predictor(blocks, client)
+    except ProviderError as error:
+        parser.error(f"the model is not available ({error.kind}); nothing was measured")
+    report = evaluate(blocks, predict, f"gemini/{settings.analyze_model}")
+    report["model_fallback_blocks"] = fallback
+    return report
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("gold", type=Path, help="resolved annotation CSV with S1-S4 columns")
@@ -354,6 +416,10 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--rater-a", type=Path, help="first rater's CSV (block_id, téma, tón)")
     parser.add_argument("--rater-b", type=Path, help="second rater's CSV")
     parser.add_argument("--json", type=Path, help="also save the full report as JSON")
+    parser.add_argument(
+        "--provider", choices=("lexicon", "gemini"), default="lexicon",
+        help="gemini: label with the model (needs ZENFEED_AI_API_KEY; sends the excerpts to Google)",
+    )
     args = parser.parse_args(argv)
     if (args.rater_a is None) != (args.rater_b is None):
         parser.error("--rater-a and --rater-b go together")
@@ -361,7 +427,11 @@ def main(argv: list[str] | None = None) -> None:
         languages = _languages(args.lang)
     except argparse.ArgumentTypeError as error:
         parser.error(str(error))
-    report = evaluate(load_gold(args.gold, languages))
+    blocks = load_gold(args.gold, languages)
+    if args.provider == "gemini":
+        report = _evaluate_with_gemini(parser, blocks)
+    else:
+        report = evaluate(blocks)
     agreed = agreement(load_rater(args.rater_a), load_rater(args.rater_b)) if args.rater_a else None
     print(render(report, agreed))
     if args.json:

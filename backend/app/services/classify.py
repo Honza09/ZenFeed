@@ -328,13 +328,17 @@ def _topic(text: str) -> tuple[TopicId, float]:
     return "jine", 0.8
 
 
-def _action(
+def decide_action(
     topic: TopicId,
     topic_confidence: float,
     tone: ToneLabel,
     tone_confidence: float,
     preferences: dict[str, bool],
 ) -> str:
+    """Hide only a selected topic or tone with enough confidence; a weaker match is review.
+
+    Shared with the model classifier, so the threshold is the same for both.
+    """
     topic_selected = topic != "jine" and preferences.get(topic) is True
     tone_selected = tone == "toxicky" and preferences.get(TONE_PREFERENCE) is True
     if (topic_selected and topic_confidence >= HIDE_MIN_CONFIDENCE) or (
@@ -376,7 +380,7 @@ def classify_block(
         "tone": tone,
         "toxicity_score": tone_confidence if tone == "toxicky" else 0.0,
         "confidence": topic_confidence,
-        "recommended_action": _action(
+        "recommended_action": decide_action(
             topic, topic_confidence, tone, tone_confidence, preferences
         ),
     }

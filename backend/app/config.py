@@ -15,6 +15,8 @@ _MAX_BODY_BYTES = 1_048_576
 # docs/rozhodnuti-zf-25.md: Gemini free tier, no billing account.
 DEFAULT_SUMMARY_MODEL = "gemini-3.5-flash-lite"
 DEFAULT_SUMMARY_API_BASE = "https://generativelanguage.googleapis.com/v1beta"
+# /v1/analyze: the local lexicon unless the team switches the model on.
+ANALYZE_PROVIDERS = ("lexicon", "gemini")
 
 
 def _timeout_from_env(name: str, default: str) -> float:
@@ -38,6 +40,9 @@ class Settings:
     summary_model: str = DEFAULT_SUMMARY_MODEL
     summary_api_base: str = DEFAULT_SUMMARY_API_BASE
     summary_timeout_seconds: float = 30.0
+    # Opt-in: "gemini" classifies with the model and falls back to the lexicon.
+    analyze_provider: str = "lexicon"
+    analyze_model: str = DEFAULT_SUMMARY_MODEL
 
     def __repr__(self) -> str:
         key_state = "set" if self.ai_api_key else "unset"
@@ -48,7 +53,9 @@ class Settings:
             f"ai_api_key={key_state}, "
             f"max_body_bytes={self.max_body_bytes}, "
             f"summary_model={self.summary_model!r}, "
-            f"summary_timeout_seconds={self.summary_timeout_seconds})"
+            f"summary_timeout_seconds={self.summary_timeout_seconds}, "
+            f"analyze_provider={self.analyze_provider!r}, "
+            f"analyze_model={self.analyze_model!r})"
         )
 
     @classmethod
@@ -72,6 +79,14 @@ class Settings:
         )
         if not api_base.startswith(("https://", "http://127.0.0.1", "http://localhost")):
             raise ValueError("ZENFEED_SUMMARY_API_BASE must be https, or http on localhost")
+        analyze_provider = os.environ.get("ZENFEED_ANALYZE_PROVIDER", "").strip().lower() or "lexicon"
+        if analyze_provider not in ANALYZE_PROVIDERS:
+            raise ValueError("ZENFEED_ANALYZE_PROVIDER must be lexicon or gemini")
+        if analyze_provider == "gemini" and not api_key:
+            raise ValueError("ZENFEED_ANALYZE_PROVIDER=gemini needs ZENFEED_AI_API_KEY")
+        analyze_model = os.environ.get("ZENFEED_ANALYZE_MODEL", "").strip() or summary_model
+        if not _is_safe_model_name(analyze_model):
+            raise ValueError("ZENFEED_ANALYZE_MODEL must be a model name such as gemini-3.5-flash-lite")
         return cls(
             analyze_timeout_seconds=timeout,
             log_level=log_level,
@@ -79,6 +94,8 @@ class Settings:
             summary_model=summary_model,
             summary_api_base=api_base,
             summary_timeout_seconds=summary_timeout,
+            analyze_provider=analyze_provider,
+            analyze_model=analyze_model,
         )
 
 

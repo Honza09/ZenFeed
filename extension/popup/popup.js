@@ -57,6 +57,7 @@
 
   const elements = {
     form: document.getElementById("preferences"),
+    analyzePrivacy: document.getElementById("analyze-privacy"),
     topics: document.getElementById("topics"),
     tone: document.getElementById("tone"),
     analyze: document.getElementById("analyze"),
@@ -681,9 +682,35 @@
     }
   }
 
+  // The privacy note before "Analyzovat" says where block text goes. popup.html
+  // has a general text that is true either way; once the backend says which
+  // classifier it uses, the note names it exactly (docs/privacy.md).
+  const PRIVACY_AFTER = {
+    lexicon: " se text bloků této stránky pošle na server ZenFeed na tomto počítači (127.0.0.1), aby se u nich "
+      + "dalo určit téma a tón. Dál se neposílá. Adresa stránky, cookies, formuláře ani přihlašovací údaje se "
+      + "neposílají a nic se neukládá. Na stránkách s osobními údaji (e-mail, banka) ZenFeed nepoužívejte.",
+    gemini: " se text bloků této stránky pošle na server ZenFeed na tomto počítači (127.0.0.1) a ten ho předá "
+      + "službě Google Gemini (bezplatná vrstva; Google odeslaný text může používat ke zlepšování svých produktů), "
+      + "aby se u nich dalo určit téma a tón. Adresa stránky, cookies, formuláře ani přihlašovací údaje se "
+      + "neposílají. Na stránkách s osobními údaji (e-mail, banka) ZenFeed nepoužívejte.",
+  };
+
+  async function showAnalyzePrivacy() {
+    const provider = await Client.analyzeProvider(fetch);
+    if (!provider) {
+      return;
+    }
+    const strong = document.createElement("strong");
+    strong.textContent = "Analyzovat";
+    elements.analyzePrivacy.replaceChildren("Po kliknutí na ", strong, PRIVACY_AFTER[provider]);
+    elements.analyzePrivacy.dataset.provider = provider;
+  }
+
   async function init() {
     preferences = await Preferences.load(chrome);
     renderPreferences();
+    // Not awaited: the popup works while /health answers (at most 1.5 s).
+    showAnalyzePrivacy();
     elements.form.addEventListener("change", handlePreferenceChange);
     elements.analyze.addEventListener("click", () => !busy && handleAnalyze());
     elements.showAll.addEventListener("click", () => !busy && handleShowAll());

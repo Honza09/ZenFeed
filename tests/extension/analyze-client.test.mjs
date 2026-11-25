@@ -181,3 +181,51 @@ test("a block missing from a 200 response counts as failed", async () => {
   assert.deepEqual(plain(reply.failedIds), ["zf-1"]);
   assert.equal(calls.length, 1, "an incomplete answer is not retried");
 });
+
+// analyzeProvider: which classifier the backend uses, for the privacy note.
+
+test("analyzeProvider reads lexicon or gemini from /health and sends no page data", async () => {
+  const client = loadClient();
+  for (const provider of ["lexicon", "gemini"]) {
+    const calls = [];
+    const fetchFn = async (url, init) => {
+      calls.push({ url, init });
+      return okResponse({ status: "ok", analyze_provider: provider });
+    };
+    assert.equal(await client.analyzeProvider(fetchFn), provider);
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0].url, "http://127.0.0.1:8000/health");
+    assert.equal(calls[0].init.method, undefined);
+    assert.equal(calls[0].init.body, undefined);
+  }
+});
+
+test("analyzeProvider gives null when the answer cannot be trusted", async () => {
+  const client = loadClient();
+  const cases = [
+    async () => { throw new TypeError("Failed to fetch"); },
+    async () => ({ ok: false, status: 404, json: async () => ({}) }),
+    async () => okResponse({ status: "ok" }),
+    async () => okResponse({ status: "ok", analyze_provider: "openai" }),
+    async () => okResponse(null),
+    async () => ({ ok: true, status: 200, json: async () => { throw new SyntaxError("bad json"); } }),
+  ];
+  for (const fetchFn of cases) {
+    assert.equal(await client.analyzeProvider(fetchFn), null);
+  }
+});
+
+test("analyzeProvider gives up after its timeout", async () => {
+  const client = loadClient();
+  const hanging = (url, init) => new Promise((resolve, reject) => {
+    // Keeps the event loop alive until the abort, like a real slow server (Node 22).
+    const keepAlive = setTimeout(() => resolve(okResponse({ analyze_provider: "gemini" })), 5000);
+    init.signal.addEventListener("abort", () => {
+      clearTimeout(keepAlive);
+      reject(init.signal.reason);
+    });
+  });
+  const started = Date.now();
+  assert.equal(await client.analyzeProvider(hanging, { timeoutMs: 50 }), null);
+  assert.ok(Date.now() - started < 2000);
+});

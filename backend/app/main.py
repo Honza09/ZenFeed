@@ -21,6 +21,7 @@ from app.schemas import (
 )
 from app.services.analyze import analyze_blocks
 from app.services.gemini import GeminiClient
+from app.services.model_classify import ClassifyModel
 from app.services.summarize import SummaryError, SummaryModel, summarize
 
 logger = logging.getLogger("zenfeed")
@@ -28,6 +29,9 @@ logger = logging.getLogger("zenfeed")
 
 # Extra time on top of the provider's own timeout before the route gives up.
 _SUMMARY_HANG_MARGIN_SECONDS = 5.0
+# The model gets the analyze timeout minus this, so the lexicon fallback still
+# answers before the route's own timeout.
+_ANALYZE_FALLBACK_MARGIN_SECONDS = 1.5
 
 # HTTP status and body for each summary failure (docs/API.md).
 _SUMMARY_ERRORS = {
@@ -49,15 +53,32 @@ def _default_summary_model(settings: Settings) -> SummaryModel | None:
     )
 
 
+def _default_analyze_model(settings: Settings) -> ClassifyModel | None:
+    """Gemini only when the team switched it on (ZENFEED_ANALYZE_PROVIDER=gemini)."""
+    if settings.analyze_provider != "gemini" or not settings.ai_api_key:
+        return None
+    return GeminiClient(
+        api_key=settings.ai_api_key,
+        model=settings.analyze_model,
+        api_base=settings.summary_api_base,
+        timeout_seconds=settings.analyze_timeout_seconds,
+    )
+
+
 def create_app(
-    settings: Settings | None = None, summary_model: SummaryModel | None = None
+    settings: Settings | None = None,
+    summary_model: SummaryModel | None = None,
+    analyze_model: ClassifyModel | None = None,
 ) -> FastAPI:
-    """``summary_model`` replaces Gemini in tests; by default it comes from settings."""
+    """The models replace Gemini in tests; by default they come from settings."""
     resolved = settings if settings is not None else Settings.from_env()
     application = FastAPI(title="ZenFeed", version="0.1.0")
     application.state.settings = resolved
     application.state.summary_model = (
         summary_model if summary_model is not None else _default_summary_model(resolved)
+    )
+    application.state.analyze_model = (
+        analyze_model if analyze_model is not None else _default_analyze_model(resolved)
     )
     logger.setLevel(resolved.log_level)
     application.add_middleware(LimitBodySize, max_bytes=resolved.max_body_bytes)
@@ -89,8 +110,9 @@ def create_app(
         return JSONResponse(status_code=500, content={"error": "internal_error"})
 
     @application.get("/health", response_model=HealthResponse)
-    def health() -> HealthResponse:
-        return HealthResponse(status="ok")
+    def health(request: Request) -> HealthResponse:
+        provider = "gemini" if request.app.state.analyze_model is not None else "lexicon"
+        return HealthResponse(status="ok", analyze_provider=provider)
 
     @application.post("/v1/analyze", response_model=AnalysisResponse)
     async def analyze(
@@ -100,7 +122,13 @@ def create_app(
         logger.info("analyze request accepted block_count=%s", len(payload.blocks))
         try:
             result = await asyncio.wait_for(
-                asyncio.to_thread(analyze_blocks, payload),
+                asyncio.to_thread(
+                    analyze_blocks,
+                    payload,
+                    request.app.state.analyze_model,
+                    current.analyze_model,
+                    current.analyze_timeout_seconds - _ANALYZE_FALLBACK_MARGIN_SECONDS,
+                ),
                 timeout=current.analyze_timeout_seconds,
             )
         except TimeoutError:
