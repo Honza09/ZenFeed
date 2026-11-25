@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Večerník Horní Lhoty – ukázková stránka pro demo ZenFeed</title>
+  <!--
+    Demo page for ZF-23 (docs/demo/scenar.md). Every story is invented: the
+    places and countries do not exist and no text is copied from a real site.
+    data-demo-expect says what ZenFeed must do with the block when every
+    preference is on: a topic id (hide as that topic), "toxicky" (hide for
+    the tone) or "show". backend/tests/test_demo_page.py checks it, so a
+    classifier change cannot break the demo unnoticed.
+  -->
+  <style>
+    :root { color-scheme: light; --ink: #1d232b; --muted: #5b6673; --line: #dde2e8; --accent: #2f5d8a; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 17px/1.55 Georgia, "Times New Roman", serif; color: var(--ink); background: #f6f7f9; }
+    header { background: var(--accent); color: #fff; padding: 18px 16px; }
+    header h1 { margin: 0; font-size: 28px; letter-spacing: 0.5px; }
+    header p { margin: 4px 0 0; font: 14px/1.4 system-ui, sans-serif; opacity: 0.9; }
+    .notice { max-width: 980px; margin: 12px auto 0; padding: 8px 12px; font: 14px/1.4 system-ui, sans-serif;
+      background: #fff8e1; border: 1px solid #f0d58a; border-radius: 6px; }
+    main { max-width: 980px; margin: 0 auto; padding: 16px; display: grid; gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+    article { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; }
+    article h2 { margin: 0 0 6px; font-size: 20px; line-height: 1.25; }
+    .rubric { font: 12px/1.2 system-ui, sans-serif; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+    article p { margin: 6px 0 0; }
+    section.comments { max-width: 980px; margin: 0 auto 32px; padding: 0 16px; }
+    section.comments h2 { font-size: 20px; }
+    .comment { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; margin-bottom: 10px;
+      font: 15px/1.5 system-ui, sans-serif; }
+    .comment .who { color: var(--muted); font-size: 13px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Večerník Horní Lhoty</h1>
+    <p>Úterý · zprávy z regionu i ze světa</p>
+  </header>
+  <p class="notice">Ukázková stránka pro předvedení rozšíření ZenFeed. Všechny zprávy, místa i země jsou smyšlené.</p>
+
+  <main>
+    <article data-demo-expect="valka">
+      <span class="rubric">Svět</span>
+      <h2>Bombardování přístavu pokračuje</h2>
+      <p>Vojska Severní Valdorie v noci znovu ostřelovala přístavní město Korvel. Bombardování zasáhlo sklady s obilím a okupace pobřeží trvá už třetí měsíc, uvedl mluvčí místní správy.</p>
+    </article>
+
+    <article data-demo-expect="show">
+      <span class="rubric">Region</span>
+      <h2>Nová knihovna otevře v sobotu</h2>
+      <p>Městská knihovna v Horní Lhotě se po dvou letech stěhuje do opravené budovy staré sýpky. Čtenáři najdou dětské oddělení, studovnu s výhledem na náměstí a kavárnu u vchodu.</p>
+    </article>
+
+    <article data-demo-expect="nasili">
+      <span class="rubric">Krimi</span>
+      <h2>Policie zadržela útočníka z nádraží</h2>
+      <p>Policisté v pondělí večer zadrželi muže, který na nádraží v Dolní Lhotě ubodal cestujícího. Útočník podle mluvčí policie utíkal směrem k parku, kde ho po krátké honičce zastavila hlídka.</p>
+    </article>
+
+    <article data-demo-expect="show">
+      <span class="rubric">Počasí</span>
+      <h2>Přes víkend se oteplí</h2>
+      <p>Meteorologové slibují na sobotu i neděli slunečné počasí s teplotami kolem patnácti stupňů. V pondělí od západu přijde oblačnost a v horách může ojediněle pršet.</p>
+    </article>
+
+    <article data-demo-expect="katastrofy">
+      <span class="rubric">Hory</span>
+      <h2>Lavina zasypala skupinu turistů</h2>
+      <p>V pohoří Bělé štíty sjela lavina, která zasypala čtyřčlennou skupinu turistů. Horská služba všechny vyprostila a varuje, že nebezpečí sesuvu sněhu zůstává vysoké i zítra.</p>
+    </article>
+
+    <article data-demo-expect="politicke_konflikty">
+      <span class="rubric">Domov</span>
+      <h2>Opozice chce vyslovit nedůvěru vládě</h2>
+      <p>Opozice v Lhotském kraji vyvolala hlasování o nedůvěře krajské vládě. Spor se vede o rozpočet na opravy silnic a hejtman mluví o politické krizi, kterou podle něj nikdo nechtěl.</p>
+    </article>
+
+    <article data-demo-expect="show">
+      <span class="rubric">Technika</span>
+      <h2>Studenti postavili solární lavičku</h2>
+      <p>Studenti místní průmyslovky postavili lavičku se solárním panelem, na které si lidé u autobusové zastávky nabijí telefon. Lavička vydrží svítit i v noci a měří teplotu vzduchu.</p>
+    </article>
+
+    <article data-demo-expect="umrti">
+      <span class="rubric">Kultura</span>
+      <h2>Zemřel herec Lhotského divadla</h2>
+      <p>Ve věku 81 let zemřel dlouholetý herec Lhotského divadla, který na jeho jevišti odehrál přes tři tisíce představení. Rozloučení a pohřeb budou v pátek v divadelním sále.</p>
+    </article>
+
+    <article data-demo-expect="show">
+      <span class="rubric">Recept</span>
+      <h2>Dýňová polévka za dvacet minut</h2>
+      <p>Na podzimní polévku stačí dýně hokkaido, cibule, kousek zázvoru a smetana. Dýni nakrájíme i se slupkou, orestujeme s cibulí, zalijeme vývarem a po dvaceti minutách rozmixujeme.</p>
+    </article>
+  </main>
+
+  <section class="comments">
+    <h2>Komentáře čtenářů</h2>
+    <div class="comment" data-demo-expect="show">
+      <div class="who">čtenář_42</div>
+      Knihovna v sýpce je skvělý nápad, konečně bude kam chodit s dětmi i v zimě. Děkuji všem, kdo to připravili.
+    </div>
+    <div class="comment" data-demo-expect="toxicky">
+      <div class="who">anonym</div>
+      Kdo tu opravu silnic schválil, je degenerát a idiot!!! Ať se všichni z kraje okamžitě sbalí a zmizí.
+    </div>
+    <div class="comment" data-demo-expect="show">
+      <div class="who">pekarka</div>
+      Tu dýňovou polévku jsem včera vařila, jen jsem přidala trochu kokosového mléka. Výborná.
+    </div>
+  </section>
+</body>
+</html>

@@ -113,7 +113,7 @@ The last command needs Google Chrome (set `CHROME_PATH` if it is elsewhere). The
 bash tests/extension/run-e2e.sh
 ```
 
-`MEASURE=3 bash tests/extension/run-e2e.sh` measures latency and summary compression instead ([`docs/testing/mereni-latence.md`](docs/testing/mereni-latence.md)). More in [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md) and [`docs/TESTING.md`](docs/TESTING.md).
+`bash tests/extension/run-demo.sh` starts the backend and an offline demo page for the final presentation ([`docs/demo/scenar.md`](docs/demo/scenar.md)). `MEASURE=3 bash tests/extension/run-e2e.sh` measures latency and summary compression instead ([`docs/testing/mereni-latence.md`](docs/testing/mereni-latence.md)). More in [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md) and [`docs/TESTING.md`](docs/TESTING.md).
 
 ## Known limitations
 
